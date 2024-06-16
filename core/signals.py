@@ -312,12 +312,12 @@ def placement_post_delete(sender, instance, **kwargs):
 
         # Удаление из группы 'manager', если пользователь больше не является менеджером в других активных назначениях.
         if not active_placements.filter(manager=True).exists():
-            manager_group = EmployeesGroup.objects.get(name='Managers', type='system')
+            manager_group, _ = EmployeesGroup.objects.get_or_create(name='Managers', type='system')
             manager_group.user_set.remove(instance.employee)
 
         # Удаление из группы 'employee', если пользователь стал сотрудником в других активных назначениях.
         if active_placements.filter(manager=True).exists():
-            employee_group = EmployeesGroup.objects.get(name='Employees', type='system')
+            employee_group, _ = EmployeesGroup.objects.get_or_create(name='Employees', type='system')
             employee_group.user_set.remove(instance.employee)
 
     # Логирование исключений, если они возникнут.
