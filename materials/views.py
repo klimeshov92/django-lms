@@ -337,7 +337,7 @@ class MaterialDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 # Список файлов.
-class FilesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class FilesView(PreviousPageSetMixinL2, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'materials.view_file'
     # Модель.
@@ -372,7 +372,7 @@ class FilesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект файла.
-class FileView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
+class FileView(PreviousPageGetMixinL2, PermissionRequiredMixin, DetailView):
     # Права доступа
     permission_required = 'materials.view_file'
     accept_global_perms = True
