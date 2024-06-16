@@ -143,6 +143,7 @@ class EmployeesGroup(Group):
         ('subdivision', 'Подразделение'),
         ('position', 'Должность'),
         ('employee_excel_import', 'Импорт сотрудников из Excel'),
+        ('employee_api_import', 'Импорт сотрудников по API'),
         ('event_participants', 'Участники мероприятия'),
         ('event_responsibles', 'Ответственные мероприятия'),
         ('assignment', 'Назначение'),

@@ -1190,7 +1190,7 @@ def start_employee_excel_import_mdm_view(request, pk):
                     logger.info(f"Добавлен сотрудник: {emp}")
                     # Добавление сотрудника в группу, связанную с его импортом Excel.
                     group_name = f"Импорт из Excel: [{excel_file.id}] {excel_file.name}"
-                    group, _ = EmployeesGroup.objects.get_or_create(name=group_name)
+                    group, _ = EmployeesGroup.objects.get_or_create(name=group_name, type='employee_excel_import')
                     group.user_set.add(emp)
                     logger.info(f"Сотрудник добавлен в группу: {group}")
 
@@ -1442,7 +1442,7 @@ def start_employee_excel_import_name_view(request, pk):
                     logger.info(f"Добавлен сотрудник: {emp}")
                     # Добавление сотрудника в группу, связанную с его импортом Excel.
                     group_name = f"Импорт из Excel: [{excel_file.id}] {excel_file.name}"
-                    group, _ = EmployeesGroup.objects.get_or_create(name=group_name)
+                    group, _ = EmployeesGroup.objects.get_or_create(name=group_name, type='employee_excel_import')
                     group.user_set.add(emp)
                     logger.info(f"Сотрудник добавлен в группу: {group}")
 

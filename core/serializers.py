@@ -65,7 +65,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         # Добавление сотрудника в группу, связанную с его импортом API.
         current_date = str(date.today().strftime('%d.%m.%Y'))
         group_name = f"Импорт через API от {current_date}"
-        group, _ = EmployeesGroup.objects.get_or_create(name=group_name)
+        group, _ = EmployeesGroup.objects.get_or_create(name=group_name, type='employee_api_import')
         group.user_set.add(employee)
         logger.info(f"Сотрудник добавлен в группу: {group}")
         # Сохранение сотрудника.
