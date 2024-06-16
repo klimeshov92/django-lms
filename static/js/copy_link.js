@@ -1,19 +1,16 @@
 document.addEventListener("DOMContentLoaded", function() {
-    // Пытаемся найти элемент с id "copy_link"
-    var copyLinkElement = document.getElementById("copy_link");
+    // Находим все элементы с классом "copy_link"
+    var copyLinkElements = document.querySelectorAll(".copy_link");
 
-    // Проверяем, существует ли элемент
-    if (copyLinkElement) {
-        console.log("Элемент с id 'copy_link' найден");
-
-        // Если элемент существует, добавляем к нему обработчик события клика
+    // Перебираем все найденные элементы и добавляем обработчик события клика
+    copyLinkElements.forEach(function(copyLinkElement) {
         copyLinkElement.addEventListener("click", function(event) {
-            event.preventDefault(); // Отменяем стандартное действие перехода по ссылке
+            event.preventDefault();
 
-            console.log("Клик по элементу с id 'copy_link' произведен");
+            console.log("Клик по элементу с классом 'copy_link' произведен");
 
             // Получаем URL из атрибута href ссылки
-            var urlToCopy = event.target.getAttribute("href");
+            var urlToCopy = copyLinkElement.getAttribute("href");
             console.log("URL для копирования:", urlToCopy);
 
             // Создаем временное текстовое поле и устанавливаем его значение равным URL
@@ -39,7 +36,5 @@ document.addEventListener("DOMContentLoaded", function() {
             // Удаляем временное текстовое поле из документа
             document.body.removeChild(urlField);
         });
-    } else {
-        console.log("Элемент с id 'copy_link' не найден");
-    }
+    });
 });

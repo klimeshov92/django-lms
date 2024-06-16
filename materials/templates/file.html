@@ -62,7 +62,7 @@
                         <a href="{% url 'materials:file_delete' pk=object.id %}">Удалить</a>
                     {% endif %}
                     <a href="{{ object.upload_file.url }}" target="_blank">Открыть файл</a>
-                    <a href="{{ BASE_URL }}{{ object.upload_file.url }}" id="copy_link">Скопировать ссылку</a>
+                    <a href="{{ BASE_URL }}{{ object.upload_file.url }}" class="copy_link">Скопировать ссылку</a>
                     <a href="{{ object.upload_file.url }}" download>Скачать файл</a>
                     <a href="{{ previous_page_l1 }}">Назад</a>
                 </nav>

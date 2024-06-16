@@ -126,7 +126,7 @@
                             <a href="{% url 'events:change_status' pk=object.id status='planned' %}">Вернуть к планированию</a>
                         {% endif %}
                     {% endif %}
-                    <a href="{{ BASE_URL }}{% url 'events:event' pk=object.id %}" id="copy_link">Скопировать ссылку</a>
+                    <a href="{{ BASE_URL }}{% url 'events:event' pk=object.id %}" class="copy_link">Скопировать ссылку</a>
                     <a href="{{ previous_page_l1 }}">Назад</a>
                 </nav>
             </div>
