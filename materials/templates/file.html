@@ -61,11 +61,9 @@
                     {% if user|perms:"materials.delete_file" %}
                         <a href="{% url 'materials:file_delete' pk=object.id %}">Удалить</a>
                     {% endif %}
-                    {% if user|perms:"materials.view_file" %}
-                        <a href="{{ file.upload_file.url }}" target="_blank">Открыть файл</a>
-                        <a href="{{ BASE_URL }}{{ file.upload_file.url }}" id="copy_link">Скопировать ссылку</a>
-                        <a href="{{ file.upload_file.url }}" download>Скачать файл</a>
-                    {% endif %}
+                    <a href="{{ file.upload_file.url }}" target="_blank">Открыть файл</a>
+                    <a href="{{ BASE_URL }}{{ file.upload_file.url }}" id="copy_link">Скопировать ссылку</a>
+                    <a href="{{ file.upload_file.url }}" download>Скачать файл</a>
                     <a href="{{ previous_page_l1 }}">Назад</a>
                 </nav>
             </div>

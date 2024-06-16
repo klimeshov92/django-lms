@@ -366,6 +366,8 @@ class FilesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         context = super().get_context_data(**kwargs)
         # Добавляем фильтрсет.
         context['filterset'] = self.filterset
+        # Добавляем базовый адрес.
+        context['BASE_URL'] = settings.BASE_URL
         # Возвращаем новый набор переменных.
         return context
 
