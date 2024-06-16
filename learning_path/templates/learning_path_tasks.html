@@ -1,0 +1,259 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Учебные задачи
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+<div class="content-container">
+
+    {# Заголовок элементов #}
+    <div class="content-type-div">
+        <span class="content-type-basic">Задачи траектории обучения</span>
+    </div>
+    <div class="h1-center">
+        <h1>{{object.name}}</h1>
+    </div>
+    <div class="content-grid">
+        <div class="content-grid-item">
+            {# Вывод элементов #}
+            {% if object_list %}
+                {# Перебор элементов #}
+                <div class="content-grid-item-list-grid">
+                    {% for obj in object_list %}
+                        <div class="content-grid-item-list-grid-item">
+                            <div class="content-grid-item-list-grid-item-header">
+                                <div class="content-type-sub-div">
+                                    <span class="content-type-sub">{{obj.get_type_display}}</span>
+                                </div>
+                            </div>
+                            <div class="content-grid-item-list-grid-item-image-container">
+                                {% if obj.type == 'material' %}
+                                    {% if obj.material.avatar %}
+                                       <img src="{{obj.material.avatar.url}}">
+                                    {% else %}
+                                        <div class="content-grid-item-list-grid-item-image-container-blank">
+
+                                        </div>
+                                    {% endif %}
+                                {% elif obj.type == 'test' %}
+                                    {% if obj.test.avatar %}
+                                       <img src="{{obj.test.avatar.url}}">
+                                    {% else %}
+                                        <div class="content-grid-item-list-grid-item-image-container-blank">
+
+                                        </div>
+                                    {% endif %}
+                                {% elif obj.type == 'course' %}
+                                    {% if obj.course.avatar %}
+                                       <img src="{{obj.course.avatar.url}}">
+                                    {% else %}
+                                        <div class="content-grid-item-list-grid-item-image-container-blank">
+
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="content-grid-item-list-grid-item-header">
+                                {% if obj.type == 'material' %}
+                                    <h3>{{obj.material.name}} </h3>
+                                {% elif obj.type == 'test' %}
+                                    <h3>{{obj.test.name}} </h3>
+                                {% elif obj.type == 'course' %}
+                                    <h3>{{obj.course.name}} </h3>
+                                {% endif %}
+                            </div>
+                            <div class="content-grid-item-list-grid-item-content">
+                                {% if obj.control_task %}
+                                    <p class="status">Контрольная задача!</p>
+                                {% endif %}
+                                {% if obj.tasks_latest_result_status %}
+                                    {% if obj.tasks_latest_result_status == 'appointed' or obj.tasks_latest_result_status == 'in_progress' %}
+                                        <p class="status">{{obj.tasks_latest_result_status|status_display}}{% if obj.tasks_latest_result_planned_end_date %} до {{obj.tasks_latest_result_planned_end_date}}{% endif %}</p>
+                                    {% elif obj.tasks_latest_result_status == 'completed'%}
+                                        <p class="status status-completed">{{obj.tasks_latest_result_status|status_display}}{% if obj.tasks_latest_result_end_date %} {{obj.tasks_latest_result_end_date}}{% endif %}</p>
+                                    {% elif obj.tasks_latest_result_status == 'failed'%}
+                                        <p class="status status-failed">{{obj.tasks_latest_result_status|status_display}}{% if obj.tasks_latest_result_end_date %} {{obj.tasks_latest_result_end_date}}{% endif %}</p>
+                                    {% endif %}
+                                {% elif obj.latest_result_status %}
+                                    {% if obj.latest_result_status == 'appointed' or obj.latest_result_status == 'in_progress' %}
+                                        <p class="status">Уже {{obj.latest_result_status|status_display|lower}}{% if obj.latest_result_planned_end_date %} до {{obj.latest_result_planned_end_date}}{% endif %}</p>
+                                    {% elif obj.latest_result_status == 'completed'%}
+                                        <p class="status status-completed">Уже {{obj.latest_result_status|status_display|lower}}{% if obj.latest_result_end_date %} {{obj.latest_result_end_date}}{% endif %}</p>
+                                    {% elif obj.latest_result_status == 'failed'%}
+                                        <p class="status status-failed">Уже {{obj.latest_result_status|status_display|lower}}{% if obj.latest_result_end_date %} {{obj.latest_result_end_date}}{% endif %}</p>
+                                    {% endif %}
+                                {% endif %}
+                                {% if obj.now_blocking_tasks %}
+                                    <p class="status status-failed">Заблокировано! Нужно пройти:</p>
+                                    {% for blocking_task in obj.now_blocking_tasks %}
+                                        <p>
+                                            {% if blocking_task.type == 'material' %}
+                                                <a href="{% url 'materials:material' pk=blocking_task.material.id %}" class="status-button status-button-failed">{{blocking_task}}</a>
+                                            {% elif blocking_task.type == 'course' %}
+                                                <a href="{% url 'courses:course' pk=blocking_task.course.id %}" class="status-button status-button-failed">{{blocking_task}}</a>
+                                            {% elif blocking_task.type == 'test' %}
+                                                <a href="{% url 'tests:test' pk=blocking_task.test.id %}" class="status-button status-button-failed">{{blocking_task}}</a>
+                                            {% endif %}
+                                        </p>
+                                    {% endfor %}
+                                {% endif %}
+                                {% if obj.type == 'material' %}
+                                    {% if obj.material.categories.exists  %}
+                                        <p><span class="description-item">Категории:</span>
+                                            {% for category in obj.material.categories.all %}
+                                                <span>
+                                                    <a href="{% url 'materials:materials' %}?сategory={{category.id}}" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                                                </span>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                {% elif obj.type == 'test' %}
+                                    {% if obj.test.categories.exists  %}
+                                        <p><span class="description-item">Категории:</span>
+                                            {% for category in obj.test.categories.all %}
+                                                <span>
+                                                    <a href="{% url 'testing:tests' %}?сategory={{category.id}}" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                                                </span>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                {% elif obj.type == 'course' %}
+                                    {% if obj.course.categories.exists  %}
+                                        <p><span class="description-item">Категории:</span>
+                                            {% for category in obj.course.categories.all %}
+                                                <span>
+                                                    <a href="{% url 'courses:courses' %}?сategory={{category.id}}" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                                                </span>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
+                                {% endif %}
+                                {% if obj.type == 'material' %}
+                                    {% if obj.material.desc %}
+                                        <p>{{obj.material.desc}}</p>
+                                    {% endif %}
+                                {% elif obj.type == 'test' %}
+                                    {% if obj.test.desc %}
+                                        <p>{{obj.test.desc}}</p>
+                                    {% endif %}
+                                {% elif obj.type == 'course' %}
+                                    {% if obj.course.desc %}
+                                        <p>{{obj.course.desc}}</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% if obj.type == 'material' %}
+                                <div class="content-grid-item-list-grid-item-footer">
+                                    <div class="submenu-mini">
+                                        {% if obj.tasks_latest_result_status == 'appointed' or obj.tasks_latest_result_status == 'in_progress' %}
+                                            {% if not obj.now_blocking_tasks %}
+                                                <a href="{% url 'materials:material_read' pk=obj.material.id %}">Просмотреть</a>
+                                            {% endif %}
+                                        {% endif %}
+                                        <a href="{% url 'materials:material' pk=obj.material.id %}">Подробнее</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if obj.type == 'test' %}
+                                <div class="content-grid-item-list-grid-item-footer">
+                                    <div class="submenu-mini">
+                                        {% if obj.tasks_latest_result_status == 'appointed' or obj.tasks_latest_result_status == 'in_progress' %}
+                                            {% if not obj.now_blocking_tasks %}
+                                                <a href="{% url 'testing:take_assigned_test' pk=obj.tasks_latest_result_id %}">Выполнить</a>
+                                            {% endif %}
+                                        {% endif %}
+                                        <a href="{% url 'testing:test' pk=obj.test.id %}">Подробнее</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if obj.type == 'course' %}
+                                <div class="content-grid-item-list-grid-item-footer">
+                                    <div class="submenu-mini">
+                                        {% if obj.course.scorm_package %}
+                                            {% if obj.tasks_latest_result_status == 'appointed' or obj.tasks_latest_result_status == 'in_progress' %}
+                                                {% if not obj.now_blocking_tasks %}
+                                                    <a href="{% url 'courses:scorm_display' scorm_package_id=obj.course.scorm_package.id %}">Пройти</a>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                        <a href="{% url 'courses:course' pk=obj.course.id %}">Подробнее</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {# Пагинация #}
+                <div class="pagination pagination-content">
+                    {# Информация о предыдущих страницах #}
+                    {% if page_obj.has_previous %}
+                        <a href="?{% url_replace page=1 %}">1</a>
+                        {% if page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if page_obj.has_next %}
+                        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элементов нет #}
+                    <div class="not-found">
+                        <p>Учебные задачи не найдены!</p>
+                    </div>
+            {% endif %}
+        </div>
+        <div class="content-grid-item">
+            <div class="content-grid-item-sub">
+                <div class="content-grid-item-sub-header">
+                    <h3>Детали</h3>
+                </div>
+                <div class="content-grid-item-sub-content">
+                    {% if appointed_education_count != 0 %}
+                        <p class="status-big">Назначено задач: {{appointed_education_count}}</p>
+                    {% endif %}
+                    {% if education_in_progress_count != 0 %}
+                        <p class="status-big">Задачи в процессе: {{education_in_progress_count}}</p>
+                    {% endif %}
+                    {% if completed_education_count != 0 %}
+                        <p class="status-big status-completed">Пройдено задач: {{completed_education_count}}</p>
+                    {% endif %}
+                    {% if failed_education_count != 0 %}
+                        <p class="status-big status-failed">Провалено задач: {{failed_education_count}}</p>
+                    {% endif %}
+                    {% if object.desc %}
+                        <p>{{object.desc}}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Управление #}
+    <div class="submenu-container">
+        <nav class="submenu">
+            <a href="{% url 'learning_path:learning_path' pk=object.id%}">Назад</a>
+        </nav>
+    </div>
+
+</div>
+
+{% endblock content %}

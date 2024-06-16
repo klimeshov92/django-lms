@@ -1,0 +1,236 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Вопрос
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    {# Вывод элемента #}
+    <div class="detail-card-with-image-container">
+
+        <div class="content-type-div">
+            <span class="content-type-basic">Вопрос</span>
+        </div>
+
+        {% if object %}
+            <div class="detail-content-with-image">
+                <div class="detail-content-with-image-image-container">
+                    {% if object.picture %}
+                       <img src="{{object.picture.url}}">
+                    {% else %}
+                        <div class="detail-content-with-image-image-container-blank">
+
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="detail-content-with-image-text-container">
+                    <h1>{{object.text}}</h1>
+                    {% if object.categories.exists %}
+                        <p><span class="description-item">Категории:</span>
+                            {% for category in object.categories.all %}
+                                <span>
+                                    <a href="{% url 'core:category' pk=category.id %}" class="link" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                                </span>
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                    <p><span class="description-item">Тип:</span> {{object.get_type_display}}</p>
+                </div>
+            </div>
+            {# Управление #}
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if user|perms:"testing.change_question" %}
+                        <a href="{% url 'testing:question_update' pk=object.id %}">Изменить</a>
+                    {% endif %}
+                    {% if user|perms:"testing.delete_question" %}
+                        <a href="{% url 'testing:question_delete' pk=object.id %}">Удалить</a>
+                    {% endif %}
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% else %}
+            {# Вывод сообщения, если элемента нет #}
+            <div class="not-found">
+                <p>Вопрос не найден!</p>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="tab-menu-container">
+        <nav class="tab-menu">
+            {% if user|perms:"testing.change_test" %}
+                <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Ответы [{{qs_count}}]</a>
+                <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Настройки</a>
+            {% endif %}
+        </nav>
+    </div>
+
+    <div class="tab-content-container">
+
+        <div id="tab1" class="tab-content">
+            {% if object_list %}
+                <div class="list-table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Позиция в списке</th>
+                                {% if object.type != 'text_input' and object.type != 'numeric_input' %}
+                                    <th>Текст ответа</th>
+                                    <th>Картинка</th>
+                                {% endif %}
+                                {% if object.type == 'single_selection' or object.type == 'multiple_choice' %}
+                                    <th>Правильный ответ</th>
+                                {% endif %}
+                                {% if object.type == 'sorting' %}
+                                    <th>Правильная позиция</th>
+                                {% endif %}
+                                {% if object.type == 'compliance' %}
+                                    <th>Соотвествующий пункт</th>
+                                {% endif %}
+                                {% if object.type == 'text_input' %}
+                                    <th>Правильный ответ</th>
+                                {% endif %}
+                                {% if object.type == 'numeric_input' %}
+                                    <th>Правильный ответ</th>
+                                {% endif %}
+                                <th>Балл</th>
+                                <th>Обратная связь при правильном ответе</th>
+                                <th>Обратная связь при неправильном ответе</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obj in object_list %}
+                                <tr>
+                                    <td>{{obj.position}}</td>
+                                    {% if object.type != 'text_input' and object.type != 'numeric_input' %}
+                                        <td>{{obj.text}}</td>
+                                        <td>
+                                            {% if obj.picture %}
+                                                <img src="{{obj.picture.url}}">
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    {% if object.type == 'single_selection' or object.type == 'multiple_choice' %}
+                                        <td>{{obj.correct_answer|yesno}}</td>
+                                    {% endif %}
+                                    {% if object.type == 'sorting' %}
+                                        <td>{{obj.correct_position}}</td>
+                                    {% endif %}
+                                    {% if object.type == 'compliance' %}
+                                        <td>
+                                            {% if obj.relevant_point %}
+                                                <p>{{obj.relevant_point}}</p>
+                                                {% if user|perms:"testing.change_question" %}
+                                                    <p>
+                                                       <a href="{% url 'testing:relevant_point_update' pk=obj.relevant_point.id %}">Изменить</a>
+                                                    </p>
+                                                {% endif %}
+                                            {% else %}
+                                                {% if user|perms:"testing.change_question" %}
+                                                    <p>
+                                                       <a href="{% url 'testing:relevant_point_create' pk=obj.id %}">Создать</a>
+                                                    </p>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    {% if object.type == 'text_input' %}
+                                        <td>{{obj.correct_text_input}}</td>
+                                    {% endif %}
+                                    {% if object.type == 'numeric_input' %}
+                                        <td>{{obj.correct_numeric_input}}</td>
+                                    {% endif %}
+                                    <td>{{obj.score}}</td>
+                                    <td>{{obj.feedback_for_correct}}</td>
+                                    <td>{{obj.feedback_for_incorrect}}</td>
+                                    <td>
+                                        {% if user|perms:"testing.change_question" %}
+                                            <p><a href="{% url 'testing:answer_update' pk=obj.id %}">Изменить</a></p>
+                                        {% endif %}
+                                        {% if user|perms:"testing.change_question" %}
+                                            <p><a href="{% url 'testing:answer_delete' pk=obj.id %}">Удалить</a></p>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {# Пагинация #}
+                <div class="pagination">
+                    {# Информация о предыдущих страницах #}
+                    {% if page_obj.has_previous %}
+                        <a href="?{% url_replace page=1 %}">1</a>
+                        {% if page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if page_obj.has_next %}
+                        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элемента нет #}
+                    <div class="not-found">
+                        <p>Ответы не найдены!</p>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if user|perms:"testing.add_question" %}
+                        <a href="{% url 'testing:answer_create' pk=object.id %}">Создать ответ</a>
+                    {% endif %}
+                    {% if user|perms:"testing.change_question" %}
+                        {% if answers_exists %}
+                            <a href="{% url 'testing:answers_ordering' pk=object.id %}">Сортировать ответы</a>
+                        {% endif %}
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+
+        {% if user|perms:"testing.change_test" %}
+            <div id="tab2" class="tab-content">
+                <p><span class="description-item">Инструкция:</span> {{object.instruction}}</p>
+                {% if object.score %}
+                    <p><span class="description-item">Балл:</span> {{object.score}}</p>
+                {% endif %}
+                <p><span class="description-item">Обратная связь при правильном ответе:</span> {{object.feedback_for_correct}}</p>
+                <p><span class="description-item">Обратная связь при неправильном ответе:</span> {{object.feedback_for_incorrect}}</p>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock content %}

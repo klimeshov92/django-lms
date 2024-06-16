@@ -1,0 +1,318 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Материал
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    {# Вывод элемента #}
+    <div class="detail-card-with-image-container">
+
+        <div class="content-type-div">
+            <span class="content-type-basic">Материал</span>
+            {% if reviews_average_mark %}<span class="review-average-mark">{{reviews_average_mark}}</span>{% endif %}
+        </div>
+
+        {% if object %}
+            <div class="detail-content-with-image">
+                <div class="detail-content-with-image-image-container">
+                    {% if object.avatar %}
+                       <img src="{{object.avatar.url}}">
+                    {% else %}
+                        <div class="detail-content-with-image-image-container-blank">
+
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="detail-content-with-image-text-container">
+                    <h1>{{object.name}}</h1>
+                    {% if result %}
+                        {% if result.status == 'appointed' or result.status == 'in_progress' %}
+                            <p class="status-big">{{result.get_status_display}}{% if result.learning_path_result.planned_end_date %} до {{result.learning_path_result.planned_end_date}}{% endif %}</p>
+                            {% if blocked == True %}
+                                <p class="status-big status-failed">Заблокировано! Нужно пройти:</p>
+                                {% for blocking_task in now_blocking_tasks %}
+                                    <p>
+                                        {% if blocking_task.type == 'material' %}
+                                            <a href="{% url 'materials:material' pk=blocking_task.material.id %}" class="status-button-big status-button-failed">{{blocking_task}}</a>
+                                        {% elif blocking_task.type == 'course' %}
+                                            <a href="{% url 'courses:course' pk=blocking_task.course.id %}" class="status-button-big status-button-failed">{{blocking_task}}</a>
+                                        {% elif blocking_task.type == 'test' %}
+                                            <a href="{% url 'tests:test' pk=blocking_task.test.id %}" class="status-button-big status-button-failed">{{blocking_task}}</a>
+                                        {% endif %}
+                                    </p>
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                        {% if result.status == 'completed' %}
+                            <p class="status-big status-completed">{{result.get_status_display}} {{result.end_date}}</p>
+                        {% endif %}
+                        {% if result.status == 'failed' %}
+                            <p class="status-big status-failed">{{result.get_status_display}} {{result.end_date}}</p>
+                        {% endif %}
+                    {% endif %}
+                    {% if object.categories.exists %}
+                    <p><span class="description-item">Категории:</span>
+                        {% for category in object.categories.all %}
+                            <span>
+                                <a href="{% url 'materials:materials' %}?сategory={{category.id}}" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                            </span>
+                        {% endfor %}
+                    </p>
+                    {% endif %}
+                    {% if object.authors %}
+                        <p><span class="description-item">Авторы:</span> {{object.authors}}</p>
+                    {% endif %}
+                    <p><span class="description-item">Время на просмотр (минуты):</span> {{object.time_to_complete}}</p>
+                    {% if object.bonus != 0 %}
+                        <p><span class="description-item">Бонусы:</span> {{object.bonus}}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if result %}
+                        {% if result.status != 'failed' and result.status != 'completed' %}
+                            {% if blocked == False %}
+                                <a href="{% url 'materials:material_read' pk=object.id %}">Просмотреть</a>
+                            {% endif %}
+                        {% else %}
+                            {% if object.self_appointment == True %}
+                                <a href="{% url 'learning_path:self_appointment' pk=object.id type='material' %}">Самоназначение</a>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        {% if object.self_appointment == True %}
+                            <a href="{% url 'learning_path:self_appointment' pk=object.id type='material' %}">Самоназначение</a>
+                        {% endif %}
+                    {% endif %}
+                    {% if user|perms:"materials.change_material" %}
+                        <a href="{% url 'materials:material_update' pk=object.id %}">Изменить</a>
+                    {% endif %}
+                    {% if user|perms:"materials.delete_material" %}
+                        <a href="{% url 'materials:material_delete' pk=object.id %}">Удалить</a>
+                    {% endif %}
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% else %}
+            {# Вывод сообщения, если элемента нет #}
+            <div class="not-found">
+                <p>Материал не найден!</p>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="tab-menu-container">
+        <nav class="tab-menu">
+            <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
+            {% if user|perms:"reviews.view_review" %}
+                <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Отзывы [{{reviews_qs_count}}]</a>
+            {% endif %}
+            {% if 'core.view_employeesgroupobjectpermission' in perms %}
+                <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Объектные права [{{group_object_permissions_qs_count}}]</a>
+            {% endif %}
+        </nav>
+    </div>
+
+    <div class="tab-content-container">
+
+        <div id="tab1" class="tab-content">
+            {% if object.desc %}
+                <p>{{object.desc}}</p>
+            {% else %}
+                <p>Описания нет!</p>
+            {% endif %}
+        </div>
+
+        {% if user|perms:"reviews.view_review" %}
+            <div id="tab2" class="tab-content">
+                {# Фильтр элементов #}
+                <div class="filters-header">
+                    <a href="" class="filters-button">Фильтры</a>
+                </div>
+                <div class="filters-area">
+                    <form action="" method="get" class="form filter-form">
+                        {{ reviews_filter.form.media.css }}
+                        {{ reviews_filter.form.as_p }}
+                        {{ reviews_filter.form.media.js }}
+                    <nav class="form-menu ">
+                        <input type="submit" value="Найти" class="button"/>
+                    </nav>
+                    </form>
+                </div>
+                {# Вывод элементов #}
+                {% if reviews_page_obj %}
+                    <div class="tab-list-grid">
+                        {% for obj in reviews_page_obj %}
+                            <div class="tab-list-grid-item">
+                                <div class="tab-list-grid-item-content">
+                                    <p class="text-align-right">{% if reviews_average_mark %}<span class="review-mark">{{obj.score}}</span>{% endif %}</p>
+                                    <h3>{{obj.creator}}</h3>
+                                    <p><span class="description-item">Дата и время создания:</span> {{obj.created}}</p>
+                                    <p>{{obj.text}}</p>
+                                    {% if user|perms:"reviews.change_review" or user|perms:"reviews.delete_review" %}
+                                        <div class="submenu-mini submenu-mini-end">
+                                            {% if 'reviews.change_review' in perms %}
+                                                <a href="{% url 'reviews:review_update' pk=obj.id %}">Изменить</a>
+                                            {% endif %}
+                                            {% if 'reviews.delete_review' in perms %}
+                                                <a href="{% url 'reviews:review_delete' pk=obj.id %}">Удалить</a>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {# Пагинация #}
+                    <div class="pagination">
+                        {# Информация о предыдущих страницах #}
+                        {% if reviews_page_obj.has_previous %}
+                            <a href="?{% url_replace reviews_page=1 %}">1</a>
+                            {% if reviews_page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace reviews_page=reviews_page_obj.previous_page_number %}">{{ reviews_page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ reviews_page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if reviews_page_obj.has_next %}
+                            <a href="?{% url_replace reviews_page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                            {% if reviews_page_obj.paginator.num_pages != reviews_page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace reviews_page=reviews_page_obj.paginator.num_pages %}">{{ reviews_page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {# Вывод сообщения, если элементов нет #}
+                        <div class="not-found">
+                            <p>Отзывы не найдены!</p>
+                        </div>
+                {% endif %}
+
+                {# Управление #}
+                <div class="submenu-container">
+                    <nav class="submenu">
+                        {% if result %}
+                            {% if haves_review == False %}
+                                {% if 'reviews.add_review' in perms %}
+                                    <a href="{% url 'reviews:review_create' type='material' pk=object.id %}">Создать</a>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if 'core.view_employeesgroupobjectpermission' in perms %}
+            <div id="tab3" class="tab-content">
+                {# Фильтр элементов #}
+                <div class="filters-header">
+                    <a href="" class="filters-button">Фильтры</a>
+                </div>
+                <div class="filters-area">
+                    <form action="" method="get" class="form filter-form">
+                        {{ group_object_permissions_filter.form.media.css }}
+                        {{ group_object_permissions_filter.form.as_p }}
+                        {{ group_object_permissions_filter.form.media.js }}
+                    <nav class="form-menu ">
+                        <input type="submit" value="Найти" class="button"/>
+                    </nav>
+                    </form>
+                </div>
+                {# Вывод элементов #}
+                {% if group_object_permissions_page_obj %}
+                    <div class="list-table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Группа</th>
+                                    <th>Права</th>
+                                    <th>Объект</th>
+                                    {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                        <th>Действия</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in group_object_permissions_page_obj %}
+                                    <tr>
+                                        <td>{{obj.group}}</td>
+                                        <td>{{obj.permission.name}}</td>
+                                        <td>{{obj.content_object}}</td>
+                                        {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                            <td>
+                                                <a href="{% url 'core:employees_group_object_permissions_delete' type='material' pk=object.id employees_group_object_permission_pk=obj.id %}">Удалить</a>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {# Пагинация #}
+                    <div class="pagination">
+                        {# Информация о предыдущих страницах #}
+                        {% if group_object_permissions_page_obj.has_previous %}
+                            <a href="?{% url_replace group_object_permissions_page=1 %}">1</a>
+                            {% if group_object_permissions_page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace group_object_permissions_page=group_object_permissions_page_obj.previous_page_number %}">{{ group_object_permissions_page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ group_object_permissions_page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if group_object_permissions_page_obj.has_next %}
+                            <a href="?{% url_replace group_object_permissions_page=group_object_permissions_page_obj.next_page_number %}">{{ group_object_permissions_page_obj.next_page_number }}</a>
+                            {% if group_object_permissions_page_obj.paginator.num_pages != group_object_permissions_page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace group_object_permissions_page=group_object_permissions_page_obj.paginator.num_pages %}">{{ group_object_permissions_page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {# Вывод сообщения, если элементов нет #}
+                        <div class="not-found">
+                            <p>Объектные права не найдены!</p>
+                        </div>
+                {% endif %}
+                {# Управление #}
+                <div class="submenu-container">
+                    <nav class="submenu">
+                        {% if 'core.add_employeesgroupobjectpermission' in perms %}
+                            <a href="{% url 'core:employees_group_object_permissions_create' type='material' pk=object.id %}">Создать</a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock content %}

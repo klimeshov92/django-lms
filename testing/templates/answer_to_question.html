@@ -1,0 +1,249 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Форма вопроса
+{% endblock %}
+
+{% block content %}
+
+<div class="test-container-header">
+
+    <div class="content-type-div">
+        <span class="content-type-basic">Выполнение теста</span>
+    </div>
+    <div class="h1-center">
+        <h1>{{ tests_result.test.name }}</h1>
+    </div>
+
+    {% if end_of_test %}
+        <div class="status-big">
+            Тест окончен! Нажмите "Закончить попытку"
+        </div>
+    {% endif %}
+
+</div>
+
+<div class="test-container">
+
+    <div class="test-grid">
+        <div class="test-grid-item">
+            <form action="" method="post" enctype="multipart/form-data" class="form">
+                <div class="test-grid-item-sub">
+
+                    {# Вывод вопроса #}
+                    <div class="test-grid-item-sub-header">
+                        <h3>Вопрос ({{ current_index_normal }} из {{ questions_results_list_count }})</h3>
+                    </div>
+
+                    <div class="test-grid-item-sub-content">
+
+                        {# Вывод вопроса #}
+                        <div class="test-grid-item-sub-content-questions-text-container">
+                            <h3>{{ questions_result.question.text }}</h3>
+                        </div>
+
+                        {# Вывод картинки вопроса #}
+                        {% if questions_result.question.picture %}
+                            <div class="test-grid-item-sub-content-image-container">
+                                <img src="{{questions_result.question.picture.url}}">
+                            </div>
+                        {% endif %}
+
+                        {# Вывод инструкции вопроса #}
+                        <div class="test-grid-item-sub-content-questions-text-container">
+                            <p>{{ questions_result.question.instruction }}</p>
+                            <p>
+                                {% if tests_result.test.show_questions_results == True %}
+                                    {% if questions_result.status == 'completed' %}
+                                        <span class="status status-completed">{{questions_result.question.feedback_for_correct}}</span>
+                                    {% elif questions_result.status == 'failed' %}
+                                        <span class="status status-failed">{{questions_result.question.feedback_for_incorrect}}</span>
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        {# Стандартная защита формы #}
+                        {% csrf_token %}
+
+                        {# Расширенный вывод формы #}
+
+                        {{ formset.management_form }}
+
+                        {# Вывод общих для всего сета ошибок #}
+                        {% if formset.non_form_errors %}
+                            <div>
+                                {% for error in formset.non_form_errors %}
+                                <p><em>{{error|escape}}</em></p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {# Вывод форм #}
+                        {% for form in formset %}
+
+                            {# Вывод скрытых полей #}
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            {# Вывод не связанных с полями  #}
+                            {% if form.non_field_errors %}
+                                <div>
+                                    {% for error in form.non_field_errors %}
+                                    <p><em>{{error|escape}}</em></p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {# Вывод видимых полей #}
+                            {% for field in form.visible_fields %}
+
+                                {# Вывод ошибок для полей формы #}
+                                {% if field.errors %}
+                                    <div>
+                                        {% for error in field.errors %}
+                                        <p><em>{{error|escape}}</em></p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                {# Вывод ответа #}
+                                    <div class="test-grid-item-sub-content-answer-container">
+
+                                        {# Вывод картинки ответа #}
+                                        {% if form.instance.answer.picture %}
+                                            <div class="test-grid-item-sub-content-image-container-min">
+                                                <img src="{{form.instance.answer.picture.url}}">
+                                            </div>
+                                        {% endif %}
+
+                                        {# Вывод текста ответа #}
+                                        <div>
+                                            <p>
+                                                {# Вывод ответа #}
+                                                <span>{{ form.instance.answer.text }}</span>
+                                                {# Вывод поля для ответа #}
+                                                <span>{{ field }}</span>
+                                                {# Вывод помогающего текста #}
+                                                <span>{{ field.help_text }}</span>
+                                            </p>
+                                            <p>
+                                                {% if tests_result.test.show_answers_results == True %}
+                                                    {% if form.instance.status == 'completed' %}
+                                                        <span class="status status-completed">{{form.instance.answer.feedback_for_correct}}</span>
+                                                    {% elif form.instance.status == 'failed' %}
+                                                        <span class="status status-failed">{{form.instance.answer.feedback_for_incorrect}}</span>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="test-nav">
+                    <div class="test-nav-pagination">
+                        {% if previous_question_result != None %}
+                            <a href="{% url 'testing:answer_to_question' pk=previous_question_result.id %}">Пред.</a>
+                        {% endif %}
+                    </div>
+                    <div class="div-test-button test-nav-pagination">
+                        {% if questions_result.status == 'completed' or questions_result.status == 'failed' %}
+                            <input type="submit" value="Отправить" class="button test-button" disabled>
+                        {% else %}
+                            <input type="submit" value="Отправить" class="button test-button">
+                        {% endif %}
+                    </div>
+                    <div class="test-nav-pagination">
+                        {% if next_question_result != None %}
+                            <a href="{% url 'testing:answer_to_question' pk=next_question_result.id %}">След.</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="test-grid-item">
+            <div class="test-grid-item-sub">
+                <div class="test-grid-item-sub-header">
+                    <h3>Детали</h3>
+                </div>
+                <div class="test-grid-item-sub-content">
+                    <p>
+                        <span class="description-item">Время (мин):</span>
+                        <span id="timer"></span>
+                    </p>
+                    <p><span class="description-item">Вопросы:</span></p>
+                    {% for a_quesrions_result in page_obj %}
+                        <p>
+                            <a href="{% url 'testing:answer_to_question' pk=a_quesrions_result.id %}">{{a_quesrions_result.question.text}}</a>
+                        </p>
+                    {% endfor %}
+                    {# Пагинация #}
+                    <div class="pagination pagination-test">
+                        {# Информация о предыдущих страницах #}
+                        {% if page_obj.has_previous %}
+                            <a href="?{% url_replace page=1 %}">1</a>
+                            {% if page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if page_obj.has_next %}
+                            <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                            {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    {% if tests_result.test.desc %}
+                        <p>{{tests_result.test.desc}}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="test-container-footer">
+
+    {# Управление #}
+    <div class="submenu-container">
+        <nav class="submenu">
+            {% if end_of_test %}
+                <a href="{% url 'testing:take_assigned_test' pk=tests_result.id %}">Закончить попытку</a>
+            {% endif %}
+                <a href="{% url 'testing:test' pk=tests_result.test.id %}">Назад</a>
+        </nav>
+    </div>
+
+</div>
+
+{# Забираем переменную в глобальный контекст #}
+<script type="text/javascript">
+    window.timerDuration = {{ time }};
+    window.testsResultId = {{ tests_result.id }};
+</script>
+
+{# Подключение скриптов #}
+{% load static %}
+<script src="{% static 'js/timer.js' %}"></script>
+<script src="{% static 'js/single_selection.js' %}"></script>
+<script src="{% static 'js/show_img.js' %}"></script>
+
+{% endblock content %}
+

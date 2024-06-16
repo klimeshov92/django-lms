@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Отображение курса SCORM</title>
+    {% load static %}
+    {# Подключение стилей #}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/SCORM_player.css' %}">
+</head>
+<body>
+
+    <div id="scorm-player" class="scorm-player">
+        <iframe id="scorm-player-iframe" class="scorm-player-iframe"></iframe>
+        <nav class="submenu">
+            <a href="#" id="fullscreen-btn">Развернуть на весь экран</a>
+            <a href="{% url 'courses:course' pk=course.id %}">Назад</a>
+        </nav>
+        {# Контент #}
+    </div>
+
+    {# Передача переменных в глобальный контекст #}
+    <script>
+        // Получение и передача параметров из контекста шаблона Django.
+        var scorm_package_id = "{{ scorm_package_id }}";
+        var user_id = "{{ user_id }}";
+        var type = "{{ type }}";
+        console.log("Переданный scorm_package_id:", scorm_package_id);
+        console.log("Переданный user_id:", user_id);
+    </script>
+
+    {# Скрипт запуска API #}
+    <script src="{% static 'js/SCORM_player.js' %}"></script>
+    {# API #}
+    <script src="{% static 'js/SCORM_2004_API.js' %}"></script>
+
+</body>
+</html>

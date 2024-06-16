@@ -1,0 +1,151 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Результаты
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="list-container">
+
+    {# Заголовок элементов #}
+    <div class="h1-center">
+        <h1>Результаты</h1>
+    </div>
+    {# Фильтр элементов #}
+    <div class="filters-header">
+        <a href="" class="filters-button">Фильтры</a>
+    </div>
+    <div class="filters-area">
+        <form action="" method="get" class="form filter-form">
+        {{ filterset.form.as_p }}
+        <nav class="form-menu ">
+            <input type="submit" value="Найти" class="button"/>
+            <button type="submit" name="export_excel" value="1" class="button">Экспорт в Excel</button>
+        </nav>
+        </form>
+    </div>
+    {# Вывод элементов #}
+    {% if object_list %}
+        <div>
+            <div class="list-table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Сотрудник</th>
+                            <th>Учебная задача</th>
+                            <th>Назначение</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in object_list %}
+                            <tr>
+                                <td>{{obj.employee}}</td>
+                                <td>
+                                    {% if obj.type == 'learning_complex' %}
+                                        Комплексная программа: {{obj.learning_complex}}
+                                    {% elif obj.type == 'learning_path' %}
+                                        Траектория обучения: {{obj.learning_path}}
+                                    {% elif obj.type == 'material' %}
+                                        Материал: {{obj.material}}
+                                    {% elif obj.type == 'course' %}
+                                        Курс: {{obj.course}}
+                                    {% elif obj.type == 'test' %}
+                                        Тест: {{obj.test}}
+                                    {% elif obj.type == 'event' %}
+                                        Мероприятие: {{obj.event}}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if obj.assignment %}
+                                        {{obj.assignment}}
+                                    {% else %}
+                                        {% if obj.self_appointment %}
+                                            Самоназначение
+                                        {% else %}
+                                            Приглашение
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if obj.type != 'event' %}
+                                        {% if obj.status == 'appointed' or obj.status == 'in_progress' %}
+                                                {{obj.get_status_display}}
+                                                {% if obj.type == 'learning_path' %}
+                                                    до {{obj.planned_end_date}}
+                                                {% elif obj.learning_path_result %}
+                                                    до {{obj.learning_path_result.planned_end_date}}
+                                                {% endif %}
+                                        {% endif %}
+                                        {% if obj.status == 'completed' and obj.end_date %}
+                                                {{obj.get_status_display}}
+                                                {{obj.end_date}}
+                                                {% if obj.score_scaled %}
+                                                    ({{obj.score_scaled}}%)
+                                                {% endif %}
+                                        {% endif %}
+                                        {% if obj.status == 'failed' and obj.end_date %}
+                                                {{obj.get_status_display}}
+                                                {{obj.end_date}}
+                                                {% if obj.score_scaled %}
+                                                    ({{obj.score_scaled}}%)
+                                                {% endif %}
+                                        {% endif %}
+                                    {% else %}
+                                        {% if obj.presence_mark == 'registered' %}
+                                                {{obj.get_presence_mark_display}}
+                                        {% endif %}
+                                        {% if obj.presence_mark == 'present' %}
+                                                {{obj.get_presence_mark_display}}
+                                        {% endif %}
+                                        {% if obj.presence_mark == 'refused' or obj.presence_mark == 'absent' %}
+                                                {{obj.get_presence_mark_display}}
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {# Пагинация #}
+        <div class="pagination">
+            {# Информация о предыдущих страницах #}
+            {% if page_obj.has_previous %}
+                <a href="?{% url_replace page=1 %}">1</a>
+                {% if page_obj.previous_page_number != 1 %}
+                    <span class="pagination-gap">...</span>
+                    <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                {% endif %}
+            {% endif %}
+
+            {# Информация о текущей странице #}
+            <span class="current-page">{{ page_obj.number }}</span>
+
+            {# Информация о следующих страницах #}
+            {% if page_obj.has_next %}
+                <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                    <span class="pagination-gap">...</span>
+                    <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% else %}
+        {# Вывод сообщения, если элементов нет #}
+            <div class="not-found">
+                <p>Результаты не найдены!</p>
+            </div>
+    {% endif %}
+
+</div>
+
+{% endblock content %}

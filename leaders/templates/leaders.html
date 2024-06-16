@@ -1,0 +1,92 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Лидеры
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="list-container">
+
+    {# Заголовок элементов #}
+    <div class="h1-center">
+        <h1>Лидеры</h1>
+    </div>
+    {# Фильтр элементов #}
+    <div class="filters-header">
+        <a href="" class="filters-button">Фильтры</a>
+    </div>
+    <div class="filters-area">
+        <form action="" method="get" class="form filter-form">
+        {{ filterset.form.as_p }}
+        <nav class="form-menu ">
+            <input type="submit" value="Найти" class="button"/>
+        </nav>
+        </form>
+    </div>
+    {# Вывод элементов #}
+
+    {% if leaders_list %}
+        <div>
+            <div class="list-table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Место</th>
+                            <th>Сотрудник</th>
+                            <th>Бонусы</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in leaders_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{obj}}</td>
+                                <td>{{obj.total_bonus}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {# Пагинация #}
+            <div class="pagination">
+                {# Информация о предыдущих страницах #}
+                {% if page_obj.has_previous %}
+                    <a href="?{% url_replace page=1 %}">1</a>
+                    {% if page_obj.previous_page_number != 1 %}
+                        <span class="pagination-gap">...</span>
+                        <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                    {% endif %}
+                {% endif %}
+
+                {# Информация о текущей странице #}
+                <span class="current-page">{{ page_obj.number }}</span>
+
+                {# Информация о следующих страницах #}
+                {% if page_obj.has_next %}
+                    <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                    {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                        <span class="pagination-gap">...</span>
+                        <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        {# Вывод сообщения, если элементов нет #}
+            <div class="not-found">
+                <p>Лидеры не найдены!</p>
+            </div>
+    {% endif %}
+
+    {# Управление #}
+
+</div>
+
+{% endblock content %}

@@ -1,0 +1,139 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Отзывы
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="list-container">
+
+    {# Заголовок элементов #}
+        <div class="content-type-div">
+            <span class="content-type-basic">
+                Отзывы
+                {% if type == 'learning_path' %}
+                    на траекторию обучения
+                {% endif %}
+                {% if type == 'material' %}
+                    на материал
+                {% endif %}
+                {% if type == 'course' %}
+                    на курс
+                {% endif %}
+                {% if type == 'test' %}
+                    на тест
+                {% endif %}
+                {% if type == 'event' %}
+                    на мероприятие
+                {% endif %}
+                {% if type == 'group' %}
+                    группы
+                {% endif %}
+            </span>
+        </div>
+    <div class="h1-center">
+        <h1>{{object}}</h1>
+    </div>
+    {# Фильтр элементов #}
+    <div class="filters-header">
+        <a href="" class="filters-button">Фильтры</a>
+    </div>
+    <div class="filters-area">
+        <form action="" method="get" class="form filter-form">
+        {{ filterset.form.as_p }}
+        <nav class="form-menu ">
+            <input type="submit" value="Найти" class="button"/>
+        </nav>
+        </form>
+    </div>
+    {# Вывод элементов #}
+    {% if object_list %}
+        <div>
+            <div class="list-table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Дата и время создания</th>
+                            <th>Создатель</th>
+                            <th>Балл</th>
+                            <th>Текст</th>
+                            {% if user|perms:"reviews.change_review" or user|perms:"reviews.delete_review" %}
+                                <th>Действия</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in object_list %}
+                            <tr>
+                                <td>{{obj.created}}</td>
+                                <td>{{obj.creator}}</td>
+                                <td>{{obj.score}}</td>
+                                <td>{{obj.text}}</td>
+                                {% if user|perms:"reviews.change_review" or user|perms:"reviews.delete_review" %}
+                                    <td>
+                                        {% if 'reviews.change_review' in perms %}
+                                            <a href="{% url 'reviews:review_update' pk=obj.id %}">Изменить</a>
+                                        {% endif %}
+                                        {% if 'reviews.delete_review' in perms %}
+                                            <a href="{% url 'reviews:review_delete' pk=obj.id %}">Удалить</a>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {# Пагинация #}
+            <div class="pagination">
+                {# Информация о предыдущих страницах #}
+                {% if page_obj.has_previous %}
+                    <a href="?{% url_replace page=1 %}">1</a>
+                    {% if page_obj.previous_page_number != 1 %}
+                        <span class="pagination-gap">...</span>
+                        <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                    {% endif %}
+                {% endif %}
+
+                {# Информация о текущей странице #}
+                <span class="current-page">{{ page_obj.number }}</span>
+
+                {# Информация о следующих страницах #}
+                {% if page_obj.has_next %}
+                    <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                    {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                        <span class="pagination-gap">...</span>
+                        <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        {# Вывод сообщения, если элементов нет #}
+            <div class="not-found">
+                <p>Отзывы не найдены!</p>
+            </div>
+    {% endif %}
+
+    {# Управление #}
+    <div class="submenu-container">
+        <nav class="submenu">
+            {% if haves_review == False %}
+                {% if 'reviews.add_review' in perms %}
+                    <a href="{% url 'reviews:review_create' type=type pk=object.id %}">Создать</a>
+                {% endif %}
+            {% endif %}
+            <a href="{{ previous_page_l0 }}">Назад</a>
+        </nav>
+    </div>
+
+</div>
+
+{% endblock content %}

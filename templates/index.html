@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+{# Выбираем русский язык #}
+<html lang="ru">
+
+<head>
+    {# Подключение кастомных тегов #}
+    {% load custom_tags %}
+    {% load guardian_tags %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        {# Подключение заголовка #}
+        {% block title %}
+        {% endblock title %}
+    </title>
+    {# Подключение джиквери #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    {# Подключение стилей для медиа форм #}
+    {{ form.media.css }}
+    {{ filterset.form.media.css }}
+    {% load static %}
+    {# Стили страничек с кодом #}
+    <link rel="stylesheet" type="text/css" href="{% static 'highlight/styles/arta.min.css' %}">
+    {# Подключение основных стилей после иных для полного переопределения #}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+    {# Шапка #}
+    <header class="header">
+        <div>
+            <button class="hamburger-menu">☰</button>
+        </div>
+        <div class="header-username">
+            {% if user.is_authenticated %}
+                {{request.user.username}}
+            {% else %}
+                Пользователь не авторизован!
+            {% endif %}
+        </div>
+    </header>
+
+    {# Меню #}
+    <nav class="menu">
+
+        <a href="{% url 'home' %}">Главная</a>
+
+        {% if user|perms:"core.view_category" %}
+            <a href="{% url 'core:categories' %}">Категории</a>
+        {% endif %}
+
+        {% if user|perms:"events.view_event" %}
+            <a href="{% url 'events:events' %}">Мероприятия</a>
+        {% endif %}
+
+        {% if user|perms:"learning_path.view_learningpath" %}
+            <a href="{% url 'learning_path:learning_paths' %}">Траектории обучения</a>
+        {% endif %}
+
+        {% if user|perms:"learning_path.view_learningcomplex" %}
+            <a href="{% url 'learning_path:learning_complexs' %}">Комплексные программы</a>
+        {% endif %}
+
+        {% if user|perms:"materials.view_material" %}
+            <a href="{% url 'materials:materials' %}">Материалы</a>
+        {% endif %}
+
+        {% if user|perms:"courses.view_course" %}
+        <a href="{% url 'courses:courses' %}">Курсы</a>
+        {% endif %}
+
+        {% if user|perms:"testing.view_test" %}
+            <a href="{% url 'testing:tests' %}">Тесты</a>
+        {% endif %}
+
+        {% if user|perms:"testing.view_question" %}
+            <a href="{% url 'testing:questions' %}">Вопросы</a>
+        {% endif %}
+
+        {% if user|perms:"learning_path.view_assignment" %}
+            <a href="{% url 'learning_path:assignments' %}">Назначения</a>
+        {% endif %}
+
+        {% if user|perms:"learning_path.view_result" or user|perms:"learning_path.view_managed_result" or user|perms:"learning_path.view_self_result" %}
+            <a href="{% url 'learning_path:results' %}">Результаты</a>
+        {% endif %}
+
+        {% if user|perms:"reviews.view_all_review" %}
+            <a href="{% url 'reviews:reviews' %}">Отзывы</a>
+        {% endif %}
+
+        {% if user|perms:"leaders.view_transaction" %}
+            <a href="{% url 'leaders:leaders' %}">Лидеры</a>
+        {% endif %}
+
+        {% if user|perms:"core.view_employee" %}
+            <a href="{% url 'core:employees' %}">Сотрудники</a>
+        {% endif %}
+
+        {% if user|perms:"core.view_organization" %}
+            <a href="{% url 'core:organizations' %}">Организации</a>
+        {% endif %}
+
+        {% if user|perms:"core.view_subdivision" %}
+            <a href="{% url 'core:subdivisions' %}">Подразделения</a>
+        {% endif %}
+
+        {% if user|perms:"core.view_position" %}
+            <a href="{% url 'core:positions' %}">Должности</a>
+        {% endif %}
+        
+        {% if user|perms:"core.view_employeesgroup" %}
+        <a href="{% url 'core:groups' %}">Группы</a>
+        {% endif %}
+
+        {% if user|perms:"emails.view_email" %}
+        <a href="{% url 'emails:emails' %}">Рассылки</a>
+        {% endif %}
+
+        {% if user|perms:"core.view_employeeexcelimport" %}
+            <a href="{% url 'core:employee_excel_imports' %}">Импорт из Excel</a>
+        {% endif %}
+
+        {% if user|perms:"materials.view_file" %}
+        <a href="{% url 'materials:files' %}">Файлы</a>
+        {% endif %}
+
+        {% if user|perms:"courses.view_scormpackage" %}
+        <a href="{% url 'courses:scorm_packages' %}">SCORM-пакеты</a>
+        {% endif %}
+
+    </nav>
+
+    {# Подключение контента #}
+    {% block content %}
+    {% endblock content %}
+
+    {# Подключение скриптов для медиа форм #}
+    {{ form.media.js }}
+    {{ filterset.form.media.js }}
+
+    {# Подключение основных скриптов после иных для полного переопределения #}
+    {# Работа меню #}
+    <script src="{% static 'js/menu.js' %}"></script>
+    <script src="{% static 'js/sub_hide.js' %}"></script>
+    {# Работа фильтров #}
+    <script src="{% static 'js/filter.js' %}"></script>
+    {# Мат. формулы #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    {# Странички с кодом #}
+    <script src="{% static 'highlight/highlight.min.js' %}"></script>
+    <script>hljs.highlightAll();</script>
+    {# Открытие подствернутого окна #}
+    <script src="{% static 'js/popup_link.js' %}"></script>
+    {# Копирование ссылки #}
+    <script src="{% static 'js/copy_link.js' %}"></script>
+    {# Табы #}
+    <script src="{% static 'js/open_tab.js' %}"></script>
+
+</body>
+</html>

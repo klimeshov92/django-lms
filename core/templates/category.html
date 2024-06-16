@@ -1,0 +1,73 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Категория
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    <div class="detail-container">
+
+        {# Вывод элемента #}
+        <div class="detail-card-with-image-container">
+
+            <div class="content-type-div">
+                <span class="content-type-basic">Категория</span>
+            </div>
+
+            {% if object %}
+                <div class="detail-content-with-image">
+                    <div class="detail-content-with-image-image-container">
+                        {% if object.avatar %}
+                           <img src="{{object.avatar.url}}">
+                        {% else %}
+                            <div class="detail-content-with-image-image-container-blank">
+
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="detail-content-with-image-text-container">
+                        <h1>{{object}}</h1>
+                        {% if object.desc %}
+                            <p>{{object.desc}}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="submenu-container">
+                    <nav class="submenu">
+                        {% if 'core.change_category' in perms %}
+                            <a href="{% url 'core:category_update' pk=object.id %}">Изменить</a>
+                        {% endif %}
+                        {% if 'core.delete_category' in perms %}
+                            <a href="{% url 'core:category_delete' pk=object.id %}">Удалить</a>
+                        {% endif %}
+                        <a href="{{ previous_page_l1 }}">Назад</a>
+                    </nav>
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элемента нет #}
+                <div class="not-found">
+                    <p>Категория не найдена!</p>
+                </div>
+                <div class="submenu-container">
+                    <nav class="submenu">
+                        <a href="{{ previous_page_l1 }}">Назад</a>
+                    </nav>
+                </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock content %}

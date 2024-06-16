@@ -1,0 +1,195 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Сотрудник
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    {# Вывод элемента #}
+    <div class="detail-card-with-image-container">
+
+        <div class="content-type-div">
+            <span class="content-type-basic">Сотрудник</span>
+        </div>
+
+        {% if object %}
+            <div class="detail-content-with-image">
+                <div class="detail-content-with-image-image-container">
+                    {% if object.avatar %}
+                       <img src="{{object.avatar.url}}">
+                    {% else %}
+                        <div class="detail-content-with-image-image-container-blank">
+
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="detail-content-with-image-text-container">
+                    <h1>
+                        {{object.username}}
+                    </h1>
+                    {% if object.last_name and object.first_name %}
+                        <h1>
+                            {{object.last_name}} {{object.first_name}}
+                        </h1>
+                    {% endif %}
+                    {% if object.mdm_id %}
+                        <p><span class="description-item">MDM ID:</span> {{object.mdm_id}}</p>
+                    {% endif %}
+                    {% if object.birthday %}
+                        <p><span class="description-item">Дата рождения:</span> {{object.birthday}}</p>
+                    {% endif %}
+                    {% if object.email %}
+                        <p><span class="description-item">Электронная почта:</span> {{object.email}}</p>
+                    {% endif %}
+                    {% if object.phone %}
+                        <p><span class="description-item">Телефон:</span> {{object.phone}}</p>
+                    {% endif %}
+                    {% if object.mobile_phone %}
+                        <p><span class="description-item">Мобильный телефон:</span> {{object.mobile_phone}}</p>
+                    {% endif %}
+                    {% if 'core.add_placement' in perms %}
+                        <p><span class="description-item">Пользователь активен:</span> {{object.is_active|yesno}}</p>
+                        <p><span class="description-item">Пользователь административной панели:</span> {{object.is_staff|yesno}}</p>
+                        <p><span class="description-item">Суперпользователь:</span> {{object.is_superuser|yesno}}</p>
+                    {% endif %}
+                    {% if object.groups.exists %}
+                        <p><span class="description-item">Группы:</span>
+                            {% for group in object.groups.all %}
+                                <span>
+                                    <a href="{% url 'core:employees' %}?groups={{group.id}}" class="link" target="_blank">{{group}}</a>{% if not forloop.last %}, {% endif %}
+                                </span>
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            {# Управление #}
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if 'core.change_employee' in perms %}
+                        <a href="{% url 'core:update_password' pk=object.id %}">Обновить пароль</a>
+                        <a href="{% url 'core:employee_update' pk=object.id %}">Изменить</a>
+                    {% endif %}
+                    {% if 'core.delete_employee' in perms %}
+                        <a href="{% url 'core:employee_delete' pk=object.id %}">Удалить</a>
+                    {% endif %}
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% else %}
+            {# Вывод сообщения, если элемента нет #}
+            <div class="not-found">
+                <p>Сотрудник не найден!</p>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="tab-menu-container">
+        <nav class="tab-menu">
+            <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Должности сотрудника [{{qs_count}}]</a>
+        </nav>
+    </div>
+
+    <div class="tab-content-container">
+        <div id="tab1" class="tab-content">
+            {% if object_list %}
+                <div class="list-table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Организация</th>
+                                <th>Подразделение</th>
+                                <th>Должность</th>
+                                <th>Является руководителем</th>
+                                <th>Начало работы</th>
+                                <th>Окончание работы</th>
+                                {% if user|perms:"core.change_placement" or user|perms:"core.delete_placement" %}
+                                    <th>Действия</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obj in object_list %}
+                                <tr>
+                                    <td>{{obj.position.subdivision.organization.legal_name}}</td>
+                                    <td>{{obj.position.subdivision.name}}</td>
+                                    <td>{{obj.position.name}}</td>
+                                    <td>{{obj.manager|yesno}}</td>
+                                    <td>{{obj.start_date}}</td>
+                                    {% if obj.end_date %}
+                                        <td>{{obj.end_date}}</td>
+                                    {% else %}
+                                        <td>-</td>
+                                    {% endif %}
+                                    {% if user|perms:"core.change_placement" or user|perms:"core.delete_placement" %}
+                                        <td>
+                                            {% if 'core.change_placement' in perms %}
+                                                <a href="{% url 'core:placement_update' pk=obj.id %}">Изменить</a>
+                                            {% endif %}
+                                            {% if 'core.delete_placement' in perms %}
+                                                <a href="{% url 'core:placement_delete' pk=obj.id %}">Удалить</a>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {# Пагинация #}
+                <div class="pagination">
+                    {# Информация о предыдущих страницах #}
+                    {% if page_obj.has_previous %}
+                        <a href="?{% url_replace page=1 %}">1</a>
+                        {% if page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if page_obj.has_next %}
+                        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элемента нет #}
+                    <div class="not-found">
+                        <p>Назначения сотрудника не найдены!</p>
+                    </div>
+            {% endif %}
+            {# Управление #}
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if 'core.add_placement' in perms %}
+                        <a href="{% url 'core:placement_create' pk=object.id %}">Создать назначение</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}

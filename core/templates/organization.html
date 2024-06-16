@@ -1,0 +1,60 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Организация
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    {# Вывод элемента #}
+    <div class="detail-card-container">
+
+        <div class="content-type-div">
+            <span class="content-type-basic">Организация</span>
+        </div>
+
+        {% if object %}
+            <div>
+                <h1>{{object.legal_name}}</h1>
+            </div>
+            <div class="detail-content">
+                {% if object.mdm_id %}
+                    <p><span class="description-item">MDM ID:</span> {{object.mdm_id}}</p>
+                {% endif %}
+                <p><span class="description-item">ИНН:</span> {{object.tin}}</p>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if user|perms:"core.change_organization" %}
+                        <a href="{% url 'core:organization_update' pk=object.id %}">Изменить</a>
+                    {% endif %}
+                    {% if user|perms:"core.delete_organization" %}
+                        <a href="{% url 'core:organization_delete' pk=object.id %}">Удалить</a>
+                    {% endif %}
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% else %}
+            {# Вывод сообщения, если элемента нет #}
+            <div class="not-found">
+                <p>Организация не найден!</p>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock content %}

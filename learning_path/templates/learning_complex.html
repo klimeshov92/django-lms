@@ -1,0 +1,187 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Комплексная программа
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    {# Вывод элемента #}
+    <div class="detail-card-with-image-container">
+
+        {% if object %}
+            <div class="content-type-div">
+                <span class="content-type-basic">Комплексная программа</span>
+            </div>
+            <div class="detail-content-with-image ">
+                <div class="detail-content-with-image-image-container">
+                    {% if object.avatar %}
+                       <img src="{{object.avatar.url}}">
+                    {% else %}
+                        <div class="detail-content-with-image-image-container-blank">
+
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="detail-content-with-image-text-container">
+                    <h1>{{object.name}}</h1>
+                    {% if object.categories.exists  %}
+                        <p><span class="description-item">Категории:</span>
+                            {% for category in object.categories.all %}
+                                <span>
+                                    <a href="{% url 'learning_path:learning_complexs' %}?сategory={{category.id}}" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                                </span>
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            {# Управление #}
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if user|perms:"learning_path.view_learningpath" %}
+                        <a href="{% url 'learning_path:learning_complex_paths' pk=object.id%}">Просмотреть</a>
+                    {% endif %}
+                    {% if user|perms:"learning_path.change_learningcomplex" %}
+                        <a href="{% url 'learning_path:learning_complex_update' pk=object.id %}">Изменить</a>
+                    {% endif %}
+                    {% if user|perms:"learning_path.delete_learningcomplex" %}
+                        <a href="{% url 'learning_path:learning_complex_delete' pk=object.id %}">Удалить</a>
+                    {% endif %}
+                    <a href="{{ previous_page_l5 }}">Назад</a>
+                </nav>
+            </div>
+        {% else %}
+            {# Вывод сообщения, если элемента нет #}
+            <div class="not-found">
+                <p>Программа обучения не найдена!</p>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    <a href="{{ previous_page_l5 }}">Назад</a>
+                </nav>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <div class="tab-menu-container">
+        <nav class="tab-menu">
+            <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
+            {% if user|perms:"learning_path.change_learningcomplex" %}
+                <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Траектории обучения [{{qs_count}}]</a>
+            {% endif %}
+        </nav>
+    </div>
+
+    <div class="tab-content-container">
+
+        <div id="tab1" class="tab-content">
+            {% if object.desc %}
+                <p>{{object.desc}}</p>
+            {% else %}
+                <p>Описания нет!</p>
+            {% endif %}
+        </div>
+
+        {# Вывод вопросов теста #}
+        {% if user|perms:"learning_path.change_learningcomplex" %}
+            <div id="tab3" class="tab-content">
+                {% if object_list %}
+                    <div class="list-table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Позиция</th>
+                                    <th>Название</th>
+                                    <th>Дительность (дней)</th>
+                                    <th>Необходимо пройти (контрольных задач)</th>
+                                    <th>Описание</th>
+                                    {% if user|perms:"learning_path.change_learningcomplexpath" or user|perms:"learning_path.delete_learningcomplexpath" in perms %}
+                                        <th>Действия</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in object_list %}
+                                    <tr>
+                                        <td>{{obj.position}}</td>
+                                        <td>{{obj.learning_path.name}}</td>
+                                        <td>{{obj.learning_path.duration}}</td>
+                                        <td>{{obj.learning_path.number_control_tasks}}</td>
+                                        <td>
+                                            {% if obj.learning_path.desc %}
+                                                {{obj.learning_path.desc}}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if user|perms:"learning_path.change_learningcomplexpath" %}
+                                                <a href="{% url 'learning_path:learning_complex_path_update' pk=obj.id %}">Изменить</a>
+                                            {% endif %}
+                                            {% if user|perms:"learning_path.delete_learningcomplexpath" %}
+                                                <a href="{% url 'learning_path:learning_complex_path_delete' pk=obj.id %}">Удалить</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {# Пагинация #}
+                    <div class="pagination">
+                        {# Информация о предыдущих страницах #}
+                        {% if page_obj.has_previous %}
+                            <a href="?{% url_replace page=1 %}">1</a>
+                            {% if page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if page_obj.has_next %}
+                            <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                            {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {# Вывод сообщения, если элементов нет #}
+                        <div class="not-found">
+                            <p>Вопросы теста не найдены!</p>
+                        </div>
+                {% endif %}
+                {# Управление #}
+                <div class="submenu-container">
+                    <nav class="submenu">
+                        {% if user|perms:"learning_path.add_learningcomplexpath" %}
+                           <a href="{% url 'learning_path:learning_complex_path_create' pk=object.id %}">Создать</a>
+                        {% endif %}
+                        {% if user|perms:"learning_path.change_learningcomplexpath" %}
+                            {% if learning_complex_paths_exists %}
+                                <a href="{% url 'learning_path:learning_paths_ordering' pk=object.id %}">Сортировать траектории</a>
+                            {% endif %}
+                        {% endif %}
+                    </nav>
+                </div>
+        {% endif %}
+
+    </div>
+</div>
+
+
+{% endblock content %}

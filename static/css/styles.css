@@ -1,0 +1,1732 @@
+/* Тема */
+:root {
+    /* Основной цвет rgb(51, 101, 138) var(--color-primary-rgb)*/
+    --color-primary-rgb: rgb(51, 101, 138);
+    /* Темнее для основной кнопки */
+    --color-primary-rgb-dark: rgb(41, 81, 110);
+
+    /* Акцентный цвет rgb(209, 73, 91) var(--color-accent-rgb)*/
+    --color-accent-rgb: rgb(209, 73, 91);
+    /* Темнее на для акцентной кнопки */
+    --color-accent-rgb-dark: rgb(167, 58, 73);
+
+    /* Цвет для легкого разделения rgb(221, 232, 236) var(--color-divider-rgb)*/
+    --color-divider-rgb: rgb(221, 232, 236);
+    --color-divider-rgba: rgba(221, 232, 236, 0.7);
+
+    /* Цвет текста rgb(48, 48, 48) var(--color-text-rgb)*/
+    --color-text-rgb: rgb(48, 48, 48);
+
+    /* Фиолетовый для подписи типа контента rgb(126, 87, 194) var(--color-content-label-rgb)*/
+    --color-content-label-rgb: rgb(126, 87, 194);
+
+    /* Оранжевый для статуса "В процессе" rgb(255, 165, 0) var(--color-in-progress-rgb)*/
+    --color-in-progress-rgb: rgb(255, 165, 0);
+
+    /* Зеленый для статуса "Завершено" rgb(76, 175, 80) var(--color-completed-rgb)*/
+    --color-completed-rgb: rgb(76, 175, 80);
+
+    /* Красный для статуса "Требует внимания" rgb(244, 67, 54) var(--color-attention-rgb)*/
+    --color-attention-rgb: rgb(244, 67, 54);
+
+    /* Более бледный оранжевый rgb(255, 255, 204) var(--color-in-progress-light-rgb)*/
+    --color-in-progress-light-rgb: rgb(255, 255, 204);
+
+    /* Более бледный зеленый rgb(204, 255, 204) var(--color-completed-light-rgb)*/
+    --color-completed-light-rgb: rgb(204, 255, 204);
+
+    /* Более бледный красный rgb(255, 204, 204) var(--color-attention-light-rgb)*/
+    --color-attention-light-rgb: rgb(255, 204, 204);
+
+}
+
+/* Глобальные стили для <html> и <body> */
+html, body {
+    margin: 0; /* Убираем внешние отступы */
+    padding: 0; /* Убираем внутренние отступы */
+    color: var(--color-text-rgb); /* Цвет текста */
+    font-family: 'Roboto', sans-serif; /* Основной шрифт 'Roboto' */
+    font-weight: 400; /* Жирность шрифта */
+    width: 100% !important; /* Ширина */
+    line-height: 1.5; /* Междустрочный */
+    height: 100%; /* Полная высота для html и body */
+    width: 100%; /* Полная ширина для html и body */
+}
+
+/* Заголовки */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 500; /* Жирность шрифта */
+    margin-top: 20px; /* Верхний наружный отступ */
+    margin-bottom: 20px; /* Нижний наружный отступ */
+}
+
+/* Заголовки */
+.h1-center {
+    text-align: center; /* Выравнивание текста */
+}
+
+/* Абзацы */
+p {
+    margin-top: 15px; /* Верхний наружный отступ */
+    margin-bottom: 15px; /* Нижний наружный отступ */
+}
+
+/* Текст */
+.text-align-right {
+    text-align:right; /* Расположение текста */
+}
+
+/* Стили для ссылок в содержимом элементов сетки */
+a {
+    color: var(--color-accent-rgb); /* Цвет ссылок */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    text-decoration: underline; /* Подчеркивание ссылок */
+    font-weight: 500; /* Жирность текста */
+    word-wrap: break-word; /* Перенос */
+}
+
+/* Стили для ссылок в содержимом при наведении */
+a:hover {
+    text-decoration: none; /* Убираем подчеркивание при наведении */
+    color: var(--color-accent-rgb-dark); /* Цвет ссылок */
+
+}
+
+/* iframe */
+iframe {
+    max-width:100% !important; /* Ширина */
+}
+
+/* Изображения */
+.enlarged-image {
+    max-width: 100%; /* Устанавливаем максимальную ширину изображения равной 90% ширины оверлея */
+    max-height: 100%; /* Устанавливаем максимальную ширину изображения равной 90% ширины оверлея */
+    cursor: auto; /* Устанавливаем вид курсора при наведении на изображение */
+}
+
+/* Изображения */
+.image-overlay {
+    position: fixed; /* Устанавливаем позицию оверлея как фиксированную, чтобы он оставался на месте при прокрутке страницы */
+    top: 0; /* Размещаем оверлей в верхнем краю окна браузера */
+    left: 0; /* Размещаем оверлей в левом краю окна браузера */
+    width: 100%; /* Устанавливаем ширину оверлея на 100% окна браузера */
+    height: 100%; /* Устанавливаем высоту оверлея на 100% окна браузера */
+    background-color: var(--color-divider-rgba); /* Устанавливаем цвет фона оверлея с прозрачностью */
+    display: flex; /* Используем flexbox для выравнивания содержимого по центру */
+    justify-content: center; /* Центрируем содержимое по горизонтали */
+    align-items: center; /* Центрируем содержимое по вертикали */
+    z-index: 9999; /* Устанавливаем z-index, чтобы оверлей был выше других элементов на странице */
+}
+
+/* Изображения */
+.close-button {
+    color: var(--color-attention-rgb); /* Устанавливаем цвет иконки крестика */
+    font-size: 50px; /* Устанавливаем размер шрифта для иконки крестика */
+    position: absolute; /* Устанавливаем позицию кнопки как абсолютную относительно ближайшего позиционированного родителя */
+    top: 15px; /* Располагаем кнопку на 10px от верхнего края оверлея */
+    right: 25px; /* Располагаем кнопку на 10px от правого края оверлея */
+    cursor: pointer; /* Устанавливаем вид курсора при наведении на кнопку */
+}
+
+/* Изображения */
+.close-button:hover {
+    color: var(--color-accent-rgb-dark); /* Цвет ссылок */
+}
+
+/* Стилизуем шапку сайта */
+.header {
+    display: flex; /* Флекс элемент */
+    justify-content: space-between; /* Распределение элементов по краям контейнера */
+    align-items: center; /* Выравниваем по центру по высоте */
+    background-color: var(--color-primary-rgb); /* Задаем цвет фона шапки */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+}
+
+/* Стилизуем шапку сайта */
+.header:hover {
+    background-color: var(--color-primary-rgb-dark); /* Цвет */
+}
+
+/* Стили для кнопки гамбургер-меню */
+.hamburger-menu {
+    background: none; /* Без фона */
+    color: white; /* Цвет иконки белый */
+    border: none; /* Без границ */
+    font-size: 2rem; /* Размер шрифта */
+    cursor: pointer; /* Стиль курсора */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+}
+
+/* Стили для кнопки гамбургер-меню */
+.hamburger-menu:hover {
+    transform: scale(1.05); /* Увеличение при наведении */
+}
+
+/* Стили для имени пользователя */
+.header-username {
+    color: white; /* Цвет текста */
+    padding: 0px 15px; /* Отступы */
+    font-weight: 500; /* Толщина шрифта */
+}
+
+/* Стили для меню */
+.menu {
+    display: none; /* Скрыто */
+    flex-wrap: wrap; /* Разрешаем элементам обтекать */
+    align-items: center; /* Выравниваем элементы по центру по вертикали */
+    justify-content: center; /* Выравниваем элементы по центру по горизонтали */
+    border-top: 2px solid var(--color-divider-rgb); /* Линия сверху */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Линия снизу */
+    text-align: center; /* Текст по центру */
+    width: 100% !important; /* Ширина */
+    font-size: 1.1rem; /* Размер шрифта */
+    background: white; /* Белый фон формы */
+}
+
+/* Стили для меню */
+.menu.active {
+    display: flex; /* Показать меню */
+}
+
+/* Стили для меню */
+.menu a {
+    color: var(--color-accent-rgb); /* Цвет текста */
+    text-decoration: none; /* Без подчеркивания */
+    padding: 15px 25px; /* Отступы */
+    display: inline-block; /* Блочно-строчное отображение */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    word-wrap: break-word; /* Перенос */
+    font-weight: 400; /* Жирность текста */
+}
+
+/* Стили для меню */
+.menu a.active, .menu a:hover, .menu a:focus {
+    background-color: var(--color-accent-rgb); /* Фон при активации */
+    color: white; /* Цвет текста */
+}
+
+/* Список */
+.detail-container {
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 1075px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Стили для нижнего меню */
+.tab-menu-container {
+    display: flex; /* Включаем Flexbox */
+    justify-content: center; /* Выравниваем элементы по центру по горизонтали */
+    align-items: center; /* Выравниваем элементы по центру по вертикали */
+    width: 100% !important; /* Ширина */
+}
+
+/* Стили для меню */
+.tab-menu {
+    display: flex; /* Показать меню */
+    flex-wrap: wrap; /* Разрешаем элементам обтекать */
+    align-items: center; /* Выравниваем элементы по центру по вертикали */
+    justify-content: start; /* Выравниваем элементы по центру по горизонтали */
+    border-top: 2px solid var(--color-divider-rgb); /* Линия сверху */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Линия снизу */
+    width: 100% !important; /* Ширина */
+    font-size: 1.1rem; /* Размер шрифта */
+    background: white; /* Белый фон формы */
+}
+
+/* Стили для меню */
+.tab-menu-link {
+    color: var(--color-accent-rgb); /* Цвет текста */
+    text-decoration: none; /* Без подчеркивания */
+    padding: 15px 25px; /* Отступы */
+    display: inline-block; /* Блочно-строчное отображение */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    word-wrap: break-word; /* Перенос */
+    font-weight: 400; /* Жирность текста */
+}
+
+/* Стили для меню */
+.tab-menu-link.active, .tab-menu-link:hover, .tab-menu-link:focus {
+    background-color: var(--color-accent-rgb); /* Фон при активации */
+    color: white; /* Цвет текста */
+}
+
+/* Список */
+.tab-content-container {
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 100%; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Табы */
+.tab-content {
+    display: none;
+}
+
+/* Табы */
+.tab-content.active {
+    display: block; /* Отображаем активное содержимое */
+    padding: 0 25px 25px 25px; /* Отступы внутри */
+}
+
+/* Стили для нижнего меню */
+.submenu-container {
+    display: flex; /* Включаем Flexbox */
+    justify-content: center; /* Выравниваем элементы по центру по горизонтали */
+    margin: 25px 0 0 0; /* Отступы внешние */
+}
+
+/* Стили для нижнего меню */
+.submenu-padding-top-container {
+    padding: 25px 0; /* Отступ внутренний */
+}
+
+/* Стили для нижнего меню */
+.submenu {
+    display: flex; /* Включаем Flexbox */
+    flex-wrap: wrap; /* Разрешаем элементам обтекать */
+    align-items: center; /* Выравниваем элементы по центру по вертикали */
+    justify-content: center; /* Выравниваем элементы по центру по горизонтали */
+    text-align: center; /* Текст по центру */
+    width: 100%; /* Ширина */
+    gap: 15px; /* Отступ между элементами */
+}
+
+/* Стили меню формы */
+.form-menu {
+    display: flex; /* Включаем Flexbox */
+    flex-wrap: wrap; /* Разрешаем элементам обтекать */
+    align-items: center; /* Выравниваем по вертикали */
+    justify-content: start; /* Выравниваем по горизонтали */
+    text-align: center; /* Текст по центру */
+    gap: 15px; /* Отступы между элементами */
+    margin: 15px 0; /* Наружный отступ */
+}
+
+/* Стили меню формы */
+.form-menu-center {
+    justify-content: center; /* Выравниваем по горизонтали */
+}
+
+/* Стили кнопок */
+.div-test-button {
+    text-align: center;
+
+}
+
+/* Стили кнопок */
+a.button,
+.submenu a,
+.button,
+.form input.button {
+    display: inline-block; /* Блочно-строчный */
+    text-align: center; /* Выравнивание текста */
+    font-weight: normal; /* Обычный (нормальный) шрифт */
+    font-size: 1.1rem; /* Размер шрифта */
+    line-height: 1.5 !important; /* Высота строки */
+    background-color: var(--color-primary-rgb); /* Фон кнопки */
+    color: white; /* Цвет текста кнопки */
+    border: none; /* Отсутствие границы у кнопки */
+    text-decoration: none; /* Без подчеркивания */
+    border-radius: 15px; /* Скругленные углы кнопки */
+    padding: 10px 15px; /* Вертикальный и горизонтальный отступы кнопки */
+    cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+}
+
+/* Стили кнопок */
+a.button:hover,
+.submenu a:hover,
+.button:hover,
+.form input.button:hover,
+a.button:focus,
+.submenu a:focus,
+.button:focus,
+.form input.button:focus {
+    background-color: var(--color-primary-rgb-dark);
+}
+
+/* Стили кнопок */
+a.button:disabled,
+.submenu a:disabled,
+.button:disabled,
+.form input.button:disabled {
+    background-color: var(--color-divider-rgb); /* Светло-серый фон неактивной кнопки */
+    cursor: default; /* Обычный курсор для неактивной кнопки */
+    box-shadow: none; /* Убрать тени для неактивной кнопки */
+}
+
+/* Стили кнопок */
+a.button:not(:first-of-type),
+.submenu a:not(:first-of-type),
+.button:not(:first-of-type),
+.form input.button:not(:first-of-type) {
+    display: inline-block; /* Блочно-строчный */
+    text-align: center; /* Выравнивание текста */
+    font-weight: normal; /* Обычный (нормальный) шрифт */
+    font-size: 1.1rem; /* Размер шрифта */
+    line-height: 1.5 !important; /* Высота строки */
+    background-color: white; /* Фон кнопки */
+    border: 3px solid var(--color-primary-rgb); /* Граница */
+    color: var(--color-primary-rgb); /* Цвет текста кнопки */
+    text-decoration: none; /* Без подчеркивания */
+    border-radius: 15px; /* Скругленные углы кнопки */
+    padding: 7px 12px; /* Вертикальный и горизонтальный отступы кнопки */
+    cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+}
+
+/* Стили кнопок */
+a.button:not(:first-of-type):hover,
+.submenu a:not(:first-of-type):hover,
+.button:not(:first-of-type):hover,
+.form input.button:not(:first-of-type):hover,
+a.button:not(:first-of-type):focus,
+.submenu a:not(:first-of-type):focus,
+.button:not(:first-of-type):focus,
+.form input.button:not(:first-of-type):focus {
+    background-color: var(--color-primary-rgb-dark);
+    border: 3px solid var(--color-primary-rgb-dark); /* Граница */
+    color: white; /* Цвет текста кнопки */
+}
+
+/* Стили кнопок */
+a.button:not(:first-of-type):disabled,
+.submenu a:not(:first-of-type):disabled,
+.button:not(:first-of-type):disabled,
+.form input.button:not(:first-of-type):disabled {
+    background-color: var(--color-divider-rgb); /* Светло-серый фон неактивной кнопки */
+    cursor: default; /* Обычный курсор для неактивной кнопки */
+    box-shadow: none; /* Убрать тени для неактивной кнопки */
+}
+
+/* Стили для нижнего меню */
+.submenu-mini {
+    display: flex; /* Включаем Flexbox */
+    flex-wrap: wrap; /* Разрешаем элементам обтекать */
+    text-align: center; /* Текст по центру */
+    align-items: center; /* Выравниваем элементы по центру по вертикали */
+    justify-content: center; /* Выравниваем элементы по центру по горизонтали */
+    width: 100%; /* Ширина */
+    gap: 10px; /* Отступ между элементами */
+    margin: 15px 0; /* Отступы */
+}
+
+/* Стили для нижнего меню */
+.submenu-mini-end {
+    justify-content: end; /* Выравниваем элементы по центру по горизонтали */
+}
+
+/* Стили кнопок */
+a.button-mini,
+.submenu-mini a,
+.button-mini {
+    display: inline-block; /* Блочно-строчный */
+    text-align: center; /* Выравнивание текста */
+    font-weight: normal; /* Обычный (нормальный) шрифт */
+    line-height: 1.5 !important; /* Высота строки */
+    background-color: var(--color-primary-rgb); /* Фон кнопки */
+    color: white; /* Цвет текста кнопки */
+    border: none; /* Отсутствие границы у кнопки */
+    text-decoration: none; /* Без подчеркивания */
+    border-radius: 10px; /* Скругленные углы кнопки */
+    padding: 5px 10px; /* Вертикальный и горизонтальный отступы кнопки */
+    cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+}
+
+/* Стили кнопок */
+a.button-mini:hover,
+.submenu-mini a:hover,
+.button-mini:hover,
+a.button-mini:focus,
+.submenu-mini a:focus,
+.button-mini:focus {
+    background-color: var(--color-primary-rgb-dark);
+}
+
+/* Стили кнопок */
+a.button-mini:disabled,
+.submenu-mini a:disabled,
+.button-mini:disabled {
+    background-color: var(--color-divider-rgb); /* Светло-серый фон неактивной кнопки */
+    cursor: default; /* Обычный курсор для неактивной кнопки */
+    box-shadow: none; /* Убрать тени для неактивной кнопки */
+}
+
+/* Стили кнопок */
+a.button-mini:not(:first-of-type),
+.submenu-mini a:not(:first-of-type),
+.button-mini:not(:first-of-type) {
+    display: inline-block; /* Блочно-строчный */
+    text-align: center; /* Выравнивание текста */
+    font-weight: normal; /* Обычный (нормальный) шрифт */
+    line-height: 1.5 !important; /* Высота строки */
+    background-color: white; /* Фон кнопки */
+    border: 3px solid var(--color-primary-rgb); /* Граница */
+    color: var(--color-primary-rgb); /* Цвет текста кнопки */
+    text-decoration: none; /* Без подчеркивания */
+    border-radius: 10px; /* Скругленные углы кнопки */
+    padding: 2px 7px; /* Вертикальный и горизонтальный отступы кнопки */
+    cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+}
+
+/* Стили кнопок */
+a.button-mini:not(:first-of-type):hover,
+.submenu-mini a:not(:first-of-type):hover,
+.button-mini:not(:first-of-type):hover,
+a.button-mini:not(:first-of-type):focus,
+.submenu-mini a:not(:first-of-type):focus,
+.button-mini:not(:first-of-type):focus {
+    background-color: var(--color-primary-rgb-dark);
+    border: 3px solid var(--color-primary-rgb-dark); /* Граница */
+    color: white; /* Цвет текста кнопки */
+}
+
+/* Стили кнопок */
+a.button-mini:not(:first-of-type):disabled,
+.submenu-mini a:not(:first-of-type):disabled,
+.button-mini:not(:first-of-type):disabled {
+    background-color: var(--color-divider-rgb); /* Светло-серый фон неактивной кнопки */
+    cursor: default; /* Обычный курсор для неактивной кнопки */
+    box-shadow: none; /* Убрать тени для неактивной кнопки */
+}
+
+/* Список */
+.informers-grid {
+    display: grid; /* Сетка */
+    grid-gap: 25px; /* Расстояние между элементами */
+    justify-content: center;
+    max-width: 525px; /* Ширина */
+    margin: 25px auto; /* Отступы внешние */
+    text-align: center; /* Выравнивание текста */
+}
+
+/* Список */
+.informers-grid-item {
+    display: flex; /* Flexbox */
+    flex-direction: column; /* Колонки */
+    justify-content: space-between; /* Распределение пространства */
+}
+
+/* Информеры */
+.informers-grid-item-container {
+    font-weight: 400; /* Обычный (нормальный) шрифт */
+    font-size: 1.1rem; /* Размер шрифта */
+    background-color: white; /* Фон */
+    color: var(--color-in-progress-rgb); /* Цвет текста */
+    border-radius: 15px; /* Радиус углов рамки */
+    padding: 15px 25px; /* Вертикальный и горизонтальный отступы кнопки */
+    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+}
+
+/* Информеры */
+.informers-grid-item-container-completed{
+    color: var(--color-completed-rgb); /* Цвет текста */
+    border: 2px solid var(--color-completed-rgb); /* Граница */
+}
+
+/* Информеры */
+.informers-grid-item-container-failed {
+    color: var(--color-attention-rgb); /* Цвет текста */
+    border: 2px solid var(--color-attention-rgb); /* Граница */
+}
+
+/* Информеры */
+.informer-int {
+    font-size: 3rem;
+}
+
+/* Информеры */
+a.informers-grid-item-button {
+    font-weight: 400; /* Обычный (нормальный) шрифт */
+    font-size: 1.1rem; /* Размер шрифта */
+    color: var(--color-in-progress-rgb); /* Цвет текста */
+    border-radius: 15px; /* Радиус углов рамки */
+    padding: 15px 25px; /* Вертикальный и горизонтальный отступы кнопки */
+    border: 3px solid var(--color-in-progress-rgb); /* Граница */
+    text-decoration: none; /* Без подчеркивания */
+    cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+}
+
+/* Информеры */
+a.informers-grid-item-button-completed {
+    color: var(--color-completed-rgb); /* Цвет текста */
+    border: 3px solid var(--color-completed-rgb); /* Граница */
+}
+
+/* Информеры */
+a.informers-grid-item-button-failed {
+    color: var(--color-attention-rgb); /* Цвет текста */
+    border: 3px solid var(--color-attention-rgb); /* Граница */
+}
+
+/* Информеры */
+a.informers-grid-item-button:hover {
+    color: var(--color-in-progress-light-rgb); /* Цвет текста кнопки при наведении */
+    background-color: var(--color-in-progress-rgb); /* Фон */
+
+}
+
+/* Информеры */
+a.informers-grid-item-button-completed:hover,
+a.informers-grid-item-button-completed:focus {
+    color: var(--color-completed-light-rgb); /* Цвет текста кнопки при наведении */
+    background-color: var(--color-completed-rgb); /* Фон */
+}
+
+/* Информеры */
+a.informers-grid-item-button-failed:hover,
+a.informers-grid-item-button-failed:focus {
+    color: var(--color-attention-light-rgb); /* Цвет текста кнопки при наведении */
+    background-color: var(--color-attention-rgb); /* Фон */
+}
+
+/* Авторизация */
+.auth-container{
+    display: flex; /* Использование flexbox */
+    justify-content: center; /* Горизонтальное центрирование */
+    align-items: center; /* Вертикальное центрирование */
+    min-height: calc(100vh - 45px); /* Высота контейнера, равная высоте видимой области окна минус высота шапки */
+    padding: 25px; /* Отступы внутри контейнера */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+    overflow: hidden; /* Предотвращаем переполнение */
+}
+
+/* Авторизация */
+.auth {
+    max-width: 300px; /* Установка максимальной ширины */
+    width: 100%; /* Обеспечиваем, что контейнер займет всю ширину */
+    padding: 25px; /* Отступы внутри контейнера */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Авторизация */
+.auth-text {
+    text-align: center; /* Текст по центру */
+    word-wrap: break-word; /* Перенос слов */
+}
+
+/* Авторизация */
+.auth form p {
+    text-align: center;
+    word-wrap: break-word; /* Перенос слов */
+}
+
+/* Карточка */
+.home-container {
+    padding: 0px 25px 25px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 575px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Список */
+.list-container {
+    padding: 0px 25px 25px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 1050px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Список */
+.list-grid {
+    display: grid; /* Сетка */
+    grid-gap: 50px; /* Расстояние между элементами */
+    justify-content: center; /* По центру */
+    max-width: 1000px; /* Ширина */
+    margin: 25px auto; /* Отступы внешние */
+}
+
+/* Список */
+.list-grid-item {
+    background: white; /* Фон белый */
+    border-radius: 25px; /* Скругленные углы */
+    overflow: hidden; /* Скрываем выходящее за границы */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    display: flex; /* Flexbox */
+    flex-direction: column; /* Колонки */
+}
+
+/* Список */
+.list-grid-item-header {
+    padding: 0 25px; /* Отступы */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Линия снизу */
+}
+
+/* Список */
+.list-grid-item-image-container {
+    display: flex; /* Используем flexbox */
+    flex-direction: column; /* Располагаем элементы в колонку */
+    justify-content: center; /* Выравниваем по центру по вертикали */
+    align-items: center; /* Выравниваем по центру по горизонтали */
+    padding: 15px 25px; /* Добавляем отступы */
+    width: 100%; /* Занимает 100% ширины родительского контейнера */
+    height: 200px; /* Жестко фиксированная высота в 200px */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Линия снизу */
+}
+
+/* Список */
+.list-grid-item-image-container img {
+    max-width: 100%; /* Максимальная ширина изображения равна ширине контейнера */
+    max-height: 100%; /* Максимальная высота изображения равна высоте контейнера */
+    border-radius: 5px; /* Скругление углов */
+}
+
+/* Список */
+.list-grid-item-image-container-blank {
+    width: 100%; /* Занимает доступную ширину */
+    height: 100%; /* Занимает доступную высоту */
+    border: 2px dashed var(--color-divider-rgb); /* Устанавливаем пунктирную рамку серого цвета */
+    border-radius: 5px; /* Скругление углов */
+}
+
+/* Список */
+.list-grid-item-content {
+    padding: 0 25px; /* Отступы */
+    word-wrap: break-word; /* Перенос слов */
+}
+
+/* Список */
+.list-grid-item-footer {
+    text-align: center; /* Текст по центру */
+    padding: 0 25px; /* Отступы */
+    margin-top: auto; /* Это заставит элемент прилипнуть к низу флекс-контейнера */
+}
+
+/* Флекс-список */
+.tab-list-grid {
+    display: grid; /* Сетка */
+    grid-gap: 25px; /* Расстояние между элементами */
+    justify-content: center; /* По центру */
+    max-width: 1025px; /* Ширина */
+    margin: 25px auto; /* Отступы внешние */
+}
+
+/* Флекс-список */
+.tab-list-grid-item {
+    background: white; /* Фон белый */
+    border-radius: 15px; /* Скругленные углы */
+    overflow: hidden; /* Скрываем выходящее за границы */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    display: flex; /* Flexbox */
+    flex-direction: column; /* Колонки */
+}
+
+/* Флекс-список */
+.tab-list-grid-item-content {
+    padding: 0 15px; /* Отступы */
+}
+
+/* Флекс-список */
+.tab-list-grid-item-footer {
+    padding: 0 15px; /* Отступы */
+    margin-top: auto; /* Это заставит элемент прилипнуть к низу флекс-контейнера */
+}
+
+/* Таблица */
+.list-table-responsive {
+    margin: 25px auto; /* Отступ внешний */
+    overflow-x: auto; /* Добавляет горизонтальную прокрутку, если содержимое шире контейнера */
+    max-width: 100%; /* Полная ширина родительского элемента */
+    -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS устройствах */
+    -ms-overflow-style: -ms-autohiding-scrollbar; /* Автоматически скрывающиеся полосы прокрутки в IE и Edge */
+}
+
+/* Таблица */
+.list-table-responsive table {
+    border-collapse: collapse; /* Убираем двойные границы между ячейками */
+    margin: 0 auto; /* Отступ сверху и снизу таблицы */
+}
+
+/* Таблица */
+.list-table-responsive th {
+    background-color: var(--color-divider-rgb); /* Фоновый цвет заголовков */
+    font-weight: 500; /* Жирное начертание для текста заголовков */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Границы вокруг ячеек */
+    padding: 10px 10px; /* Внутренние отступы в ячейках */
+    text-align: left; /* Выравнивание текста в ячейках */
+}
+
+
+/* Таблица */
+.list-table-responsive td {
+    border-bottom: 2px solid var(--color-divider-rgb); /* Границы вокруг ячеек */
+    padding: 10px 10px; /* Внутренние отступы в ячейках */
+    text-align: left; /* Выравнивание текста в ячейках */
+}
+
+/* Таблица */
+.list-table-responsive table img {
+    border-radius: 5px; /* Скругление границ изображения */
+    max-width: 50px; /* Максимальная ширина изображения */
+    height: auto; /* Высота изображения автоматически адаптируется к ширине */
+}
+
+/* Стили для пагинации */
+.pagination {
+    text-align: center; /* Выравнивание элементов по центру */
+    margin: 25px 0 0 0; /* Отступ внутренний */
+}
+
+/* Стили для пагинации */
+.pagination-content {
+    margin: 25px 0 0 0; /* Отступ внутренний */
+}
+
+/* Стили для пагинации */
+.pagination-test {
+    margin: 25px 0; /* Отступ внутренний */
+}
+
+/* Стили для пагинации */
+.pagination a {
+    color: var(--color-accent-rgb); /* Цвет текста */
+    text-decoration: none !important; /* Без подчеркивания */
+    padding: 10px 15px; /* Отступы */
+    display: inline-block; /* Блочно-строчное отображение */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    word-wrap: break-word; /* Перенос */
+    font-weight: 400; /* Жирность текста */
+}
+
+/* Стили для пагинации */
+.pagination-gap {
+    color: var(--color-accent-rgb); /* Цвет текста */
+    display: inline-block; /* Блочно-строчное отображение */
+}
+
+/* Стили для пагинации */
+.pagination a:hover,
+.pagination a:focus {
+    background-color: var(--color-accent-rgb); /* Фон при активации */
+    color: white; /* Цвет текста */
+}
+
+/* Стили для пагинации */
+.current-page {
+    padding: 10px 15px; /* Отступы */
+    background-color: var(--color-accent-rgb); /* Фон при активации */
+    color: white; /* Цвет текста */
+    display: inline-block; /* Строчный блок */
+}
+
+/* Фильтры */
+.filters-header {
+    text-align: right; /* Выравнивание текста */
+    margin: 15px auto; /* Перенос снаружи */
+}
+
+/* Фильтры */
+.filters-button {
+
+}
+
+/* Фильтры */
+.filters-area  {
+    display: none; /* Скрыто */
+}
+
+/* Фильтры */
+.filters-area.active {
+    display: block; /* Показать */
+}
+
+/* Карточка */
+.detail-card-container {
+    padding: 0px 25px 25px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 550px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Карточка */
+.detail-card-with-image-container {
+    padding: 0px 25px 25px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 825px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Карточка */
+.detail-content {
+    word-wrap: break-word; /* Перенос слов */
+    margin: 25px auto; /* Перенос снаружи */
+}
+
+/* Карточка */
+.detail-content-with-image {
+    display: flex; /* Включаем Flexbox для горизонтального расположения */
+    align-items: flex-start; /* Выравниваем элементы по верхнему краю */
+    gap: 25px; /* Отступ между контейнерами */
+    word-wrap: break-word; /* Перенос слов */
+    margin: 25px auto; /* Перенос снаружи */
+}
+
+/* Карточка */
+.detail-content-with-image-image-container {
+    width: 33.33%; /* Вложенные элементы занимают всю ширину */
+}
+
+/* Карточка */
+.detail-content-with-image-image-container img {
+    max-width: 100%; /* Ширина изображения не шире контейнера */
+    height: auto; /* Высота автоматически регулируется */
+    object-fit: contain; /* Изображение сохраняет пропорции и полностью помещается в контейнер */
+    border-radius: 5px; /* Скругление углов */
+    margin-top: 20px; /* Отступ сверху */
+    margin-bottom: 15px; /* Отступ снизу */
+}
+
+/* Карточка */
+.detail-content-with-image-image-container-blank {
+    height: 300px;
+    border: 2px dashed var(--color-divider-rgb); /* Устанавливает пунктирную рамку серого цвета */
+    border-radius: 5px; /* Скругление углов */
+    margin-top: 20px; /* Отступ сверху */
+    margin-bottom: 15px; /* Отступ снизу */
+}
+
+/* Карточка */
+.detail-content-with-image-text-container {
+    width: 66.66%; /* Задаем ширину */
+}
+
+/* Нет элемента */
+.not-found {
+    text-align: center; /* Выравнивание по центру */
+}
+
+/* Контейнер типа контента */
+.content-type-div {
+    margin: 25px auto; /* Отступы внешние */
+    text-align: right; /* Выравнивание текста */
+}
+
+/* Контейнер типа контента */
+.content-type-sub-div {
+    margin: 15px auto; /* Отступы внешние */
+    text-align: right; /* Выравнивание текста справа */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
+}
+
+/* Контейнер типа контента */
+.content-type-basic {
+    display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
+    color: var(--color-content-label-rgb); /* Цвет текста */
+    border-radius: 15px; /* Радиус углов рамки */
+    padding: 10px 15px; /* Внутренний отступ */
+    border: 2px solid var(--color-content-label-rgb); /* Граница */
+    font-size: 1.1rem; /* Размер шрифта */
+}
+
+/* Контейнер типа контента */
+.content-type-sub {
+    display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
+    color: var(--color-content-label-rgb); /* Цвет текста */
+    border-radius: 10px; /* Радиус углов рамки */
+    padding: 5px 10px; /* Внутренний отступ */
+    border: 2px solid var(--color-content-label-rgb); /* Граница */
+}
+
+/* Отзыв */
+.review-average-mark {
+    display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
+    color: var(--color-in-progress-rgb); /* Цвет текста */
+    border-radius: 15px; /* Радиус углов рамки */
+    padding: 10px 15px; /* Внутренний отступ */
+    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+    font-size: 1.1rem; /* Размер шрифта */
+}
+
+/* Отзыв */
+.review-mark {
+    display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
+    color: var(--color-in-progress-rgb); /* Цвет текста */
+    border-radius: 10px; /* Радиус углов рамки */
+    padding: 5px 10px; /* Внутренний отступ */
+    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+}
+
+/* Статус */
+.status {
+    font-weight: normal; /* Обычный (нормальный) шрифт */
+
+    color: var(--color-in-progress-rgb); /* Цвет текста */
+    border-radius: 10px; /* Радиус углов рамки */
+    padding: 5px 10px; /* Внутренний отступ */
+    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+    text-align: center;
+    display: block; /* Блочное отображение */
+}
+
+/* Статус */
+.status-big {
+    font-weight: normal; /* Обычный (нормальный) шрифт */
+    color: var(--color-in-progress-rgb); /* Цвет текста */
+    border-radius: 15px; /* Радиус углов рамки */
+    padding: 10px 15px; /* Внутренний отступ */
+    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+    text-align: center;
+    display: block; /* Блочное отображение */
+    font-size: 1.1rem; /* Размер шрифта */
+}
+
+/* Статус */
+.status-completed {
+    color: var(--color-completed-rgb); /* Цвет текста */
+    border: 2px solid var(--color-completed-rgb); /* Граница */
+}
+
+/* Статус */
+.status-failed {
+    color: var(--color-attention-rgb); /* Цвет текста */
+    border: 2px solid var(--color-attention-rgb); /* Граница */
+}
+
+/* Статус */
+a.status-button {
+    font-weight: normal; /* Обычный (нормальный) шрифт */
+    color: var(--color-in-progress-rgb); /* Цвет текста */
+    border-radius: 10px; /* Радиус углов рамки */
+    padding: 5px 10px; /* Внутренний отступ */
+    border: 3px solid var(--color-in-progress-rgb); /* Граница */
+    text-decoration: none; /* Без подчеркивания */
+    cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    display: block; /* Блочное отображение */
+}
+
+/* Статус */
+a.status-button-big {
+    font-weight: normal; /* Обычный (нормальный) шрифт */
+    color: var(--color-in-progress-rgb); /* Цвет текста */
+    border-radius: 15px; /* Радиус углов рамки */
+    padding: 10px 15px; /* Вертикальный и горизонтальный отступы кнопки */
+    border: 3px solid var(--color-in-progress-rgb); /* Граница */
+    text-decoration: none; /* Без подчеркивания */
+    cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    display: block; /* Блочное отображение */
+    font-size: 1.1rem; /* Размер шрифта */
+}
+
+/* Статус */
+a.status-button-completed {
+    color: var(--color-completed-rgb); /* Цвет текста */
+    border: 3px solid var(--color-completed-rgb); /* Граница */
+}
+
+/* Статус */
+a.status-button-failed {
+    color: var(--color-attention-rgb); /* Цвет текста */
+    border: 3px solid var(--color-attention-rgb); /* Граница */
+}
+
+/* Статус */
+a.status-button:hover {
+    color: var(--color-in-progress-light-rgb); /* Цвет текста кнопки при наведении */
+    background-color: var(--color-in-progress-rgb); /* Фон */
+
+}
+
+/* Статус */
+a.status-button-completed:hover {
+    color: var(--color-completed-light-rgb); /* Цвет текста кнопки при наведении */
+    background-color: var(--color-completed-rgb); /* Фон */
+}
+
+/* Статус */
+a.status-button-failed:hover {
+    color: var(--color-attention-light-rgb); /* Цвет текста кнопки при наведении */
+    background-color: var(--color-attention-rgb); /* Фон */
+}
+
+/* Пункт описания */
+.description-item {
+    color: var(--color-text-rgb); /* Серый цвет текста */
+    font-weight: 500; /* Жирность шрифта */
+}
+
+/* Стили для верхней грацницы */
+.hr-top {
+    border-top: 2px solid var(--color-accent-rgb); /* Устанавливает пунктирную рамку алого цвета сверху */
+}
+
+/* Материал */
+.material-container-header {
+    padding: 0px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
+}
+
+/* Материал */
+.material-container {
+    padding: 0px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
+}
+
+/* Материал */
+.material-container-footer {
+    padding: 0px 25px 25px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
+}
+
+/* Материал */
+.material {
+    display: flex; /* Устанавливаем Flexbox */
+    justify-content: center;
+    align-items: center;
+    margin: 25px 0; /* Отступы снаружи */
+}
+
+/* Материал */
+.material-content {
+    padding: 25px; /* Отступы внутри */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Добавляет тень для эффекта глубины */
+    border-radius: 25px; /* Радиус скругления границ элементов формы */
+    word-wrap: break-word; /* Перенос слов */
+    width: 100%; /* Полная ширина родительского элемента */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
+}
+
+/* Списки */
+.material-content ul {
+    margin-top: 15px; /* Верхний отступ */
+    margin-bottom: 15px; /* Нижний отступ */
+}
+
+/* Списки */
+.material-content ol {
+    margin-top: 15px; /* Верхний отступ */
+    margin-bottom: 15px; /* Нижний отступ */
+}
+
+/* Списки */
+.material-content li {
+    margin-top: 15px; /* Верхний отступ */
+    margin-bottom: 15px; /* Нижний отступ */
+}
+
+/* Списки */
+.material-content ul, ol {
+    padding-inline-start: 25px; /* Отступ */
+}
+
+/* Материал */
+.material-content img {
+    border-radius: 5px; /* Скругление углов */
+    max-width: 100%; /* Максимальня ширина 100% */
+    height: auto; /* Высота автоматически регулируется */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+}
+
+/* Материал */
+.material-content video {
+    width: 100%; /* Ширина 100% */
+    height: 100%; /* Высота 100% */
+    border-radius: 5px; /* Скругление углов */
+    max-width: 600px; /* Максимальная ширина(по вашему выбору) */
+    box-sizing: border-box; /* Размеры включают в себя границу и внутренние отступы */
+}
+
+/* Материал */
+.material-content-table-responsive {
+    margin: 15px 0; /* Отступ внешний */
+    overflow-x: auto; /* Добавляет горизонтальную прокрутку, если содержимое шире контейнера */
+    /*width: 100%; /* Полная ширина родительского элемента */
+    -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS устройствах */
+    -ms-overflow-style: -ms-autohiding-scrollbar; /* Автоматически скрывающиеся полосы прокрутки в IE и Edge */
+}
+
+/* Материал */
+.material-content-table-responsive table {
+    /*max-width: 100%; /* Убедитесь, что таблица не выходит за пределы контейнера */
+    border-collapse: collapse; /* Убираем двойные границы между ячейками */
+    border: 2px solid var(--color-divider-rgb); /* Дополнительные стили для таблицы */
+    /* Добавьте дополнительные стили для таблицы здесь, например, для границ, шрифта и т.д. */
+}
+
+/* Материал */
+.material-content-table-responsive table th,
+.material-content-table-responsive table td {
+
+}
+
+/* Код */
+pre code.hljs {
+    border-radius: 5px; /* Скругление углов */
+    white-space: pre-wrap; /* Позволяет тексту переноситься */
+}
+
+/* Стили для контейнера iframe */
+.videoEmbed {
+    position: relative; /* Устанавливаем позицию контейнера как "relative" */
+    padding-bottom: 56.25%; /* Устанавливаем отступ снизу, чтобы создать соотношение сторон 16:9 */
+    height: 0; /* Начальная высота контейнера равна 0 */
+    overflow: hidden; /* Скрываем возможное содержимое, выходящее за пределы контейнера */
+}
+
+/* Стили для iframe внутри контейнера */
+.videoEmbed iframe {
+    position: absolute; /* Устанавливаем позицию iframe как "absolute" */
+    top: 0; /* Располагаем iframe сверху контейнера */
+    left: 0; /* Располагаем iframe слева контейнера */
+    width: 100%; /* Устанавливаем ширину iframe на 100% от родительского контейнера */
+    height: 100%; /* Устанавливаем высоту iframe на 100% от родительского контейнера */
+}
+
+/* Стили для контейнера select2 */
+.select2-container {
+width: 100% !important;
+display: block; /* Делаем блочный */
+}
+
+/* Стили для выбранных элементов в контейнере в select2 */
+.select2-container .select2-selection--multiple .select2-selection__rendered {
+    white-space: normal;
+}
+
+/* Стили для контейнера выбранного элемента в select2 */
+.select2-container--default .select2-selection--single {
+    border: 2px solid var(--color-text-rgb) !important; /* Граница контейнера выбранного элемента */
+    border-radius: 5px !important; /* Радиус скругления границы */
+}
+
+/* Стили для поля поиска в выпадающем списке select2 */
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 2px solid var(--color-text-rgb) !important; /* Граница поля поиска */
+    border-radius: 5px !important; /* Радиус скругления границы поля поиска */
+}
+
+/* Стили для стрелки при открытом контейнере select2 */
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+    border-color: transparent transparent var(--color-text-rgb) transparent !important; /* Цвет стрелки */
+}
+
+/* Стили для стрелки при закрытом контейнере select2 */
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: var(--color-text-rgb) transparent transparent transparent !important; /* Цвет стрелки */
+}
+
+/* Стили для выделенного элемента в списке результатов select2 */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--color-text-rgb) !important; /* Цвет фона выделенного элемента */
+}
+
+/* Стили для выпадающего списка select2 */
+.select2-dropdown {
+    border: 2px solid var(--color-text-rgb) !important; /* Граница выпадающего списка */
+    border-radius: 5px !important; /* Радиус скругления границы списка */
+}
+
+/* Стили для контейнера с множественным выбором при фокусе */
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border: 2px solid var(--color-text-rgb) !important; /* Граница контейнера при фокусе */
+}
+
+/* Стили для текста выбранного элемента в контейнере с одиночным выбором */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--color-text-rgb) !important; /* Цвет текста */
+}
+
+/* Стили для контейнера с множественным выбором */
+.select2-container--default .select2-selection--multiple {
+    border: 2px solid var(--color-text-rgb) !important; /* Граница выпадающего списка */
+    border-radius: 5px !important; /* Радиус скругления границы списка */
+}
+
+/* Стили для выбранных элементов в контейнере с множественным выбором */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: white !important; /* Белый фон выбранных элементов */
+    border: 2px solid var(--color-text-rgb) !important; /* Граница выбранных элементов */
+    border-radius: 5px !important; /* Радиус скругления границы выбранных элементов */
+}
+
+/* Стили для кнопки удаления выбранного элемента */
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: var(--color-text-rgb) !important; /* Цвет кнопки удаления */
+}
+
+/* Изменение фона выбранного элемента в Select2 */
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: var(--color-divider-rgb); /* светло-серый цвет фона */
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+    padding: 0 10px;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding-left: 10px;
+}
+
+/* Изменение формата лейблов для переноса строки */
+label {
+    display: block;
+}
+
+/* Изменение формата лейбла очистки */
+label[for$="clear_id"] {
+    display: initial;
+}
+
+/* Изменение формата хэлптекста */
+.helptext {
+    display: block;
+}
+
+/* Стили для формы */
+.form {
+    color: var(--color-text-rgb); /* Цвет текста формы - темно-серый */
+    font-family: 'Roboto', sans-serif; /* Шрифт Roboto, без засечек */
+    font-weight: 400; /* Толщина шрифта */
+    word-wrap: break-word; /* Перенос */
+}
+
+/* Стили для формы */
+.filter-form {
+    box-sizing: initial; /* Сброс размеров */
+}
+
+/* Стили для формы */
+.form input[type="text"],
+.form input[type="password"],
+.form input[type="checkbox"],
+.form input[type="radio"],
+.form input[type="hidden"],
+.form input[type="number"],
+.form input[type="datetime-local"],
+.form input[type="date"],
+.form input[type="time"],
+.form input[type="email"],
+.form select,
+.form textarea {
+    color: var(--color-text-rgb); /* Серый цвет текста элементов формы */
+    border: 2px solid var(--color-text-rgb); /* Толщина границы элементов формы */
+    border-radius: 5px; /* Радиус скругления границ элементов формы */
+    background: white; /* Белый фон формы */
+    font-size: 1rem; /* Размер шрифта */
+    max-width: 100%; /* Ширина */
+    box-sizing: border-box; /* Учитывает padding и border в размере элемента */
+}
+
+/* Стили для формы */
+.form input[type="text"],
+.form input[type="password"],
+.form input[type="hidden"],
+.form input[type="number"],
+.form input[type="datetime-local"],
+.form input[type="date"],
+.form input[type="time"],
+.form input[type="email"],
+.form select,
+.form textarea {
+    padding: 5px 10px; /* Внутренний отступ */
+    width: 100%; /* Ширина */
+}
+
+/* Стили для формы */
+.form input[type="text"]:active,
+.form input[type="password"]:active,
+.form input[type="checkbox"]:active,
+.form input[type="radio"]:active,
+.form input[type="hidden"]:active,
+.form input[type="number"]:active,
+.form input[type="datetime-local"]:active,
+.form input[type="date"]:active,
+.form input[type="time"]:active,
+.form input[type="email"]:active,
+.form select:active,
+.form textarea:active {
+    color: var(--color-text-rgb); /* Сохранение цвета текста при нажатии */
+    border: 2px solid var(--color-text-rgb); /* Сохранение толщины границы при нажатии */
+    border-radius: 5px; /* Сохранение радиуса скругления границ при нажатии */
+    max-width: 100%; /* Максимальная ширина */
+    background: white; /* Белый фон формы */
+}
+
+/* Стили для формы */
+.form input[type="text"]:disabled,
+.form input[type="password"]:disabled,
+.form input[type="checkbox"]:disabled,
+.form input[type="radio"]:disabled,
+.form input[type="hidden"]:disabled,
+.form input[type="number"]:disabled,
+.form input[type="datetime-local"]:disabled,
+.form input[type="date"]:disabled,
+.form input[type="time"]:disabled,
+.form input[type="email"]:disabled,
+.form select:disabled,
+.form textarea:disabled {
+    background-color: var(--color-divider-rgb); /* Светло-серый фон неактивной кнопки */
+    cursor: default; /* Обычный курсор для неактивной кнопки */
+    box-shadow: none; /* Убрать тени для неактивной кнопки */
+    max-width: 100%; /* Максимальная ширина */
+}
+
+/* Стили для формы */
+.form input[type="checkbox"] {
+    transform: scale(1.5); /* Увеличиваем размер чекбокса */
+}
+
+/* Контент */
+.content-container {
+    padding: 0px 25px 25px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
+}
+
+/* Контент */
+.content-grid {
+    display: grid;
+    grid-gap: 50px; /* Расстояние между элементами */
+    justify-content: center; /* Горизонтальное выравнивание грида по центру */
+    margin: 25px auto; /* Отступ внутрен */
+}
+
+/* Контент */
+.content-grid-item {
+}
+
+/* Контент */
+.content-grid-item-sub {
+    background: white; /* Фон белый */
+    border-radius: 25px; /* Скругленные углы */
+    overflow: hidden; /* Скрываем выходящее за границы */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    display: flex; /* Flexbox */
+    flex-direction: column; /* Колонки */
+    justify-content: flex-start; /* Выравнивание вначале */
+}
+
+/* Контент */
+.content-grid-item-sub:hover {
+
+}
+
+/* Контент */
+.content-grid-item-sub-header {
+    font-weight: 500; /* Жирность текста */
+    padding: 0 25px; /* Внутренние отступы */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Граница снизу */
+}
+
+/* Контент */
+.content-grid-item-sub-content {
+    padding: 0 25px; /* Отступы */
+    word-wrap: break-word; /* Перенос слов */
+}
+
+/* Контент */
+.content-grid-item-list-grid {
+    display: grid; /* Сетка */
+    grid-gap: 50px; /* Расстояние между элементами */
+    grid-template-columns: 1fr; /* Одна колонка для сетки */
+}
+
+/* Контент */
+.content-grid-item-list-grid-item {
+    background: white; /* Фон белый */
+    border-radius: 25px; /* Скругленные углы */
+    overflow: hidden; /* Скрываем выходящее за границы */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    display: flex; /* Flexbox */
+    flex-direction: column; /* Колонки */
+    justify-content: space-between; /* Распределение пространства */
+    height: 100%; /* Высота */
+}
+
+/* Контент */
+.content-grid-item-list-grid-item-header {
+    padding: 0 25px; /* Отступы */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Линия снизу */
+}
+
+/* Контент */
+.content-grid-item-list-grid-item-image-container {
+    display: flex; /* Используем flexbox */
+    flex-direction: column; /* Располагаем элементы в колонку */
+    justify-content: center; /* Выравниваем по центру по горизонтали */
+    align-items: center; /* Выравниваем по центру по вертикали */
+    padding: 15px 25px; /* Добавляем отступы */
+    width: 100%; /* Занимает 100% ширины родительского контейнера */
+    height: 200px; /* Жестко фиксированная высота в 200px */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Линия снизу */
+}
+
+/* Контент */
+.content-grid-item-list-grid-item-image-container img {
+    max-width: 100%; /* Максимальная ширина изображения равна ширине контейнера */
+    max-height: 100%; /* Максимальная высота изображения равна высоте контейнера */
+    border-radius: 5px; /* Скругление углов */
+}
+
+/* Контент */
+.content-grid-item-list-grid-item-image-container-blank {
+    width: 100%; /* Занимает доступную ширину */
+    height: 100%; /* Занимает доступную высоту */
+    border: 2px dashed var(--color-divider-rgb); /* Устанавливаем пунктирную рамку серого цвета */
+    border-radius: 5px; /* Скругление углов */
+}
+
+/* Контент */
+.content-grid-item-list-grid-item-content {
+    padding: 0 25px; /* Отступы */
+    word-wrap: break-word; /* Перенос слов */
+}
+
+/* Контент */
+.content-grid-item-list-grid-item-footer {
+    text-align: center; /* Текст по центру */
+    padding: 0 25px; /* Отступы */
+    margin-top: auto; /* Это заставит элемент прилипнуть к низу флекс-контейнера */
+}
+
+/* Тест */
+.test-container-header {
+    padding: 0px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Тест */
+.test-container {
+    padding: 0px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Тест */
+.test-container-footer {
+    padding: 0px 25px 25px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Тест */
+.test-grid {
+    display: grid;
+    grid-gap: 50px; /* Расстояние между элементами */
+    justify-content: center; /* Горизонтальное выравнивание грида по центру */
+    margin: 25px auto; /* Отступ внутрен */
+}
+
+/* Тест */
+.test-grid-item {
+
+}
+
+/* Тест */
+.test-grid-item-sub {
+    background: white; /* Фон белый */
+    border-radius: 25px; /* Скругленные углы */
+    overflow: hidden; /* Скрываем выходящее за границы */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    display: flex; /* Flexbox */
+    flex-direction: column; /* Колонки */
+    justify-content: flex-start; /* Выравнивание вначале */
+    /*height: 100%; /* Высота */
+}
+
+/* Тест */
+.test-grid-item-sub:hover {
+
+}
+
+/* Тест */
+.test-grid-item-sub-header {
+    font-weight: 500; /* Жирность текста */
+    padding: 0 25px;
+    border-bottom: 2px solid var(--color-divider-rgb); /* Граница снизу */
+}
+
+/* Тест */
+.test-grid-item-sub-content {
+    padding: 0 25px; /* Отступы внутри */
+    word-wrap: break-word; /* Перенос слов */
+}
+
+/* Тест */
+.test-grid-item-sub-content-answer-container {
+    border-top: 2px solid var(--color-divider-rgb); /* Толщина границы элементов формы */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Толщина границы элементов формы */
+    margin: 25px auto; /* Отступ сверху и снизу таблицы */
+    padding: 0 25px; /* Отступы внутри */
+}
+
+/* Тест */
+.test-grid-item-sub-content-questions-text-container {
+    margin: 25px auto; /* Отступ сверху и снизу таблицы */
+    /*padding: 0 25px; /* Отступы внутри */
+}
+
+/* Тест */
+.test-grid-item-sub-content-image-container {
+    display: flex; /* Используем flexbox */
+    flex-direction: column; /* Располагаем элементы в колонку */
+    justify-content: center; /* Выравниваем по центру по горизонтали */
+    align-items: center; /* Выравниваем по центру по вертикали */
+    padding: 15px 25px; /* Добавляем отступы */
+    width: 100%; /* Занимает 100% ширины родительского контейнера */
+    height: 300px; /* Жестко фиксированная высота в 300px */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Нижняя граница */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Тест */
+.test-grid-item-sub-content-image-container-min {
+    display: flex; /* Используем flexbox */
+    flex-direction: column; /* Располагаем элементы в колонку */
+    justify-content: center; /* Выравниваем по центру по горизонтали */
+    align-items: center; /* Выравниваем по центру по вертикали */
+    padding: 15px 25px; /* Добавляем отступы */
+    width: 100%; /* Занимает 100% ширины родительского контейнера */
+    height: 150px; /* Жестко фиксированная высота в 150px */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
+/* Тест */
+.test-grid-item-sub-content-image-container img,
+.test-grid-item-sub-content-image-container-min img {
+    max-width: 100%; /* Максимальная ширина изображения равна ширине контейнера */
+    max-height: 100%; /* Максимальная высота изображения равна высоте контейнера */
+    border-radius: 5px; /* Скругление углов */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+}
+
+/* Тест */
+.test-nav {
+    display: flex; /* Включаем Flexbox */
+    flex-wrap: wrap; /* Разрешаем элементам обтекать */
+    align-items: center; /* Выравниваем элементы по центру по вертикали */
+    justify-content: center; /* Выравниваем элементы по центру по горизонтали */
+    width: 100% !important; /* Ширина */
+    text-align: center; /* Текст по центру */
+    margin: 25px 0 0 0; /* Отступ внутренний */
+    gap: 15px; /* Отступ между элементами */
+}
+
+/* Тест */
+.test-nav-pagination {
+    text-align: center; /* Выравнивание элементов по центру */
+}
+
+/* Стили для элементов пагинации */
+.test-nav-pagination a {
+    color: var(--color-accent-rgb); /* Цвет текста */
+    text-decoration: none !important; /* Без подчеркивания */
+    padding: 10px 15px; /* Отступы */
+    display: inline-block; /* Блочно-строчное отображение */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    word-wrap: break-word; /* Перенос */
+    font-weight: 400; /* Жирность текста */
+}
+
+/* Стили для многоточия пагинации */
+.test-nav-pagination-gap {
+    color: var(--color-accent-rgb); /* Цвет текста */
+    display: inline-block; /* Блочно-строчное отображение */
+}
+
+/* Стили для ссылок пагинации при наведении */
+.test-nav-pagination a:hover,
+.test-nav-pagination a:focus {
+    background-color: var(--color-accent-rgb); /* Фон при активации */
+    color: white; /* Цвет текста */
+}
+
+/* Медиа-запросы для десктопных экранов */
+@media screen and (min-width: 800px) {
+    .informers-grid  {
+        grid-template-columns: repeat(auto-fit, 250px); /* Ширина грида */
+    }
+    .list-grid {
+        grid-template-columns: repeat(auto-fit, 300px); /* Ширина грида */
+    }
+    .tab-list-grid {
+        grid-template-columns: repeat(auto-fit, 500px); /* Ширина грида */
+    }
+    .content-grid,
+    .test-grid {
+        grid-template-columns: 400px 300px; /* Левый элемент занимает две трети, правый - одну треть */
+    }
+}
+
+/* Медиа-запросы для мобильных устройств */
+@media screen and (max-width: 799px) {
+    .informers-grid  {
+        grid-template-columns: minmax(0, 250px); /* Ширина грида */
+    }
+    .list-grid {
+        /*grid-template-columns: minmax(0, 300px); /* Ширина грида */
+        grid-template-columns: 100%; /* Ширина грида */
+    }
+    .tab-list-grid {
+        /*grid-template-columns: minmax(0, 300px); /* Ширина грида */
+        grid-template-columns: 100%; /* Ширина грида */
+    }
+    .content-grid,
+    .test-grid {
+        /*grid-template-columns: minmax(0, 400px); /* Ширина грида */
+        grid-template-columns: 100%; /* Ширина грида */
+        grid-gap: 0px;
+    }
+    .detail-content-with-image {
+        flex-direction: column; /* Располагаем элементы столбцом */
+        gap: 0px; /* Отступ между контейнерами */
+    }
+    .detail-content-with-image-image-container {
+        width: 100%; /* Вложенные элементы занимают всю ширину */
+    }
+    .detail-content-with-image-image-container img {
+        margin-top: 0; /* Отступ сверху */
+        margin-bottom: 0; /* Отступ снизу */
+    }
+    .detail-content-with-image-image-container-blank {
+        margin-top: 0; /* Отступ сверху */
+        margin-bottom: 0; /* Отступ снизу */
+    }
+    .detail-content-with-image-text-container {
+        width: 100%; /* Вложенные элементы занимают всю ширину */
+    }
+    /* Материал */
+    .material-container {
+        padding: 0; /* Отступы внутри */
+    }
+    .test-container {
+        padding: 0; /* Отступы внутри */
+    }
+    /* Тест */
+    .test-nav {
+        margin: 25px 0; /* Отступ внутренний */
+    }
+    /* Стили для пагинации */
+    .pagination-content {
+        margin: 25px 0; /* Отступ внутренний */
+    }
+}

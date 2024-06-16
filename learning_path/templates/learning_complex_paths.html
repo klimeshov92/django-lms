@@ -1,0 +1,117 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Учебные траектории комплексной прораммы
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+<div class="content-container">
+
+    {# Заголовок элементов #}
+    <div class="content-type-div">
+        <span class="content-type-basic">Учебные траектории комплексной программы</span>
+    </div>
+    <div class="h1-center">
+        <h1>{{object.name}}</h1>
+    </div>
+    <div class="content-grid">
+        <div class="content-grid-item">
+            {# Вывод элементов #}
+            {% if object_list %}
+                {# Перебор элементов #}
+                <div class="content-grid-item-list-grid">
+                    {% for obj in object_list %}
+                        <div class="content-grid-item-list-grid-item">
+                            <div class="content-grid-item-list-grid-item-image-container">
+                                {% if obj.learning_path.avatar %}
+                                   <img src="{{obj.learning_path.avatar.url}}">
+                                {% else %}
+                                    <div class="content-grid-item-list-grid-item-image-container-blank">
+
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="content-grid-item-list-grid-item-header">
+                                <h3>{{obj.learning_path.name}}</h3>
+                            </div>
+                            <div class="content-grid-item-list-grid-item-content">
+                                {% if obj.learning_path.categories.exists  %}
+                                    <p><span class="description-item">Категории:</span>
+                                        {% for category in obj.learning_path.categories.all %}
+                                            <span>
+                                                <a href="{% url 'learning_path:learning_paths' %}?сategory={{category.id}}" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                                            </span>
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                                {% if object.learning_path.desc %}
+                                    <p>{{object.learning_path.desc}}</p>
+                                {% endif %}
+                            </div>
+                            <div class="content-grid-item-list-grid-item-footer">
+                                <div class="submenu-mini">
+                                    <a href="{% url 'learning_path:learning_path_tasks' pk=obj.learning_path.id %}">Просмотреть</a>
+                                    <a href="{% url 'learning_path:learning_path' pk=obj.learning_path.id %}">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {# Пагинация #}
+                <div class="pagination pagination-content">
+                    {# Информация о предыдущих страницах #}
+                    {% if page_obj.has_previous %}
+                        <a href="?{% url_replace page=1 %}">1</a>
+                        {% if page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if page_obj.has_next %}
+                        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элементов нет #}
+                    <div class="not-found">
+                        <p>Учебные задачи не найдены!</p>
+                    </div>
+            {% endif %}
+        </div>
+        <div class="content-grid-item">
+            <div class="content-grid-item-sub">
+                <div class="content-grid-item-sub-header">
+                    <h3>Детали</h3>
+                </div>
+                <div class="content-grid-item-sub-content">
+                    <p>{{object.desc}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Управление #}
+    <div class="submenu-container">
+        <nav class="submenu">
+            <a href="{% url 'learning_path:learning_complex' pk=object.id%}">Назад</a>
+        </nav>
+    </div>
+
+</div>
+{% endblock content %}

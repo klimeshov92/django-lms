@@ -1,0 +1,76 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Импорт из Excel
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    {# Вывод элемента #}
+    <div class="detail-card-container">
+
+        <div class="content-type-div">
+            <span class="content-type-basic">Импорт из Excel</span>
+        </div>
+
+    {% if object %}
+        <div class="detail-content">
+            <h1>{{object.name}}</h1>
+            <p><span class="description-item">Тип:</span> {{object.get_type_display}}</p>
+            {% if object.categories.exists  %}
+                <p><span class="description-item">Категории:</span>
+                    {% for category in object.categories.all %}
+                        <span>
+                            <a href="{% url 'core:employee_excel_imports' %}?сategory={{category.id}}" class="link" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                        </span>
+                    {% endfor %}
+                </p>
+            {% endif %}
+            <p><span class="description-item">Дата и время создания:</span> {{object.created}}</p>
+            <p><span class="description-item">Обработан:</span> {{object.processed|yesno}}</p>
+            {% if object.desc %}
+                <p>{{object.desc}}</p>
+            {% endif %}
+        </div>
+        <div class="submenu-container">
+            <nav class="submenu">
+                {% if 'core.change_employeeexcelimport' in perms %}
+                    <a href="{% url 'core:employee_excel_import_update' pk=object.id %}">Изменить</a>
+                {% endif %}
+                {% if 'core.delete_employeeexcelimport' in perms %}
+                    <a href="{% url 'core:employee_excel_import_delete' pk=object.id %}">Удалить</a>
+                {% endif %}
+                {% if object.processed == False %}
+                    {% if object.type == 'mdm' %}
+                        <a href="{% url 'core:start_employee_excel_import_mdm' pk=object.id %}">Выполнить импорт (по MDM ID)</a>
+                    {% else %}
+                        <a href="{% url 'core:start_employee_excel_import_name' pk=object.id %}">Выполнить импорт (по именам объектов)</a>
+                    {% endif %}
+                {% endif %}
+                <a href="{{ object.upload_file.url }}" download>Скачать файл</a>
+                <a href="{{ previous_page_l1 }}">Назад</a>
+            </nav>
+        </div>
+    {% else %}
+        {# Вывод сообщения, если элемента нет #}
+        <div class="not-found">
+            <p>Импорт сотрудников не найден!</p>
+        </div>
+        <div class="submenu-container">
+            <nav class="submenu">
+                <a href="{{ previous_page_l1 }}">Назад</a>
+            </nav>
+        </div>
+    {% endif %}
+
+    </div>
+</div>
+{% endblock content %}

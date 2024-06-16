@@ -1,0 +1,136 @@
+/* Тема */
+:root {
+    /* Основной цвет rgb(51, 101, 138) var(--color-primary-rgb)*/
+    --color-primary: #33658A;
+    --color-primary-rgb: rgb(51, 101, 138);
+
+    /* Акцентный цвет rgb(209, 73, 91) var(--color-accent-rgb)*/
+    --color-accent: #D1495B;
+    --color-accent-rgb: rgb(209, 73, 91);
+
+    /* Цвет для легкого разделения rgb(221, 232, 236) var(--color-divider-rgb)*/
+    --color-divider: #DDE8EC;
+    --color-divider-rgb: rgb(221, 232, 236);
+    --color-divider-rgba: rgba(221, 232, 236, 0.7);
+
+    /* Цвет текста rgb(48, 48, 48) var(--color-text-rgb)*/
+    --color-text: #303030;
+    --color-text-rgb: rgb(48, 48, 48);
+
+    /* Фиолетовый для подписи типа контента rgb(126, 87, 194) var(--color-content-label-rgb)*/
+    --color-content-label: #7E57C2;
+    --color-content-label-rgb: rgb(126, 87, 194);
+
+    /* Оранжевый для статуса "В процессе" rgb(255, 165, 0) var(--color-in-progress-rgb)*/
+    --color-in-progress: #FFA500;
+    --color-in-progress-rgb: rgb(255, 165, 0);
+
+    /* Зеленый для статуса "Завершено" rgb(76, 175, 80) var(--color-completed-rgb)*/
+    --color-completed: #4CAF50;
+    --color-completed-rgb: rgb(76, 175, 80);
+
+    /* Красный для статуса "Требует внимания" rgb(244, 67, 54) var(--color-attention-rgb)*/
+    --color-attention: #F44336;
+    --color-attention-rgb: rgb(244, 67, 54);
+
+    /* Более бледный оранжевый rgb(255, 255, 204) var(--color-in-progress-light-rgb)*/
+    --color-in-progress-light-rgb: rgb(255, 255, 204);
+    --color-in-progress-light: #FFFFCC;
+
+    /* Более бледный зеленый rgb(204, 255, 204) var(--color-completed-light-rgb)*/
+    --color-completed-light-rgb: rgb(204, 255, 204);
+    --color-completed-light: #CCFFCC;
+
+    /* Более бледный красный rgb(255, 204, 204) var(--color-attention-light-rgb)*/
+    --color-attention-light-rgb: rgb(255, 204, 204);
+    --color-attention-light: #FFCCCC;
+
+}
+
+/* Глобальные стили для <html> и <body> */
+html, body {
+    margin: 0; /* Внешние отступы */
+    padding: 0; /* Внутренние отступы */
+    color: var(--color-text-rgb); /* Цвет текста */
+    font-family: 'Roboto', sans-serif; /* Основной шрифт 'Roboto' */
+    font-weight: 400; /* Жирность шрифта */
+    width: 100% !important; /* Ширина */
+    line-height: 1.5; /* Это значение может быть числом, процентом, em, px и т.д. */
+    height: 100%; /* Полная высота для html и body */
+    width: 100%; /* Полная ширина для html и body */
+}
+
+/* Стили для элемента с классом .scorm-player */
+.scorm-player {
+    width: 100%; /* Занимает 100% ширины родительского элемента */
+    height: 100vh; /* Занимает всю высоту окна просмотра */
+}
+
+/* Стили для элемента iframe внутри .scorm-player */
+.scorm-player-iframe {
+    width: 100%; /* Занимает 100% ширины родительского элемента */
+    height: 100%; /* Занимает 100% высоты родительского элемента */
+    border: none; /* Убирает рамку вокруг iframe, если нужно */
+}
+
+/* Стили для нижнего меню */
+.submenu {
+    display: flex; /* Скрыто */
+    flex-wrap: wrap; /* Разрешаем элементам обтекать */
+    align-items: center; /* Выравниваем элементы по центру по вертикали */
+    justify-content: center; /* Выравниваем элементы по центру по горизонтали */
+    border-top: 2px solid var(--color-accent-rgb); /* Линия сверху */
+    border-bottom: 2px solid var(--color-accent-rgb); /* Линия снизу */
+    text-align: center; /* Текст по центру */
+    width: 100%; /* Ширина */
+    font-weight: 400; /* Толщина шрифта */
+    position: fixed; /* Фиксированная позиция */
+    bottom: 0; /* Привязка к низу */
+    left: 0; /* Привязка к левому краю */
+    background: white; /* Фон */
+    z-index: 1000; /* Высокий z-index */
+    font-size: 1.1rem; /* Размер шрифта */
+}
+
+/* Стили для видимого сабменю при деактивации */
+.submenu.hidden {
+    display: none; /* Показать меню */
+}
+
+/* Стили для ссылок в нижнем меню */
+.submenu a {
+    color: var(--color-accent-rgb); /* Цвет текста */
+    text-decoration: none; /* Без подчеркивания */
+    padding: 10px 15px; /* Отступы */
+    display: inline-block; /* Блочно-строчное отображение */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    word-wrap: break-word; /* Перенос */
+    font-weight: 500; /* Жирность шрифта */
+}
+
+/* Стили для ссылок в нижнем меню при наведении, фокусе или активации */
+.submenu a.active, .submenu a:hover {
+    background-color: var(--color-accent-rgb); /* Фон при активации */
+    color: white; /* Цвет текста */
+}
+
+/* Стили для ссылок в нижнем меню при нажатии */
+.submenu a:active {
+    background-color: var(--color-accent-rgb-dark); /* Фон при активации */
+}
+
+/* Медиа-запросы для мобильных устройств с принудительной альбомной ориентацией */
+@media screen and (max-width: 767px) {
+    /* Дополнительные стили для мобильных устройств */
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+

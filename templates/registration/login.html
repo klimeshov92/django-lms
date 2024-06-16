@@ -1,0 +1,31 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение заголовка #}
+{% block title %}
+Вход
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+    <div class="auth">
+        <div class="h1-center">
+            <h1>Вход</h1>
+        </div>
+        <form method="post" class="form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <nav class="form-menu form-menu-center">
+                <input type="submit" value="Войти" class="button"/>
+            </nav>
+        </form>
+       {#<div class="auth-text">#}
+            {#<p>#}
+                {#<a href="{% url 'password_reset' %}">Сбросить пароль</a>#}
+            {#</p>#}
+       {#</div>#}
+    </div>
+</div>
+
+{% endblock content %}

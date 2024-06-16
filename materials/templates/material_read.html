@@ -1,0 +1,79 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Материал
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+{# Вывод элемента #}
+<div class="material-container-header">
+
+    <div class="content-type-div">
+        <span class="content-type-basic">Просмотр материала</span>
+    </div>
+
+    {% if object %}
+
+        <div class="h1-center">
+            <h1>{{object.name}}</h1>
+        </div>
+
+</div>
+
+<div class="material-container">
+
+        <div class="material">
+            <div class="material-content">
+                <p>{{object.content|safe}}</p>
+            </div>
+        </div>
+
+    {% else %}
+
+        {# Вывод сообщения, если элемента нет #}
+        <div class="not-found">
+            <p>Материал не найден!</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+<div class="material-container-footer">
+
+    {% if object %}
+
+        <div class="submenu-container">
+            <nav class="submenu">
+                {% if result.status == 'in_progress' %}
+                    <a href="{% url 'materials:confirm_reading' pk=object.id %}">Подтвердить ознакомление</a>
+                {% endif %}
+                <a href="{% url 'materials:material' pk=object.id %}">Назад</a>
+            </nav>
+        </div>
+
+    {% else %}
+
+        <div class="submenu-container">
+            <nav class="submenu">
+                <a href="{% url 'materials:material' pk=object.id %}">Назад</a>
+            </nav>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{# Увеличение изображений #}
+{% load static %}
+<script src="{% static 'js/show_img.js' %}"></script>
+
+{% endblock content %}

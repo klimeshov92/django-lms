@@ -1,0 +1,198 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Назначение
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    {# Вывод элемента #}
+    <div class="detail-card-with-image-container">
+
+        <div class="content-type-div">
+            <span class="content-type-basic">Назначение</span>
+        </div>
+
+        {% if object %}
+            <div class="detail-content-with-image ">
+                <div class="detail-content-with-image-image-container">
+                    {% if object.learning_complex %}
+                        {% if object.learning_complex.avatar %}
+                           <img src="{{object.learning_complex.avatar.url}}">
+                        {% else %}
+                            <div class="detail-content-with-image-image-container-blank">
+
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        {% if object.learning_path.avatar %}
+                           <img src="{{object.learning_path.avatar.url}}">
+                        {% else %}
+                            <div class="detail-content-with-image-image-container-blank">
+
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div class="detail-content-with-image-text-container">
+                    {% if object.learning_complex %}
+                        <h1>{{object.learning_complex.name}}</h1>
+                    {% else %}
+                        <h1>{{object.learning_path.name}}</h1>
+                    {% endif %}
+                    {% if object.categories.exists  %}
+                        <p><span class="description-item">Категории:</span>
+                            {% for category in object.categories.all %}
+                                <span>
+                                    <a href="{% url 'learning_path:assignments' %}?сategory={{category.id}}" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                                </span>
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                    <p><span class="description-item">Назначил:</span> {{object.creator}}</p>
+                    <p><span class="description-item">Дата и время создания:</span> {{object.created}}</p>
+                    <p><span class="description-item">Группа:</span> {{object.group}}</p>
+                    <p><span class="description-item">Дата начала: </span> {{object.planned_start_date}}</p>
+                    <p><span class="description-item">Соблюдение сроков обязательно:</span> {{object.deadlines|yesno}}</p>
+                    {% if object.desc %}
+                        <p>{{object.desc}}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {# Управление #}
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if user|perms:"learning_path.change_assignment" %}
+                        <a href="{% url 'learning_path:assignment_update' pk=object.id %}">Изменить</a>
+                    {% endif %}
+                    {% if user|perms:"learning_path.delete_assignment" %}
+                        <a href="{% url 'learning_path:assignment_delete' pk=object.id %}">Удалить</a>
+                    {% endif %}
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% else %}
+            {# Вывод сообщения, если элемента нет #}
+            <div class="not-found">
+                <p>Назначение не найдено!</p>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="tab-menu-container">
+        <nav class="tab-menu">
+            <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
+            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Повторы[{{repeats_count}}]</a>
+        </nav>
+    </div>
+
+    <div class="tab-content-container">
+
+        <div id="tab1" class="tab-content">
+            {% if object.desc %}
+                <p>{{object.desc}}</p>
+            {% else %}
+                <p>Описания нет!</p>
+            {% endif %}
+        </div>
+
+        <div id="tab2" class="tab-content">
+            {# Вывод элементов #}
+            {% if repeats_page_obj %}
+                <div class="tab-list-grid">
+                    {% for obj in repeats_page_obj %}
+                        <div class="tab-list-grid-item">
+                            <div class="tab-list-grid-item-content">
+                                <h3>
+                                    {{obj.get_type_display}}
+                                </h3>
+                                {% if obj.type == 'weekly' %}
+                                    <p><span class="description-item">День недели:</span>
+                                        {{obj.get_day_of_week_display}}
+                                    </p>
+                                {% elif obj.type == 'monthly' %}
+                                    <p><span class="description-item">Интервал (месяцев):</span>
+                                        {{obj.month_interval}}
+                                    </p>
+                                {% endif %}
+                                {% if obj.last_repeats_date %}
+                                    <p><span class="description-item">Дата последнего выполнения:</span>
+                                        {{obj.last_repeats_date}}
+                                    </p>
+                                {% endif %}
+                                {% if obj.desc %}
+                                    <p>{{obj.desc}}</p>
+                                {% endif %}
+                                {% if user|perms:"learning_path.change_assignment" or user|perms:"learning_path.delete_assignment" %}
+                                    <div class="submenu-mini submenu-mini-end">
+                                        {% if 'learning_path.change_assignment' in perms %}
+                                            <a href="{% url 'learning_path:assignment_repeat_update' pk=obj.id %}">Изменить</a>
+                                        {% endif %}
+                                        {% if 'learning_path.delete_assignment' in perms %}
+                                            <a href="{% url 'learning_path:assignment_repeat_delete' pk=obj.id %}">Удалить</a>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {# Пагинация #}
+                <div class="pagination">
+                    {# Информация о предыдущих страницах #}
+                    {% if repeats_page_obj.has_previous %}
+                        <a href="?{% url_replace repeats_page=1 %}">1</a>
+                        {% if repeats_page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace repeats_page=repeats_page_obj.previous_page_number %}">{{ repeats_page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ repeats_page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if repeats_page_obj.has_next %}
+                        <a href="?{% url_replace repeats_page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if repeats_page_obj.paginator.num_pages != repeats_page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace repeats_page=repeats_page_obj.paginator.num_pages %}">{{ repeats_page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элементов нет #}
+                    <div class="not-found">
+                        <p>Повторы не найдены!</p>
+                    </div>
+            {% endif %}
+
+            {# Управление #}
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if 'learning_path.add_assignment' in perms %}
+                        <a href="{% url 'learning_path:assignment_repeat_create' pk=object.id %}">Создать</a>
+                    {% endif %}
+                </nav>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock content %}

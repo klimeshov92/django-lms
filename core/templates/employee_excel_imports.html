@@ -1,0 +1,109 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Импорты из Excel
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="list-container">
+
+    {# Заголовок элементов #}
+    <div class="h1-center">
+        <h1>Импорты из Excel</h1>
+    </div>
+
+    {# Фильтр элементов #}
+    <div class="filters-header">
+        <a href="" class="filters-button">Фильтры</a>
+    </div>
+    <div class="filters-area">
+        <form action="" method="get" class="form filter-form">
+        {{ filterset.form.as_p }}
+        <nav class="form-menu ">
+            <input type="submit" value="Найти" class="button"/>
+        </nav>
+        </form>
+    </div>
+
+    {# Вывод элементов #}
+    {% if object_list %}
+        {# Перебор элементов #}
+        <div class="list-grid">
+            {% for obj in object_list %}
+                <div class="list-grid-item">
+                    <div class="list-grid-item-header">
+                        <h3>{{obj.name}}</h3>
+                    </div>
+                    <div class="list-grid-item-content">
+                        <p><span class="description-item">Тип:</span> {{obj.get_type_display}}</p>
+                         {% if obj.categories.exists  %}
+                            <p><span class="description-item">Категории:</span>
+                                {% for category in obj.categories.all %}
+                                    <span>
+                                        <a href="{% url 'core:employee_excel_imports' %}?сategory={{category.id}}" class="link" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                                    </span>
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                        <p><span class="description-item">Дата и время создания:</span> {{obj.created}}</p>
+                    </div>
+                    <div class="list-grid-item-footer">
+                        <div class="submenu-mini">
+                            <a href="{% url 'core:employee_excel_import' pk=obj.id %}">Открыть</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {# Пагинация #}
+        <div class="pagination">
+            {# Информация о предыдущих страницах #}
+            {% if page_obj.has_previous %}
+                <a href="?{% url_replace page=1 %}">1</a>
+                {% if page_obj.previous_page_number != 1 %}
+                    <span class="pagination-gap">...</span>
+                    <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                {% endif %}
+            {% endif %}
+
+            {# Информация о текущей странице #}
+            <span class="current-page">{{ page_obj.number }}</span>
+
+            {# Информация о следующих страницах #}
+            {% if page_obj.has_next %}
+                <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                    <span class="pagination-gap">...</span>
+                    <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% else %}
+        {# Вывод сообщения, если элементов нет #}
+            <div class="not-found">
+                <p>Импорты из Excel не найдены!</p>
+            </div>
+    {% endif %}
+
+    {# Управление #}
+    <div class="submenu-container">
+        <nav class="submenu">
+            {% if 'core.add_employeeexcelimport' in perms %}
+                <a href="{% url 'core:employee_excel_import_create' %}">Создать</a>
+            {% endif %}
+        </nav>
+    </div>
+
+</div>
+
+{% endblock content %}

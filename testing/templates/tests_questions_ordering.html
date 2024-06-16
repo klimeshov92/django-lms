@@ -1,0 +1,82 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение заголовка #}
+{% block title %}
+Сортировка вопросов теста
+{% endblock %}
+
+{% block content %}
+
+<div class="detail-card-with-image-container">
+
+    <div class="content-type-div">
+        <span class="content-type-basic">Сортировка вопросов теста</span>
+    </div>
+
+    <form action="" method="post" enctype="multipart/form-data" class="form">
+
+        {# Стандартная защита формы #}
+        {% csrf_token %}
+
+        {# Расширенный вывод формы #}
+        {{ formset.management_form }}
+
+        {# Вывод общих для всего сета ошибок #}
+        {% if formset.non_form_errors %}
+            <div>
+                {% for error in formset.non_form_errors %}
+                <p><em>{{error|escape}}</em></p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {# Вывод форм #}
+        {% for form in formset %}
+
+            {# Вывод скрытых полей #}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            {# Вывод общих для всей формы ошибок #}
+            {% if form.non_field_errors %}
+            <div>
+                {% for error in form.non_field_errors %}
+                <p><em>{{error|escape}}</em></p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# Вывод видимых полей #}
+            {% for field in form.visible_fields %}
+
+                {# Вывод ошибок для полей формы #}
+                {% if field.errors %}
+                    <div>
+                        {% for error in field.errors %}
+                        <p><em>{{error|escape}}</em></p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {# Вывод видимых полей формы #}
+                <div>
+                    {# Вывод поля для ответа #}
+                    <p>{{ form.instance.question.text }}</p>
+                    <p>{{ field }}</p>
+                    {# Вывод помогающего текста #}
+                    <p>{{ field.help_text }}</p>
+                </div>
+
+            {% endfor %}
+        {% endfor %}
+        <nav class="form-menu">
+            <button type="button" onclick="history.back();" class="button">Отмена</button>
+            <input type="submit" value="Сохранить" class="button"/>
+        </nav>
+    </form>
+
+</div>
+
+{% endblock content %}

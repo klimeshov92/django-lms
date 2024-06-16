@@ -1,0 +1,359 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Группа | Права
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    {# Вывод элемента #}
+    <div class="detail-card-container">
+
+        <div class="content-type-div">
+            <span class="content-type-basic">Группа</span>
+        </div>
+
+        {% if object %}
+            <div class="detail-content">
+                <h1>{{object}}</h1>
+                <p><span class="description-item">Тип:</span> {{object.get_type_display}}</p>
+                {% if object.categories.exists %}
+                    <p><span class="description-item">Категории:</span>
+                        {% for category in object.categories.all %}
+                            <span>
+                                <a href="{% url 'core:groups' %}?сategory={{category.id}}" class="link" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                            </span>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+            </div>
+            {# Управление #}
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {% if 'core.change_employeesgroup' in perms and object.type == 'custom' %}
+                        <a href="{% url 'core:group_update' pk=object.id %}">Изменить</a>
+                    {% endif %}
+                    {% if 'core.delete_employeesgroup' in perms and object.type == 'custom' %}
+                        <a href="{% url 'core:group_delete' pk=object.id %}">Удалить</a>
+                    {% endif %}
+                    <a href="{% url 'core:group_copy_emails' pk=object.id %}">Копировать адреса</a>
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% else %}
+            {# Вывод сообщения, если элемента нет #}
+            <div class="not-found">
+                <p>Группа не найдена!</p>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <div class="tab-menu-container">
+        <nav class="tab-menu">
+            <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
+            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Сотрудники [{{qs_count}}]</a>
+            {% if 'core.change_employeesgroup' in perms %}
+                {% if object.groups_generator %}
+                    <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Настройки</a>
+                {% endif %}
+                <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Глобальные права [{{global_permissions_qs_count}}]</a>
+            {% endif %}
+            {% if 'core.view_employeesgroupobjectpermission' in perms %}
+                <a href="#tab5" class="tab-menu-link" onclick="openTab(event, 'tab5')">Объектные права [{{group_object_permissions_qs_count}}]</a>
+            {% endif %}
+        </nav>
+    </div>
+
+
+    <div class="tab-content-container">
+
+        <div id="tab1" class="tab-content">
+            {% if object.desc %}
+                <p>{{object.desc}}</p>
+            {% else %}
+                <p>Описания нет!</p>
+            {% endif %}
+        </div>
+
+        <div id="tab2" class="tab-content">
+            {% if object %}
+                <div class="filters-header">
+                    <a href="" class="filters-button">Фильтры</a>
+                </div>
+                <div class="filters-area">
+                    <form action="" method="get" class="form filter-form">
+                    {{ filterset.form.as_p }}
+                    <nav class="form-menu ">
+                        <input type="submit" value="Найти" class="button"/>
+                    </nav>
+                    </form>
+                </div>
+                <div>
+                    {% if object_list %}
+                        <div class="list-table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Логин</th>
+                                        <th>Данные</th>
+                                        <th>Активен</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for obj in object_list %}
+                                        <tr>
+                                            <td>{{obj.username}}</td>
+                                            <td>{{obj}}</td>
+                                            <td>{{obj.is_active|yesno}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {# Пагинация #}
+                        <div class="pagination">
+                            {# Информация о предыдущих страницах #}
+                            {% if page_obj.has_previous %}
+                                <a href="?{% url_replace page=1 %}">1</a>
+                                {% if page_obj.previous_page_number != 1 %}
+                                    <span class="pagination-gap">...</span>
+                                    <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                                {% endif %}
+                            {% endif %}
+
+                            {# Информация о текущей странице #}
+                            <span class="current-page">{{ page_obj.number }}</span>
+
+                            {# Информация о следующих страницах #}
+                            {% if page_obj.has_next %}
+                                <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                                {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                                    <span class="pagination-gap">...</span>
+                                    <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        {# Вывод сообщения, если элемента нет #}
+                            <div class="not-found">
+                                <p>Участники не найдены!</p>
+                            </div>
+                    {% endif %}
+                </div>
+                {# Управление #}
+                <div class="submenu-container">
+                    <nav class="submenu">
+                        {% if 'core.change_employeesgroup' in perms %}
+                            {% if object.groups_generator %}
+                                <a href="{% url 'core:groups_generator_update' pk=object.groups_generator.id %}">Изменить сотрудников</a>
+                            {% else %}
+                                <a href="{% url 'core:groups_generator_create' pk=object.id %}">Добавить сотрудников</a>
+                            {% endif %}
+                        {% endif %}
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+
+        <div id="tab3" class="tab-content">
+            {% if object.groups_generator %}
+                <p><span class="description-item">Дата добавления сотрудников:</span> {{object.groups_generator.changed}}</p>
+                {% if object.groups_generator.added_groups.all %}
+                    <p><span class="description-item">Добавляемые группы:</span>
+                        {% for added_group in object.groups_generator.added_groups.all %}
+                            <span>
+                                {{added_group}}{% if not forloop.last %}, {% endif %}
+                            </span>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+                {% if object.groups_generator.added_users.all %}
+                    <p><span class="description-item">Добавляемые сотрудники:</span>
+                        {% for added_user in object.groups_generator.added_users.all %}
+                            <span>
+                                {{added_user}}{% if not forloop.last %}, {% endif %}
+                            </span>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+                {% if object.groups_generator.excluded_groups.all %}
+                    <p><span class="description-item">Исключаеммые группы:</span>
+                        {% for excluded_group in object.groups_generator.excluded_groups.all %}
+                            <span>
+                                {{excluded_group}}{% if not forloop.last %}, {% endif %}
+                            </span>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+                {% if object.groups_generator.excluded_users.all %}
+                    <p><span class="description-item">Исключаеммые сотрудники:</span>
+                        {% for excluded_user in object.groups_generator.excluded_users.all %}
+                            <span>
+                                {{excluded_user}}{% if not forloop.last %}, {% endif %}
+                            </span>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+                {% if object.groups_generator.start_date_lte %}
+                    <p><span class="description-item">Дата приема до или равна:</span>
+                        {{object.groups_generator.start_date_lte}}
+                    </p>
+                {% endif %}
+                {% if object.groups_generator.start_date_gte %}
+                    <p><span class="description-item">Дата приема после или равна:</span>
+                        {{object.groups_generator.start_date_gte}}
+                    </p>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        {% if 'core.change_employeesgroup' in perms %}
+            <div id="tab4" class="tab-content">
+                {# Вывод элементов #}
+                {% if global_permissions_page_obj %}
+                    <div class="list-table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Права</th>
+                                    <th>Объект</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in global_permissions_page_obj %}
+                                    <tr>
+                                        <td>{{obj.name}}</td>
+                                        <td>{{obj.content_type}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {# Пагинация #}
+                    <div class="pagination">
+                        {# Информация о предыдущих страницах #}
+                        {% if global_permissions_page_obj.has_previous %}
+                            <a href="?{% url_replace global_permissions_page=1 %}">1</a>
+                            {% if global_permissions_page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace global_permissions_page=global_permissions_page_obj.previous_page_number %}">{{ global_permissions_page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ global_permissions_page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if global_permissions_page_obj.has_next %}
+                            <a href="?{% url_replace global_permissions_page=global_permissions_page_obj.next_page_number %}">{{ global_permissions_page_obj.next_page_number }}</a>
+                            {% if global_permissions_page_obj.paginator.num_pages != global_permissions_page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace global_permissions_page=global_permissions_page_obj.paginator.num_pages %}">{{ global_permissions_page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {# Вывод сообщения, если элементов нет #}
+                        <div class="not-found">
+                            <p>Глобальные права не найдены!</p>
+                        </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+         {% if 'core.view_employeesgroupobjectpermission' in perms %}
+            <div id="tab5" class="tab-content">
+                {# Фильтр элементов #}
+                <div class="filters-header">
+                    <a href="" class="filters-button">Фильтры</a>
+                </div>
+                <div class="filters-area">
+                    <form action="" method="get" class="form filter-form">
+                        {{ group_object_permissions_filter.form.media.css }}
+                        {{ group_object_permissions_filter.form.as_p }}
+                        {{ group_object_permissions_filter.form.media.js }}
+                    <nav class="form-menu ">
+                        <input type="submit" value="Найти" class="button"/>
+                    </nav>
+                    </form>
+                </div>
+                {# Вывод элементов #}
+                {% if group_object_permissions_page_obj %}
+                    <div class="list-table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Группа</th>
+                                    <th>Права</th>
+                                    <th>Объект</th>
+                                    {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                        <th>Действия</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in group_object_permissions_page_obj %}
+                                    <tr>
+                                        <td>{{obj.group}}</td>
+                                        <td>{{obj.permission.name}}</td>
+                                        <td>{{obj.content_object}}</td>
+                                        {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                            <td>
+                                                <a href="{% url 'core:employees_group_object_permissions_delete' type='group' pk=object.id employees_group_object_permission_pk=obj.id %}">Удалить</a>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {# Пагинация #}
+                    <div class="pagination">
+                        {# Информация о предыдущих страницах #}
+                        {% if group_object_permissions_page_obj.has_previous %}
+                            <a href="?{% url_replace group_object_permissions_page=1 %}">1</a>
+                            {% if group_object_permissions_page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace group_object_permissions_page=group_object_permissions_page_obj.previous_page_number %}">{{ group_object_permissions_page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ group_object_permissions_page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if group_object_permissions_page_obj.has_next %}
+                            <a href="?{% url_replace group_object_permissions_page=group_object_permissions_page_obj.next_page_number %}">{{ group_object_permissions_page_obj.next_page_number }}</a>
+                            {% if group_object_permissions_page_obj.paginator.num_pages != group_object_permissions_page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace group_object_permissions_page=group_object_permissions_page_obj.paginator.num_pages %}">{{ group_object_permissions_page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {# Вывод сообщения, если элементов нет #}
+                        <div class="not-found">
+                            <p>Объектные права не найдены!</p>
+                        </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+    </div>
+</div>
+{% endblock content %}

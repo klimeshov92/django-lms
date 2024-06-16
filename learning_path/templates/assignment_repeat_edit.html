@@ -1,0 +1,38 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Форма повтора назначения
+{% endblock %}
+
+{% block content %}
+
+<div class="detail-card-with-image-container">
+
+    <div class="content-type-div">
+        <span class="content-type-basic">Повтор назначения</span>
+    </div>
+
+    <form action="" method="post" enctype="multipart/form-data" class="form">
+        {# Стандартная защита формы #}
+        {% csrf_token %}
+        {# Создание формы на основе представления #}
+        {{ form.as_p }}
+        <nav class="form-menu">
+            <button type="button" onclick="history.back();" class="button">Отмена</button>
+            <input type="submit" value="Сохранить" class="button"/>
+        </nav>
+    </form>
+
+</div>
+
+{# Сокрытие #}
+{% load static %}
+<script src="{% static 'js/toggle_fields.js' %}"></script>
+
+{% endblock content %}
