@@ -1755,7 +1755,7 @@ class GroupUpdateView(PermissionRequiredMixin, UpdateView):
     # Шаблон.
     template_name = 'group_edit.html'
 
-    # Проверяем права.
+    # Проверяем тип группы.
     def dispatch(self, request, *args, **kwargs):
 
         # Забираем группу.
@@ -1798,7 +1798,7 @@ class GroupDeleteView(PermissionRequiredMixin, DeleteView):
     # Шаблон.
     template_name = 'group_delete.html'
 
-    # Проверяем права.
+    # Проверяем тип группы.
     def dispatch(self, request, *args, **kwargs):
 
         # Забираем группу.
@@ -1835,6 +1835,23 @@ class GroupsGeneratorCreateView(GPermissionRequiredMixin, CreateView):
     def get_permission_object(self):
         group = EmployeesGroup.objects.get(pk=self.kwargs.get('pk'))
         return group
+
+    # Проверяем тип группы.
+    def dispatch(self, request, *args, **kwargs):
+
+        # Забираем группу.
+        group = self.get_permission_object()
+
+        # Если имеется полное разрешение.
+        if group.type == 'custom':
+
+            # Идем дальше.
+            return super().dispatch(request, *args, **kwargs)
+
+        else:
+
+            # Запрет.
+            return HttpResponseForbidden('Нельзя изменять состав групп данного типа!')
 
     # Заполнение полей данными.
     def get_initial(self):

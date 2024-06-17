@@ -161,7 +161,7 @@
                         {% if 'core.change_employeesgroup' in perms %}
                             {% if object.groups_generator %}
                                 <a href="{% url 'core:groups_generator_update' pk=object.groups_generator.id %}">Изменить сотрудников</a>
-                            {% else %}
+                            {% elif not object.groups_generator and object.type == 'custom' %}
                                 <a href="{% url 'core:groups_generator_create' pk=object.id %}">Добавить сотрудников</a>
                             {% endif %}
                         {% endif %}
