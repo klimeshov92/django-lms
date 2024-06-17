@@ -203,12 +203,11 @@
                     <div class="not-found">
                         <p>Ответы не найдены!</p>
                     </div>
-                </div>
             {% endif %}
             <div class="submenu-container">
                 <nav class="submenu">
                     {% if user|perms:"testing.add_question" %}
-                        <a href="{% url 'testing:answer_create' pk=object.id %}">Создать ответ</a>
+                        <a href="{% url 'testing:answer_create' pk=object.id %}">Создать</a>
                     {% endif %}
                     {% if user|perms:"testing.change_question" %}
                         {% if answers_exists %}
