@@ -87,30 +87,32 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
-                    {% if result %}
-                        {% if result.status != 'failed' and result.status != 'completed' %}
-                            {% if blocked == False %}
-                                <a href="{% url 'testing:take_assigned_test' pk=result.id %}">Выполнить</a>
+                    {% if qs_count != 0 %}
+                        {% if result %}
+                            {% if result.status != 'failed' and result.status != 'completed' %}
+                                {% if blocked == False %}
+                                    <a href="{% url 'testing:take_assigned_test' pk=result.id %}">Выполнить</a>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                        {% if result.status == 'failed' or result.status == 'completed' %}
-                            {% if overdue == False %}
-                                {% if object.amount_of_try > result.attempts_used %}
-                                    <a href="{% url 'testing:retake_the_test'  pk=result.id %}">Пройти занаво</a>
+                            {% if result.status == 'failed' or result.status == 'completed' %}
+                                {% if overdue == False %}
+                                    {% if object.amount_of_try > result.attempts_used %}
+                                        <a href="{% url 'testing:retake_the_test'  pk=result.id %}">Пройти занаво</a>
+                                    {% else %}
+                                        {% if object.self_appointment == True %}
+                                            <a href="{% url 'learning_path:self_appointment' pk=object.id type='test' %}">Самоназначение</a>
+                                        {% endif %}
+                                    {% endif %}
                                 {% else %}
                                     {% if object.self_appointment == True %}
                                         <a href="{% url 'learning_path:self_appointment' pk=object.id type='test' %}">Самоназначение</a>
                                     {% endif %}
                                 {% endif %}
-                            {% else %}
-                                {% if object.self_appointment == True %}
-                                    <a href="{% url 'learning_path:self_appointment' pk=object.id type='test' %}">Самоназначение</a>
-                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                    {% else %}
-                        {% if object.self_appointment == True %}
-                            <a href="{% url 'learning_path:self_appointment' pk=object.id type='test' %}">Самоназначение</a>
+                        {% else %}
+                            {% if object.self_appointment == True %}
+                                <a href="{% url 'learning_path:self_appointment' pk=object.id type='test' %}">Самоназначение</a>
+                            {% endif %}
                         {% endif %}
                     {% endif %}
                     {% if user|perms:"testing.change_test" %}
