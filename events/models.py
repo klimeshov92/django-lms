@@ -183,8 +183,20 @@ class ParticipantsGenerator(models.Model):
         related_query_name='excluded_participants_generators'
     )
     # Дата начала работы.
-    start_date_lte = models.DateField(verbose_name='Дата начала работы до или равна', null=True, blank=True)
-    start_date_gte = models.DateField(verbose_name='Дата начала работы после или равна', null=True, blank=True)
+    days_worked_lte = models.IntegerField(
+        verbose_name='Отработано менее (дней)',
+        null=True,
+        blank=True,
+        default=90,
+        validators=[MinValueValidator(0)]
+    )
+    days_worked_gte = models.IntegerField(
+        verbose_name='Отработано более (дней)',
+        null=True,
+        blank=True,
+        default=0,
+        validators=[MinValueValidator(0)]
+    )
     # Обновлять автоматически.
     autoupdate = models.BooleanField(verbose_name='Автообновление', default=False)
     class Meta:

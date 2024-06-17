@@ -68,8 +68,8 @@ class ParticipantsGeneratorForm(forms.ModelForm):
                   'added_users',
                   'excluded_groups',
                   'excluded_users',
-                  'start_date_lte',
-                  'start_date_gte',
+                  'days_worked_lte',
+                  'days_worked_gte',
                   'autoupdate',
         ]
         # Классы виджетов.
@@ -80,8 +80,6 @@ class ParticipantsGeneratorForm(forms.ModelForm):
             'added_users': Select2MultipleWidget(),
             'excluded_groups': Select2MultipleWidget(),
             'excluded_users': Select2MultipleWidget(),
-            'start_date_lte': forms.DateInput(attrs={'type': 'date'}),
-            'start_date_gte': forms.DateInput(attrs={'type': 'date'}),
         }
 
 

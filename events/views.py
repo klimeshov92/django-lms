@@ -421,11 +421,6 @@ class ParticipantsGeneratorUpdateView(PermissionRequiredMixin, UpdateView):
         initial = super().get_initial()
         # Добавляем создателя: юзера отправившего запрос.
         initial["creator"] = self.request.user
-        # Добавляем даты.
-        if self.object.start_date_lte:
-            initial["start_date_lte"] = self.object.start_date_lte.strftime('%Y-%m-%d')
-        if self.object.start_date_gte:
-            initial["start_date_gte"] = self.object.start_date_gte.strftime('%Y-%m-%d')
         # Возвращаем значения в форму.
         return initial
 

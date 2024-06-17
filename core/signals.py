@@ -15,6 +15,7 @@ from .models import EmployeeExcelImport, Organization, Subdivision, Position, Em
 from django.contrib.auth.hashers import make_password
 # Импортируем функцию get_random_string из модуля utils.crypto.
 from django.utils.crypto import get_random_string
+from datetime import datetime, timedelta
 
 # Импортируем логи.
 import logging
@@ -365,12 +366,14 @@ def update_groups_users(sender, instance, **kwargs):
             logger.info(f"Все пользователи: {final_users}")
 
         # Фильтруем по датам.
-        if instance.start_date_lte:
-            final_users = final_users.filter(placements__start_date__lte=instance.start_date_lte)
-            logger.info(f"Пользователи с датой приема до {instance.start_date_lte}: {final_users}")
-        if instance.start_date_gte:
-            final_users = final_users.filter(placements__start_date__gte=instance.start_date_gte)
-            logger.info(f"Пользователи с датой приема после {instance.start_date_gte}: {final_users}")
+        if instance.days_worked_lte is not None:
+            start_date_lte = datetime.now().date() - timedelta(days=instance.days_worked_lte)
+            final_users = final_users.filter(placements__start_date__gte=start_date_lte)
+            logger.info(f"Пользователи с датой приема после {start_date_lte}: {final_users}")
+        if instance.days_worked_gte is not None:
+            start_date_gte = datetime.now().date() - timedelta(days=instance.days_worked_gte)
+            final_users = final_users.filter(placements__start_date__lte=start_date_gte)
+            logger.info(f"Пользователи с датой приема до {start_date_gte}: {final_users}")
 
         # Назначаем оставшихся пользователей группе.
         group.user_set.set(final_users)
