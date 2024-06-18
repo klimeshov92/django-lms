@@ -65,11 +65,11 @@ from core.mixins import PreviousPageGetMixinL1, PreviousPageSetMixinL1, \
     PreviousPageGetMixinL5, PreviousPageSetMixinL5, \
     PreviousPageGetMixinL0, PreviousPageSetMixinL0
 from reviews.models import Review
-from core.models import EmployeesGroupObjectPermission
+from core.models import EmployeesGroupObjectPermission, EmployeesObjectPermission
 from reviews.filters import ObjectsReviewFilter
 from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
-from core.filters import EmployeesGroupObjectPermissionFilter
+from core.filters import EmployeesGroupObjectPermissionFilter, EmployeesObjectPermissionFilter
 
 # Импортируем логи
 import logging
@@ -508,6 +508,48 @@ class LearningPathView(PreviousPageGetMixinL3, PreviousPageSetMixinL2, PreviousP
         if settings.DEBUG:
             logger.info(f"Уже есть отзыв: {haves_review}")
         context['haves_review'] = haves_review
+
+        # Добавляем объектные права.
+        content_type = ContentType.objects.get_for_model(LearningPath)
+        if EmployeesGroupObjectPermission.objects.filter(
+            content_type=content_type,
+            object_pk=self.kwargs.get('pk')
+        ).prefetch_related('content_object').exists():
+            group_object_permissions_queryset = EmployeesGroupObjectPermission.objects.filter(
+                content_type=content_type,
+                object_pk=self.kwargs.get('pk')
+            ).prefetch_related('content_object').order_by('group')
+        else:
+            group_object_permissions_queryset = EmployeesGroupObjectPermission.objects.none()
+        context['group_object_permissions_qs_count'] = len(group_object_permissions_queryset)
+        group_object_permissions_filter = EmployeesGroupObjectPermissionFilter(self.request.GET, queryset=group_object_permissions_queryset, request=self.request)
+        group_object_permissions = group_object_permissions_filter.qs
+        # Добавляем пагинатор.
+        group_object_permissions_paginator = Paginator(group_object_permissions, 6)
+        group_object_permissions_page_number = self.request.GET.get('group_object_permissions_page')
+        group_object_permissions_page_obj = group_object_permissions_paginator.get_page(group_object_permissions_page_number)
+        # Добавляем во вью.
+        context['group_object_permissions_filter'] = group_object_permissions_filter
+        context['group_object_permissions_page_obj'] = group_object_permissions_page_obj
+
+        # Добавляем объектные права.
+        if EmployeesObjectPermission.objects.filter(object_pk=self.kwargs.get('pk'), content_type=content_type).prefetch_related('content_object').exists():
+            object_permissions_queryset = EmployeesObjectPermission.objects.filter(
+                object_pk=self.kwargs.get('pk'),
+                content_type=content_type
+            ).prefetch_related('content_object').order_by('-id')
+        else:
+            object_permissions_queryset = EmployeesObjectPermission.objects.none()
+        context['object_permissions_qs_count'] = len(object_permissions_queryset)
+        object_permissions_filter = EmployeesObjectPermissionFilter(self.request.GET, queryset=object_permissions_queryset, request=self.request)
+        object_permissions = object_permissions_filter.qs
+        # Добавляем пагинатор.
+        object_permissions_paginator = Paginator(object_permissions, 6)
+        object_permissions_page_number = self.request.GET.get('object_permissions_page')
+        object_permissions_page_obj = object_permissions_paginator.get_page(object_permissions_page_number)
+        # Добавляем во вью.
+        context['object_permissions_filter'] = object_permissions_filter
+        context['object_permissions_page_obj'] = object_permissions_page_obj
 
         # Возвращаем новый набор переменных.
         return context

@@ -100,7 +100,7 @@
                                             {% elif blocking_task.type == 'course' %}
                                                 <a href="{% url 'courses:course' pk=blocking_task.course.id %}" class="status-button status-button-failed">{{blocking_task}}</a>
                                             {% elif blocking_task.type == 'test' %}
-                                                <a href="{% url 'tests:test' pk=blocking_task.test.id %}" class="status-button status-button-failed">{{blocking_task}}</a>
+                                                <a href="{% url 'testing:test' pk=blocking_task.test.id %}" class="status-button status-button-failed">{{blocking_task}}</a>
                                             {% endif %}
                                         </p>
                                     {% endfor %}

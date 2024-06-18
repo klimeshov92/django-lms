@@ -101,10 +101,15 @@
     <div class="tab-menu-container">
         <nav class="tab-menu">
             <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Должности сотрудника [{{qs_count}}]</a>
+            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Глобальные права [{{global_permissions_qs_count}}]</a>
+            {% if 'core.view_employeeobjectpermission' in perms %}
+                <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Объектные права [{{object_permissions_qs_count}}]</a>
+            {% endif %}
         </nav>
     </div>
 
     <div class="tab-content-container">
+
         <div id="tab1" class="tab-content">
             {% if object_list %}
                 <div class="list-table-responsive">
@@ -188,6 +193,125 @@
                 </nav>
             </div>
         </div>
+
+        {% if 'core.change_employeesgroup' in perms %}
+            <div id="tab2" class="tab-content">
+                {# Вывод элементов #}
+                {% if global_permissions_page_obj %}
+                    <div class="list-table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Права</th>
+                                    <th>Объект</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in global_permissions_page_obj %}
+                                    <tr>
+                                        <td>{{obj.name}}</td>
+                                        <td>{{obj.content_type}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {# Пагинация #}
+                    <div class="pagination">
+                        {# Информация о предыдущих страницах #}
+                        {% if global_permissions_page_obj.has_previous %}
+                            <a href="?{% url_replace global_permissions_page=1 %}">1</a>
+                            {% if global_permissions_page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace global_permissions_page=global_permissions_page_obj.previous_page_number %}">{{ global_permissions_page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ global_permissions_page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if global_permissions_page_obj.has_next %}
+                            <a href="?{% url_replace global_permissions_page=global_permissions_page_obj.next_page_number %}">{{ global_permissions_page_obj.next_page_number }}</a>
+                            {% if global_permissions_page_obj.paginator.num_pages != global_permissions_page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace global_permissions_page=global_permissions_page_obj.paginator.num_pages %}">{{ global_permissions_page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {# Вывод сообщения, если элементов нет #}
+                        <div class="not-found">
+                            <p>Глобальные права не найдены!</p>
+                        </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if 'core.view_employeeobjectpermission' in perms %}
+            <div id="tab3" class="tab-content">
+                {# Вывод элементов #}
+                {% if object_permissions_page_obj %}
+                    <div class="list-table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Сотрудник</th>
+                                    <th>Права</th>
+                                    <th>Объект</th>
+                                    {% if 'core.delete_employeesobjectpermission' in perms %}
+                                        <th>Действия</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in object_permissions_page_obj %}
+                                    <tr>
+                                        <td>{{obj.user}}</td>
+                                        <td>{{obj.permission.name}}</td>
+                                        <td>{{obj.content_object}}</td>
+                                        {% if 'core.delete_employeesobjectpermission' in perms %}
+                                            <td>
+                                                <a href="{% url 'core:employees_object_permissions_delete' type='employee' pk=object.id employees_object_permission_pk=obj.id %}">Удалить</a>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {# Пагинация #}
+                    <div class="pagination">
+                        {# Информация о предыдущих страницах #}
+                        {% if object_permissions_page_obj.has_previous %}
+                            <a href="?{% url_replace object_permissions_page=1 %}">1</a>
+                            {% if object_permissions_page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace object_permissions_page=object_permissions_page_obj.previous_page_number %}">{{ object_permissions_page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ object_permissions_page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if object_permissions_page_obj.has_next %}
+                            <a href="?{% url_replace object_permissions_page=object_permissions_page_obj.next_page_number %}">{{ object_permissions_page_obj.next_page_number }}</a>
+                            {% if object_permissions_page_obj.paginator.num_pages != object_permissions_page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace object_permissions_page=object_permissions_page_obj.paginator.num_pages %}">{{ object_permissions_page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {# Вывод сообщения, если элементов нет #}
+                        <div class="not-found">
+                            <p>Объектные права не найдены!</p>
+                        </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
     </div>
 
 </div>

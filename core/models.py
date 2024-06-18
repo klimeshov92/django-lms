@@ -2,7 +2,7 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 # Импорт расширенных прав.
-from guardian.models import GroupObjectPermissionAbstract
+from guardian.models import GroupObjectPermissionAbstract, UserObjectPermissionAbstract
 
 # Импортируем класс пользователя для создания нестандартного пользователя.
 from django.contrib.auth.models import AbstractUser
@@ -291,6 +291,26 @@ class EmployeesGroupObjectPermission(GroupObjectPermissionAbstract):
     def __str__(self):
         return f'{self.group} - {self.permission}'
 
+# Модель расширенных прав.
+class EmployeesObjectPermission(UserObjectPermissionAbstract):
+    # Создатель.
+    creator = models.ForeignKey(
+        Employee,
+        verbose_name='Создатель',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='employees_object_permissions_creators',
+        related_query_name='employees_object_permissions_creators'
+    )
+    class Meta:
+        # Изменение имени модели.
+        verbose_name = 'Права сотрудника на объект'
+        verbose_name_plural = 'Права сотрудника на объекты'
+
+    # Строковое представление.
+    def __str__(self):
+        return f'{self.user} - {self.permission}'
 
 # Класс организации.
 class Organization(models.Model):

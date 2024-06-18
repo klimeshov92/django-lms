@@ -12,7 +12,8 @@ from .views import EmployeeExcelImportsView, EmployeeExcelImportView, \
    PlacementCreateView, PlacementUpdateView, PlacementDeleteView, \
    OrganizationsView, OrganizationView, OrganizationCreateView, OrganizationUpdateView, OrganizationDeleteView, \
    SubdivisionsView, SubdivisionView, SubdivisionCreateView, SubdivisionUpdateView, SubdivisionDeleteView, \
-   PositionsView, PositionView,PositionCreateView, PositionUpdateView, PositionDeleteView, update_password
+   PositionsView, PositionView,PositionCreateView, PositionUpdateView, PositionDeleteView, update_password, \
+   EmployeesObjectPermissionCreateView, EmployeesObjectPermissionDeleteView
 
 from rest_framework.routers import DefaultRouter
 from .views import EmployeeViewSet, OrganizationViewSet, SubdivisionViewSet, PlacementViewSet, PositionViewSet
@@ -314,4 +315,8 @@ urlpatterns = [
    path('employees_group_object_permissions/<str:type>/<int:pk>/create', EmployeesGroupObjectPermissionCreateView.as_view(), name='employees_group_object_permissions_create'),
    # Маршрут удаления объектных прав.
    path('employees_group_object_permissions/<str:type>/<int:pk>/<int:employees_group_object_permission_pk>/delete/', EmployeesGroupObjectPermissionDeleteView.as_view(), name='employees_group_object_permissions_delete'),
+   # Маршрут создания объектных прав.
+   path('employees_object_permissions/<str:type>/<int:pk>/create', EmployeesObjectPermissionCreateView.as_view(), name='employees_object_permissions_create'),
+   # Маршрут удаления объектных прав.
+   path('employees_object_permissions/<str:type>/<int:pk>/<int:employees_object_permission_pk>/delete/', EmployeesObjectPermissionDeleteView.as_view(), name='employees_object_permissions_delete'),
 ]

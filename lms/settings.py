@@ -262,6 +262,7 @@ AUTH_USER_MODEL = 'core.Employee'
 AUTH_GROUP_MODEL = 'core.EmployeesGroup'
 # Расширенные права.
 GUARDIAN_GROUP_OBJ_PERMS_MODEL = 'core.EmployeesGroupObjectPermission'
+GUARDIAN_USER_OBJ_PERMS_MODEL = 'core.EmployeesObjectPermission'
 ANONYMOUS_USER_ID = -1
 
 LOGGING = {

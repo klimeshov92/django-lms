@@ -154,12 +154,22 @@ class PositionFilter(FilterSet):
         widget=Select2MultipleWidget()
     )
 
-# Фильтрация импортов.
+# Фильтрация прав.
 class EmployeesGroupObjectPermissionFilter(FilterSet):
     # Фильтрация по группе.
     group = ModelMultipleChoiceFilter(
         label='Группа',
         field_name='group',
         queryset=EmployeesGroup.objects.all(),
+        widget=Select2MultipleWidget()
+    )
+
+# Фильтрация прав.
+class EmployeesObjectPermissionFilter(FilterSet):
+    # Фильтрация по группе.
+    user = ModelMultipleChoiceFilter(
+        label='Сотрудник',
+        field_name='user',
+        queryset=Employee.objects.all(),
         widget=Select2MultipleWidget()
     )

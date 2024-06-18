@@ -106,6 +106,12 @@
             {% if user|perms:"learning_path.change_learningpath" %}
                 <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Учебные задачи [{{qs_count}}]</a>
             {% endif %}
+            {% if 'core.view_employeesgroupobjectpermission' in perms %}
+                <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Права групп [{{group_object_permissions_qs_count}}]</a>
+            {% endif %}
+            {% if 'core.view_employeeobjectpermission' in perms %}
+                <a href="#tab5" class="tab-menu-link" onclick="openTab(event, 'tab5')">Права сотрудников [{{object_permissions_qs_count}}]</a>
+            {% endif %}
         </nav>
     </div>
 
@@ -313,6 +319,179 @@
                             {% if learning_tasks_exists %}
                                 <a href="{% url 'learning_path:learning_tasks_ordering' pk=object.id %}">Сортировать задачи</a>
                             {% endif %}
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        {% endif %}
+
+
+        {% if 'core.view_employeesgroupobjectpermission' in perms %}
+            <div id="tab4" class="tab-content">
+                {# Фильтр элементов #}
+                <div class="filters-header">
+                    <a href="" class="filters-button">Фильтры</a>
+                </div>
+                <div class="filters-area">
+                    <form action="" method="get" class="form filter-form">
+                        {{ group_object_permissions_filter.form.media.css }}
+                        {{ group_object_permissions_filter.form.as_p }}
+                        {{ group_object_permissions_filter.form.media.js }}
+                    <nav class="form-menu ">
+                        <input type="submit" value="Найти" class="button"/>
+                    </nav>
+                    </form>
+                </div>
+                {# Вывод элементов #}
+                {% if group_object_permissions_page_obj %}
+                    <div class="list-table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Группа</th>
+                                    <th>Права</th>
+                                    <th>Объект</th>
+                                    {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                        <th>Действия</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in group_object_permissions_page_obj %}
+                                    <tr>
+                                        <td>{{obj.group}}</td>
+                                        <td>{{obj.permission.name}}</td>
+                                        <td>{{obj.content_object}}</td>
+                                        {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                            <td>
+                                                <a href="{% url 'core:employees_group_object_permissions_delete' type='learning_path' pk=object.id employees_group_object_permission_pk=obj.id %}">Удалить</a>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {# Пагинация #}
+                    <div class="pagination">
+                        {# Информация о предыдущих страницах #}
+                        {% if group_object_permissions_page_obj.has_previous %}
+                            <a href="?{% url_replace group_object_permissions_page=1 %}">1</a>
+                            {% if group_object_permissions_page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace group_object_permissions_page=group_object_permissions_page_obj.previous_page_number %}">{{ group_object_permissions_page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ group_object_permissions_page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if group_object_permissions_page_obj.has_next %}
+                            <a href="?{% url_replace group_object_permissions_page=group_object_permissions_page_obj.next_page_number %}">{{ group_object_permissions_page_obj.next_page_number }}</a>
+                            {% if group_object_permissions_page_obj.paginator.num_pages != group_object_permissions_page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace group_object_permissions_page=group_object_permissions_page_obj.paginator.num_pages %}">{{ group_object_permissions_page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {# Вывод сообщения, если элементов нет #}
+                        <div class="not-found">
+                            <p>Объектные права не найдены!</p>
+                        </div>
+                {% endif %}
+                {# Управление #}
+                <div class="submenu-container">
+                    <nav class="submenu">
+                        {% if 'core.add_employeesgroupobjectpermission' in perms %}
+                            <a href="{% url 'core:employees_group_object_permissions_create' type='learning_path' pk=object.id %}">Создать</a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if 'core.view_employeeobjectpermission' in perms %}
+            <div id="tab5" class="tab-content">
+                {# Фильтр элементов #}
+                <div class="filters-header">
+                    <a href="" class="filters-button">Фильтры</a>
+                </div>
+                <div class="filters-area">
+                    <form action="" method="get" class="form filter-form">
+                        {{ object_permissions_filter.form.media.css }}
+                        {{ object_permissions_filter.form.as_p }}
+                        {{ object_permissions_filter.form.media.js }}
+                    <nav class="form-menu ">
+                        <input type="submit" value="Найти" class="button"/>
+                    </nav>
+                    </form>
+                </div>
+                {# Вывод элементов #}
+                {% if object_permissions_page_obj %}
+                    <div class="list-table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Сотрудник</th>
+                                    <th>Права</th>
+                                    <th>Объект</th>
+                                    {% if 'core.delete_employeesobjectpermission' in perms %}
+                                        <th>Действия</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in object_permissions_page_obj %}
+                                    <tr>
+                                        <td>{{obj.user}}</td>
+                                        <td>{{obj.permission.name}}</td>
+                                        <td>{{obj.content_object}}</td>
+                                        {% if 'core.delete_employeesobjectpermission' in perms %}
+                                            <td>
+                                                <a href="{% url 'core:employees_object_permissions_delete' type='learning_path' pk=object.id employees_object_permission_pk=obj.id %}">Удалить</a>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {# Пагинация #}
+                    <div class="pagination">
+                        {# Информация о предыдущих страницах #}
+                        {% if object_permissions_page_obj.has_previous %}
+                            <a href="?{% url_replace object_permissions_page=1 %}">1</a>
+                            {% if object_permissions_page_obj.previous_page_number != 1 %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace object_permissions_page=object_permissions_page_obj.previous_page_number %}">{{ object_permissions_page_obj.previous_page_number }}</a>
+                            {% endif %}
+                        {% endif %}
+
+                        {# Информация о текущей странице #}
+                        <span class="current-page">{{ object_permissions_page_obj.number }}</span>
+
+                        {# Информация о следующих страницах #}
+                        {% if object_permissions_page_obj.has_next %}
+                            <a href="?{% url_replace object_permissions_page=object_permissions_page_obj.next_page_number %}">{{ object_permissions_page_obj.next_page_number }}</a>
+                            {% if object_permissions_page_obj.paginator.num_pages != object_permissions_page_obj.next_page_number %}
+                                <span class="pagination-gap">...</span>
+                                <a href="?{% url_replace object_permissions_page=object_permissions_page_obj.paginator.num_pages %}">{{ object_permissions_page_obj.paginator.num_pages }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {# Вывод сообщения, если элементов нет #}
+                        <div class="not-found">
+                            <p>Объектные права не найдены!</p>
+                        </div>
+                {% endif %}
+                {# Управление #}
+                <div class="submenu-container">
+                    <nav class="submenu">
+                        {% if 'core.add_employeeobjectpermission' in perms %}
+                            <a href="{% url 'core:employees_object_permissions_create' type='learning_path' pk=object.id %}">Создать</a>
                         {% endif %}
                     </nav>
                 </div>

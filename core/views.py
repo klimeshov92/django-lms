@@ -9,14 +9,14 @@ from django.conf import settings
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 # Импорт моделей ядра.
 from .models import Organization, Subdivision, Position, Employee, Placement, \
-    EmployeeExcelImport, Category, EmployeesGroup, EmployeesGroupObjectPermission, GroupsGenerator
+    EmployeeExcelImport, Category, EmployeesGroup, EmployeesGroupObjectPermission, GroupsGenerator, EmployeesObjectPermission
 # Импорт модели фильтров.
 from .filters import CategoryFilter, EmployeeExcelImportFilter, \
-    OrganizationFilter, SubdivisionFilter, PositionFilter, GroupFilter, EmployeeFilter, GroupsEmployeeFilter
+    OrganizationFilter, SubdivisionFilter, PositionFilter, GroupFilter, EmployeeFilter, GroupsEmployeeFilter, EmployeesObjectPermissionFilter
 # Импорт форм.
 from .forms import CategoryForm, EmployeeExcelImportForm, GroupForm, GroupsGeneratorForm, \
     EmployeesGroupObjectPermissionForm, EmployeeForm, PlacementForm, \
-    OrganizationForm, SubdivisionForm, PositionForm
+    OrganizationForm, SubdivisionForm, PositionForm, EmployeesObjectPermissionForm
 # Импорт пандас.
 import pandas as pd
 # Импорт рендера, перенаправления, генерации адреса и других урл функций.
@@ -67,6 +67,7 @@ from core.filters import EmployeesGroupObjectPermissionFilter
 from django.db.models import OuterRef, Subquery
 from django.core.paginator import Paginator
 from django.contrib.auth.models import Permission
+from learning_path.models import LearningPath
 
 # Импортируем логи
 import logging
@@ -352,11 +353,14 @@ class EmployeeView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
 
     # Переопределеяем переменные вью.
     def get_context_data(self, **kwargs):
-        # забираем изначальный набор переменных
+
+        # Забираем изначальный набор переменных
         context = super().get_context_data(**kwargs)
+
         # Забираем назначения пользователя.
         object_list = self.object.placements.all().order_by('start_date')
         qs_count = object_list.count()
+
         # Если назначения есть.
         if object_list.exists():
             # Добавляем пагинатор
@@ -367,10 +371,41 @@ class EmployeeView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
         else:
             # Задаем пустую переменную для проверки в шаблоне.
             page_obj = None
+
         # Добавляем во вью.
         context['object_list'] = object_list
         context['page_obj'] = page_obj
         context['qs_count'] = qs_count
+
+        # Добавляем глобальные права.
+        if Permission.objects.filter(user__id=self.kwargs.get('pk')).exists():
+            global_permissions_queryset = Permission.objects.filter(user__id=self.kwargs.get('pk')).order_by('-id')
+        else:
+            global_permissions_queryset = Permission.objects.none()
+        context['global_permissions_qs_count'] = len(global_permissions_queryset)
+        # Добавляем пагинатор.
+        global_permissions_paginator = Paginator(global_permissions_queryset, 6)
+        global_permissions_page_number = self.request.GET.get('global_permissions_page')
+        global_permissions_page_obj = global_permissions_paginator.get_page(global_permissions_page_number)
+
+        # Добавляем во вью.
+        context['global_permissions_page_obj'] = global_permissions_page_obj
+
+        # Добавляем объектные права.
+        if EmployeesObjectPermission.objects.filter(user__id=self.kwargs.get('pk')).prefetch_related('content_object').exists():
+            object_permissions_queryset = EmployeesObjectPermission.objects.filter(
+                user__id=self.kwargs.get('pk')
+            ).prefetch_related('content_object').order_by('-id')
+        else:
+            object_permissions_queryset = EmployeesObjectPermission.objects.none()
+        context['object_permissions_qs_count'] = len(object_permissions_queryset)
+        # Добавляем пагинатор.
+        object_permissions_paginator = Paginator(object_permissions_queryset, 6)
+        object_permissions_page_number = self.request.GET.get('object_permissions_page')
+        object_permissions_page_obj = object_permissions_paginator.get_page(object_permissions_page_number)
+        # Добавляем во вью.
+        context['object_permissions_page_obj'] = object_permissions_page_obj
+
         # Возвращаем новый набор переменных в контролер.
         return context
 
@@ -1939,7 +1974,9 @@ class EmployeesGroupObjectPermissionCreateView(GPermissionRequiredMixin, CreateV
         # Добавляем создателя: юзера отправившего запрос.
         initial["creator"] = self.request.user
         # Добавляем тип контента.
-        if self.kwargs.get('type') == 'material':
+        if self.kwargs.get('type') == 'learning_path':
+            content_type = ContentType.objects.get_for_model(LearningPath)
+        elif self.kwargs.get('type') == 'material':
             content_type = ContentType.objects.get_for_model(Material)
         elif self.kwargs.get('type') == 'course':
             content_type = ContentType.objects.get_for_model(Course)
@@ -1955,12 +1992,14 @@ class EmployeesGroupObjectPermissionCreateView(GPermissionRequiredMixin, CreateV
     # Перенаправление после валидации формы.
     def get_success_url(self):
         # Направляем по адресу объекта.
-        if self.kwargs.get('type') == 'material':
+        if self.kwargs.get('type') == 'learning_path':
+            return reverse('learning_path:learning_path', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'material':
             return reverse('materials:material', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'course':
             return reverse('courses:course', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'test':
-            return reverse('tests:test', kwargs={'pk': self.kwargs.get('pk')})
+            return reverse('testing:test', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'event':
             return reverse('events:event', kwargs={'pk': self.kwargs.get('pk')})
 
@@ -1980,16 +2019,100 @@ class EmployeesGroupObjectPermissionDeleteView(PermissionRequiredMixin, DeleteVi
     # Перенаправление после валидации формы.
     def get_success_url(self):
         # Направляем по адресу объекта.
-        if self.kwargs.get('type') == 'material':
+        if self.kwargs.get('type') == 'learning_path':
+            return reverse('learning_path:learning_path', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'material':
             return reverse('materials:material', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'course':
             return reverse('courses:course', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'test':
-            return reverse('tests:test', kwargs={'pk': self.kwargs.get('pk')})
+            return reverse('testing:test', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'event':
             return reverse('events:event', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'group':
             return reverse('core:group', kwargs={'pk': self.kwargs.get('pk')})
+
+# Создание права на объект.
+class EmployeesObjectPermissionCreateView(GPermissionRequiredMixin, CreateView):
+    # Права доступа
+    permission_required = 'core.add_employeesobjectpermission'
+    # Форма.
+    form_class = EmployeesObjectPermissionForm
+    # Модель.
+    model = EmployeesObjectPermission
+    # Шаблон.
+    template_name = 'employees_object_permission_edit.html'
+
+    # Добавляем в форму аргументы.
+    def get_form_kwargs(self):
+        kwargs = super(EmployeesObjectPermissionCreateView, self).get_form_kwargs()
+        kwargs['type'] = self.kwargs.get('type')
+        return kwargs
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Добавляем тип контента.
+        if self.kwargs.get('type') == 'learning_path':
+            content_type = ContentType.objects.get_for_model(LearningPath)
+        elif self.kwargs.get('type') == 'material':
+            content_type = ContentType.objects.get_for_model(Material)
+        elif self.kwargs.get('type') == 'course':
+            content_type = ContentType.objects.get_for_model(Course)
+        elif self.kwargs.get('type') == 'test':
+            content_type = ContentType.objects.get_for_model(Test)
+        elif self.kwargs.get('type') == 'event':
+            content_type = ContentType.objects.get_for_model(Event)
+        initial["content_type"] = content_type
+        initial["object_pk"] = self.kwargs.get('pk')
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        if self.kwargs.get('type') == 'learning_path':
+            return reverse('learning_path:learning_path', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'material':
+            return reverse('materials:material', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'course':
+            return reverse('courses:course', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'test':
+            return reverse('testing:test', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'event':
+            return reverse('events:event', kwargs={'pk': self.kwargs.get('pk')})
+
+
+# Удаление права на объект.
+class EmployeesObjectPermissionDeleteView(PermissionRequiredMixin, DeleteView):
+    # Права доступа.
+    permission_required = 'core.delete_employeesobjectpermission'
+    accept_global_perms = True
+    # Модель.
+    model = EmployeesObjectPermission
+    # Шаблон.
+    template_name = 'employees_object_permission_delete.html'
+    # Название параметра pk в urls
+    pk_url_kwarg = 'employees_object_permission_pk'
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        if self.kwargs.get('type') == 'learning_path':
+            return reverse('learning_path:learning_path', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'material':
+            return reverse('materials:material', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'course':
+            return reverse('courses:course', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'test':
+            return reverse('testing:test', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'event':
+            return reverse('events:event', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'employee':
+            return reverse('core:employee', kwargs={'pk': self.kwargs.get('pk')})
 
 # Домашняя.
 def home (request):

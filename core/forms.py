@@ -7,12 +7,13 @@ from django.contrib.auth.models import Permission
 from django_select2.forms import Select2Widget, Select2MultipleWidget
 # Импорт моделей.
 from .models import EmployeeExcelImport, Category, EmployeesGroup, Employee, \
-    GroupsGenerator, EmployeesGroupObjectPermission, Placement, Organization, Subdivision, Position
+    GroupsGenerator, EmployeesGroupObjectPermission, Placement, Organization, Subdivision, Position, EmployeesObjectPermission
 from django.contrib.contenttypes.models import ContentType
 from materials.models import Material, File
 from courses.models import Course
 from testing.models import Test
 from events.models import Event
+from learning_path.models import LearningPath
 
 
 # Форма сотрудника.
@@ -33,6 +34,7 @@ class EmployeeForm(forms.ModelForm):
             'phone',
             'mobile_phone',
             'is_active',
+            'user_permissions',
             'is_staff',
             'is_superuser',
             'creator'
@@ -41,6 +43,7 @@ class EmployeeForm(forms.ModelForm):
         widgets = {
             'creator': forms.HiddenInput(),
             'birthday': forms.DateInput(attrs={'type': 'date'}),
+            'user_permissions': Select2MultipleWidget(),
         }
 
 # Форма организации.
@@ -170,20 +173,6 @@ class CategoryForm(forms.ModelForm):
 
 # Форма группы.
 class GroupForm(forms.ModelForm):
-    # Сотрудники. Убрано: не удобно при большом количестве людей. Есть генератор.
-    #employee = forms.ModelMultipleChoiceField(
-        #queryset=Employee.objects.all(),
-        #widget=forms.HiddenInput(),
-        #required=False,
-        #label="Сотрудники"
-    #)
-    # Права доступа.
-    permissions = forms.ModelMultipleChoiceField(
-        queryset=Permission.objects.all(),
-        widget=Select2MultipleWidget(),
-        required=False,
-        label="Права доступа"
-    )
     class Meta:
         model = EmployeesGroup
         # Поля.
@@ -201,6 +190,7 @@ class GroupForm(forms.ModelForm):
             'type': forms.HiddenInput(),
             'categories': Select2MultipleWidget(),
             'creator': forms.HiddenInput(),
+            'permissions': Select2MultipleWidget(),
         }
 
     # Инициализатор.
@@ -309,6 +299,61 @@ class EmployeesGroupObjectPermissionForm(forms.ModelForm):
         super(EmployeesGroupObjectPermissionForm, self).__init__(*args, **kwargs)
 
         # Определяем перечень прав для выбора.
+        if type == 'learning_path':
+            content_type = ContentType.objects.get_for_model(LearningPath)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+        if type == 'material':
+            content_type = ContentType.objects.get_for_model(Material)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+        if type == 'course':
+            content_type = ContentType.objects.get_for_model(Course)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+        if type == 'test':
+            content_type = ContentType.objects.get_for_model(Test)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+        if type == 'event':
+            content_type = ContentType.objects.get_for_model(Event)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+
+# Форма создания импорта.
+class EmployeesObjectPermissionForm(forms.ModelForm):
+    class Meta:
+        # Модель.
+        model = EmployeesObjectPermission
+        # Поля.
+        fields = [
+            'permission',
+            'content_type',
+            'object_pk',
+            'user',
+            'creator'
+        ]
+        # Классы виджетов.
+        widgets = {
+            'permission': Select2Widget(),
+            'content_type': forms.HiddenInput(),
+            'object_pk': forms.HiddenInput(),
+            'user': Select2Widget(),
+            'creator': forms.HiddenInput(),
+        }
+        # Названия полей.
+        labels = {
+            'permission': 'Права',
+            'user': 'Сотрудник',
+        }
+
+    def __init__(self, *args, **kwargs):
+
+        # Извлекаем тип.
+        type = kwargs.pop('type', None)
+
+        # Создаем форму.
+        super(EmployeesObjectPermissionForm, self).__init__(*args, **kwargs)
+
+        # Определяем перечень прав для выбора.
+        if type == 'learning_path':
+            content_type = ContentType.objects.get_for_model(LearningPath)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
         if type == 'material':
             content_type = ContentType.objects.get_for_model(Material)
             self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
