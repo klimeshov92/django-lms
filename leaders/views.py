@@ -49,8 +49,6 @@ class LeadersView(PermissionListMixin, ListView):
     ordering = 'created'
     # Шаблон.
     template_name = 'leaders.html'
-    # Количество объектов на странице
-    paginate_by = 6
 
     # Переопределяем выборку вью.
     def get_queryset(self):
@@ -79,7 +77,7 @@ class LeadersView(PermissionListMixin, ListView):
         # Если участники есть.
         if leaders:
             # Добавляем пагинатор
-            paginator = Paginator(leaders, 6)
+            paginator = Paginator(leaders, 10)
             page_number = self.request.GET.get('page')
             page_obj = paginator.get_page(page_number)
         # Если нет...

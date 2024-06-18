@@ -12,7 +12,7 @@
 {# Подключение контента #}
 {% block content %}
 
-<div class="list-container">
+<div class="leaders-container">
 
     {# Заголовок элементов #}
     <div class="h1-center">
@@ -33,27 +33,29 @@
     {# Вывод элементов #}
 
     {% if leaders_list %}
-        <div>
-            <div class="list-table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Место</th>
-                            <th>Сотрудник</th>
-                            <th>Бонусы</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for obj in leaders_list %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{obj}}</td>
-                                <td>{{obj.total_bonus}}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="long-list-grid">
+            {% for obj in leaders_list %}
+                <div class="long-list-grid-item">
+                    <div class="long-list-grid-item-header">
+                        <p class="text-align-right"><span class="bonus-mark">{{ forloop.counter }}</span></p>
+                    </div>
+                    <div class="long-list-grid-item-content-with-image">
+                        <div class="long-list-grid-item-content-with-image-image-container">
+                            {% if obj.avatar %}
+                               <img src="{{obj.avatar.url}}">
+                            {% else %}
+                                <div class="long-list-grid-item-content-with-image-image-container-blank">
+
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="long-list-grid-item-content-with-image-text-container">
+                            <h3>{{obj}}</h3>
+                            <p><span class="description-item">Бонусы:</span> {{obj.total_bonus}}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
             {# Пагинация #}
             <div class="pagination">
                 {# Информация о предыдущих страницах #}

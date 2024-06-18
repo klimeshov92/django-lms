@@ -635,6 +635,14 @@ a.informers-grid-item-button-failed:focus {
     box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
 }
 
+/* Список-лидеров */
+.leaders-container {
+    padding: 0px 25px 25px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 725px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
+}
+
 /* Список */
 .list-grid {
     display: grid; /* Сетка */
@@ -702,7 +710,75 @@ a.informers-grid-item-button-failed:focus {
     margin-top: auto; /* Это заставит элемент прилипнуть к низу флекс-контейнера */
 }
 
-/* Флекс-список */
+/* Таб-список */
+.long-list-grid {
+    display: grid; /* Сетка */
+    grid-gap: 25px; /* Расстояние между элементами */
+    max-width: 1025px; /* Ширина */
+    margin: 25px auto; /* Отступы внешние */
+}
+
+/* Длинный-список */
+.long-list-grid-item {
+    background: white; /* Фон белый */
+    border-radius: 15px; /* Скругленные углы */
+    overflow: hidden; /* Скрываем выходящее за границы */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    display: flex; /* Flexbox */
+    flex-direction: column /* Колонки */
+}
+
+/* Длинный-список */
+.long-list-grid-item-header {
+    padding: 0 25px; /* Отступы */
+    border-bottom: 2px solid var(--color-divider-rgb); /* Линия снизу */
+}
+
+/* Длинный-список */
+.long-list-grid-item-content-with-image {
+    display: flex; /* Включаем Flexbox для горизонтального расположения */
+    align-items: flex-start; /* Выравниваем элементы по верхнему краю */
+    gap: 25px; /* Отступ между контейнерами */
+    word-wrap: break-word; /* Перенос слов */
+    padding: 0 25px; /* Отступы */
+}
+
+/* Длинный-список */
+.long-list-grid-item-content-with-image-image-container {
+    width: 33.33%; /* Вложенные элементы занимают всю ширину */
+}
+
+/* Длинный-список */
+.long-list-grid-item-content-with-image-image-container img {
+    max-width: 100%; /* Ширина изображения не шире контейнера */
+    height: auto; /* Высота автоматически регулируется */
+    object-fit: contain; /* Изображение сохраняет пропорции и полностью помещается в контейнер */
+    border-radius: 5px; /* Скругление углов */
+    margin-top: 20px; /* Отступ сверху */
+    margin-bottom: 15px; /* Отступ снизу */
+}
+
+/* Длинный-список */
+.long-list-grid-item-content-with-image-image-container-blank {
+    height: 250px;
+    border: 2px dashed var(--color-divider-rgb); /* Устанавливает пунктирную рамку серого цвета */
+    border-radius: 5px; /* Скругление углов */
+    margin-top: 20px; /* Отступ сверху */
+    margin-bottom: 15px; /* Отступ снизу */
+}
+
+/* Длинный-список */
+.long-list-grid-item-content-with-image-text-container {
+    width: 66.66%; /* Задаем ширину */
+}
+
+/* Длинный-список */
+.long-list-grid-item-content {
+    padding: 0 15px; /* Отступы */
+}
+
+/* Таб-список */
 .tab-list-grid {
     display: grid; /* Сетка */
     grid-gap: 25px; /* Расстояние между элементами */
@@ -711,7 +787,7 @@ a.informers-grid-item-button-failed:focus {
     margin: 25px auto; /* Отступы внешние */
 }
 
-/* Флекс-список */
+/* Таб-список */
 .tab-list-grid-item {
     background: white; /* Фон белый */
     border-radius: 15px; /* Скругленные углы */
@@ -722,12 +798,12 @@ a.informers-grid-item-button-failed:focus {
     flex-direction: column; /* Колонки */
 }
 
-/* Флекс-список */
+/* Таб-список */
 .tab-list-grid-item-content {
     padding: 0 15px; /* Отступы */
 }
 
-/* Флекс-список */
+/* Таб-список */
 .tab-list-grid-item-footer {
     padding: 0 15px; /* Отступы */
     margin-top: auto; /* Это заставит элемент прилипнуть к низу флекс-контейнера */
@@ -950,6 +1026,15 @@ a.informers-grid-item-button-failed:focus {
 
 /* Отзыв */
 .review-mark {
+    display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
+    color: var(--color-in-progress-rgb); /* Цвет текста */
+    border-radius: 10px; /* Радиус углов рамки */
+    padding: 5px 10px; /* Внутренний отступ */
+    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+}
+
+/* Отзыв */
+.bonus-mark {
     display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
     color: var(--color-in-progress-rgb); /* Цвет текста */
     border-radius: 10px; /* Радиус углов рамки */
@@ -1675,7 +1760,6 @@ label[for$="clear_id"] {
     .test-grid {
         grid-template-columns: 400px 300px; /* Левый элемент занимает две трети, правый - одну треть */
     }
-}
 
 /* Медиа-запросы для мобильных устройств */
 @media screen and (max-width: 799px) {
