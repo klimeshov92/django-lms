@@ -1002,13 +1002,6 @@ a.informers-grid-item-button-failed:focus {
 }
 
 /* Контейнер типа контента */
-.content-type-sub-div {
-    margin: 15px auto; /* Отступы внешние */
-    text-align: right; /* Выравнивание текста справа */
-    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
-}
-
-/* Контейнер типа контента */
 .content-type-basic {
     display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
     color: var(--color-content-label-rgb); /* Цвет текста */
@@ -1057,6 +1050,19 @@ a.informers-grid-item-button-failed:focus {
 
 .bonus-mark-sub {
     border: 2px dashed var(--color-in-progress-rgb); /* Граница */
+}
+
+/* Отзыв */
+.bonus-sum {
+    display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
+    color: var(--color-completed-rgb); /* Цвет текста */
+    border-radius: 10px; /* Радиус углов рамки */
+    padding: 5px 10px; /* Внутренний отступ */
+    border: 2px solid var(--color-completed-rgb); /* Граница */
+}
+
+.bonus-sum-sub {
+    border: 2px dashed var(--color-completed-rgb); /* Граница */
 }
 
 /* Статус */

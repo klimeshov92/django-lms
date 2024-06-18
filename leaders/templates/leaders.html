@@ -54,8 +54,8 @@
                         </div>
                         <div class="long-list-grid-item-content-with-image-text-container">
                             <h3>{{obj}}</h3>
-                            <p><span class="description-item">Бонусы:</span> {{obj.total_bonus}}</p>
-                            {% if request.GET.created_lte or request.GET.created_gte %}<p><span class="description-item">По выранному периоду:</span> {{obj.filter_bonus}}</p>{% endif %}
+                            {% if request.GET.created_lte or request.GET.created_gte %}<p><span class="bonus-sum bonus-sum-sub">Бонусы: {{obj.filter_bonus}}</span></p>{% endif %}
+                            <p><span class="bonus-sum">Бонусы: {{obj.total_bonus}}</span></p>
                         </div>
                     </div>
                 </div>

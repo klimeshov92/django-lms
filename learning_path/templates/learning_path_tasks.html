@@ -30,9 +30,9 @@
                     {% for obj in object_list %}
                         <div class="content-grid-item-list-grid-item">
                             <div class="content-grid-item-list-grid-item-header">
-                                <div class="content-type-sub-div">
+                                <p class="text-align-right">
                                     <span class="content-type-sub">{{obj.get_type_display}}</span>
-                                </div>
+                                </p>
                             </div>
                             <div class="content-grid-item-list-grid-item-image-container">
                                 {% if obj.type == 'material' %}
