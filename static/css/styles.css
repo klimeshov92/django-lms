@@ -1055,6 +1055,10 @@ a.informers-grid-item-button-failed:focus {
     border: 2px solid var(--color-in-progress-rgb); /* Граница */
 }
 
+.bonus-mark-sub {
+    border: 2px dashed var(--color-in-progress-rgb); /* Граница */
+}
+
 /* Статус */
 .status {
     font-weight: normal; /* Обычный (нормальный) шрифт */
