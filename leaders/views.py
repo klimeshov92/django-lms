@@ -76,6 +76,11 @@ class LeadersView(PermissionListMixin, ListView):
         context['leaders_list'] = leaders
         # Если участники есть.
         if leaders:
+            # Добавляем ранг.
+            rank = 1
+            for leader in leaders:
+                leader.rank = rank
+                rank += 1
             # Добавляем пагинатор
             paginator = Paginator(leaders, 10)
             page_number = self.request.GET.get('page')
