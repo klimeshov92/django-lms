@@ -635,7 +635,7 @@ a.informers-grid-item-button-failed:focus {
     box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
 }
 
-/* Список-лидеров */
+/* Список лидеров */
 .leaders-container {
     padding: 0px 25px 25px 25px; /* Отступы внутри */
     margin: 0 auto; /* Отступы внешние */
@@ -710,7 +710,7 @@ a.informers-grid-item-button-failed:focus {
     margin-top: auto; /* Это заставит элемент прилипнуть к низу флекс-контейнера */
 }
 
-/* Таб-список */
+/* Длинный-список */
 .long-list-grid {
     display: grid; /* Сетка */
     grid-gap: 25px; /* Расстояние между элементами */
@@ -775,8 +775,9 @@ a.informers-grid-item-button-failed:focus {
 
 /* Длинный-список */
 .long-list-grid-item-content {
-    padding: 0 15px; /* Отступы */
+    padding: 0 25px; /* Отступы */
 }
+
 
 /* Таб-список */
 .tab-list-grid {
@@ -1760,6 +1761,7 @@ label[for$="clear_id"] {
     .test-grid {
         grid-template-columns: 400px 300px; /* Левый элемент занимает две трети, правый - одну треть */
     }
+}
 
 /* Медиа-запросы для мобильных устройств */
 @media screen and (max-width: 799px) {
@@ -1788,11 +1790,11 @@ label[for$="clear_id"] {
         width: 100%; /* Вложенные элементы занимают всю ширину */
     }
     .detail-content-with-image-image-container img {
-        margin-top: 0; /* Отступ сверху */
+        /* margin-top: 0; /* Отступ сверху */
         margin-bottom: 0; /* Отступ снизу */
     }
     .detail-content-with-image-image-container-blank {
-        margin-top: 0; /* Отступ сверху */
+        /* margin-top: 0; /* Отступ сверху */
         margin-bottom: 0; /* Отступ снизу */
     }
     .detail-content-with-image-text-container {
@@ -1812,5 +1814,23 @@ label[for$="clear_id"] {
     /* Стили для пагинации */
     .pagination-content {
         margin: 25px 0; /* Отступ внутренний */
+    }
+    .long-list-grid-item-content-with-image {
+        flex-direction: column; /* Располагаем элементы столбцом */
+        gap: 0px; /* Отступ между контейнерами */
+    }
+    .long-list-grid-item-content-with-image-image-container {
+        width: 100%; /* Вложенные элементы занимают всю ширину */
+    }
+    .long-list-grid-item-content-with-image-image-container img {
+        /*margin-top: 0; /* Отступ сверху */
+        margin-bottom: 0; /* Отступ снизу */
+    }
+    .long-list-grid-item-content-with-image-image-container-blank {
+        /*margin-top: 0; /* Отступ сверху */
+        margin-bottom: 0; /* Отступ снизу */
+    }
+    .long-list-grid-item-content-with-image-text-container {
+        width: 100%; /* Вложенные элементы занимают всю ширину */
     }
 }
