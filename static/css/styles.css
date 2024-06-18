@@ -528,7 +528,7 @@ a.button-mini:not(:first-of-type):disabled,
 /* Информеры */
 .informers-grid-item-container {
     font-weight: 400; /* Обычный (нормальный) шрифт */
-    font-size: 1.25rem; /* Размер шрифта */
+    font-size: 1.1rem; /* Размер шрифта */
     background-color: white; /* Фон */
     color: var(--color-in-progress-rgb); /* Цвет текста */
     border-radius: 15px; /* Радиус углов рамки */
@@ -556,7 +556,7 @@ a.button-mini:not(:first-of-type):disabled,
 /* Информеры */
 a.informers-grid-item-button {
     font-weight: 400; /* Обычный (нормальный) шрифт */
-    font-size: 1.25rem; /* Размер шрифта */
+    font-size: 1.1rem; /* Размер шрифта */
     color: var(--color-in-progress-rgb); /* Цвет текста */
     border-radius: 15px; /* Радиус углов рамки */
     padding: 15px 25px; /* Вертикальный и горизонтальный отступы кнопки */
