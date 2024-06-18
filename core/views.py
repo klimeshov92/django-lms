@@ -1755,23 +1755,6 @@ class GroupUpdateView(PermissionRequiredMixin, UpdateView):
     # Шаблон.
     template_name = 'group_edit.html'
 
-    # Проверяем тип группы.
-    def dispatch(self, request, *args, **kwargs):
-
-        # Забираем группу.
-        group = self.get_object()
-
-        # Если имеется полное разрешение.
-        if group.type == 'custom':
-
-            # Идем дальше.
-            return super().dispatch(request, *args, **kwargs)
-
-        else:
-
-            # Запрет.
-            return HttpResponseForbidden('Нельзя менять группы такого типа!')
-
     # Заполнение полей данными.
     def get_initial(self):
         # Забираем изначальный набор.
@@ -1797,23 +1780,6 @@ class GroupDeleteView(PermissionRequiredMixin, DeleteView):
     model = EmployeesGroup
     # Шаблон.
     template_name = 'group_delete.html'
-
-    # Проверяем тип группы.
-    def dispatch(self, request, *args, **kwargs):
-
-        # Забираем группу.
-        group = self.get_object()
-
-        # Если имеется полное разрешение.
-        if group.type == 'custom':
-
-            # Идем дальше.
-            return super().dispatch(request, *args, **kwargs)
-
-        else:
-
-            # Запрет.
-            return HttpResponseForbidden('Нельзя удалять группы такого типа!')
 
     # Перенаправление после валидации формы.
     def get_success_url(self):

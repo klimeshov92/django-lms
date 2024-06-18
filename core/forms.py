@@ -209,6 +209,12 @@ class GroupForm(forms.ModelForm):
         # Вызываем инициализатор базового класса.
         super(GroupForm, self).__init__(*args, **kwargs)
 
+        # Если это не кастомная группа.
+        if self.instance.type != 'custom':
+
+            # Не даем менять имя.
+            self.fields['name'].widget = forms.HiddenInput()
+
         # Проверяем объект, связанный с этой формой.
         if self.instance.pk:  # Проверка, что это не новый объект
 

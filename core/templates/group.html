@@ -39,7 +39,7 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
-                    {% if 'core.change_employeesgroup' in perms and object.type == 'custom' %}
+                    {% if 'core.change_employeesgroup' in perms %}
                         <a href="{% url 'core:group_update' pk=object.id %}">Изменить</a>
                     {% endif %}
                     {% if 'core.delete_employeesgroup' in perms and object.type == 'custom' %}
