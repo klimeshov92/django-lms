@@ -513,7 +513,7 @@ a.button-mini:not(:first-of-type):disabled,
     display: grid; /* Сетка */
     grid-gap: 25px; /* Расстояние между элементами */
     justify-content: center;
-    max-width: 525px; /* Ширина */
+    max-width: 625px; /* Ширина */
     margin: 25px auto; /* Отступы внешние */
     text-align: center; /* Выравнивание текста */
 }
@@ -528,7 +528,7 @@ a.button-mini:not(:first-of-type):disabled,
 /* Информеры */
 .informers-grid-item-container {
     font-weight: 400; /* Обычный (нормальный) шрифт */
-    font-size: 1.1rem; /* Размер шрифта */
+    font-size: 1.25rem; /* Размер шрифта */
     background-color: white; /* Фон */
     color: var(--color-in-progress-rgb); /* Цвет текста */
     border-radius: 15px; /* Радиус углов рамки */
@@ -556,7 +556,7 @@ a.button-mini:not(:first-of-type):disabled,
 /* Информеры */
 a.informers-grid-item-button {
     font-weight: 400; /* Обычный (нормальный) шрифт */
-    font-size: 1.1rem; /* Размер шрифта */
+    font-size: 1.25rem; /* Размер шрифта */
     color: var(--color-in-progress-rgb); /* Цвет текста */
     border-radius: 15px; /* Радиус углов рамки */
     padding: 15px 25px; /* Вертикальный и горизонтальный отступы кнопки */
@@ -635,7 +635,7 @@ a.informers-grid-item-button-failed:focus {
 .home-container {
     padding: 0px 25px 25px 25px; /* Отступы внутри */
     margin: 0 auto; /* Отступы внешние */
-    max-width: 575px; /* Установка максимальной ширины */
+    max-width: 675px; /* Установка максимальной ширины */
     box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
 }
 
@@ -1774,7 +1774,7 @@ label[for$="clear_id"] {
 /* Медиа-запросы для десктопных экранов */
 @media screen and (min-width: 800px) {
     .informers-grid  {
-        grid-template-columns: repeat(auto-fit, 250px); /* Ширина грида */
+        grid-template-columns: repeat(auto-fit, 300px); /* Ширина грида */
     }
     .list-grid {
         grid-template-columns: repeat(auto-fit, 300px); /* Ширина грида */
