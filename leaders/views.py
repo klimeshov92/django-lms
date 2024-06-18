@@ -87,8 +87,8 @@ class LeadersView(PermissionListMixin, ListView):
         leaders_list = self.absolute_leaders.filter(
             id__in=self.filterset.qs.values_list('employee', flat=True).distinct())
         leaders = leaders_list.annotate(
-            total_transactions=Count('transactions')
-        ).order_by('-total_transactions')
+            total_bonus=Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=self.filterset.qs)), 0)
+        ).order_by('-total_bonus')
 
         # Присваиваем ранг каждому лидеру.
         for leader in leaders:
