@@ -32,9 +32,9 @@
     </div>
     {# Вывод элементов #}
 
-    {% if leaders_list %}
+    {% if page_obj %}
         <div class="long-list-grid">
-            {% for obj in leaders_list %}
+            {% for obj in page_obj %}
                 <div class="long-list-grid-item">
                     <div class="long-list-grid-item-header">
                         <p class="text-align-right"><span class="bonus-mark">{{ obj.rank }}</span></p>

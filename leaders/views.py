@@ -23,7 +23,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin as GPermissionReq
 from django.contrib.auth.decorators import permission_required, login_required
 # Импорт времени с учетом таймзоны.
 from django.utils import timezone
-from django.db.models import OuterRef, Subquery, Prefetch
+from django.db.models import OuterRef, Subquery, Prefetch, Count
 from django.db.models import F
 from django.db.models import Case, When, Value
 # Импорт суммирования значений.
@@ -54,9 +54,26 @@ class LeadersView(PermissionListMixin, ListView):
     def get_queryset(self):
         # Забираем изначальную выборку вью.
         queryset = super().get_queryset()
+
+        # Получаем всех сотрудников, участвующих в транзакциях.
+        all_employees_list = queryset.values_list('employee', flat=True).distinct()
+        all_employees = Employee.objects.filter(id__in=all_employees_list)
+
+        # Аннотируем суммой бонусов для всех сотрудников.
+        self.absolute_leaders = all_employees.annotate(
+            total_bonus=Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=queryset)), 0)
+        ).order_by('-total_bonus')
+
+        # Добавляем ранг.
+        rank = 1
+        for leader in self.absolute_leaders:
+            leader.rank = rank
+            rank += 1
+
         # Добавляем модель фильтрации в выборку вью.
         self.filterset = LeadersFilter(self.request.GET, queryset, request=self.request)
-        # Возвращаем вью новую выборку.
+
+        # Возвращаем вью новую выборку и абсолютных лидеров.
         return self.filterset.qs
 
     # Добавляем во вью переменные.
@@ -65,31 +82,24 @@ class LeadersView(PermissionListMixin, ListView):
         context = super().get_context_data(**kwargs)
         # Добавляем фильтрсет.
         context['filterset'] = self.filterset
-        # Заменяем кверисет на лидеров.
-        # Забираем связанный список сотрудников и айди.
-        employees_list = self.filterset.qs.values_list('employee', flat=True).distinct()
-        employees = Employee.objects.filter(id__in=employees_list)
-        # Аннотируем суммой бонусов.
-        leaders = employees.annotate(
-            total_bonus=Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=self.filterset.qs)), 0)
-        ).order_by('-total_bonus')
+
+        # Аннотируем суммой транзакций для фильтрованных лидеров.
+        leaders_list = self.absolute_leaders.filter(
+            id__in=self.filterset.qs.values_list('employee', flat=True).distinct())
+        leaders = leaders_list.annotate(
+            total_transactions=Count('transactions')
+        ).order_by('-total_transactions')
+
+        # Присваиваем ранг каждому лидеру.
+        for leader in leaders:
+            leader.rank = next((x.rank for x in self.absolute_leaders if x.id == leader.id), None)
+
         context['leaders_list'] = leaders
-        # Если участники есть.
-        if leaders:
-            # Добавляем ранг.
-            rank = 1
-            for leader in leaders:
-                leader.rank = rank
-                rank += 1
-            # Добавляем пагинатор
-            paginator = Paginator(leaders, 10)
-            page_number = self.request.GET.get('page')
-            page_obj = paginator.get_page(page_number)
-        # Если нет...
-        else:
-            # Задаем пустую переменную для проверки в шаблоне.
-            page_obj = None
-        # Добавляем во вью.
+
+        # Добавляем пагинатор
+        paginator = Paginator(leaders, 10)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
         context['page_obj'] = page_obj
-        # Возвращаем переменные.
+
         return context
