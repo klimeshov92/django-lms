@@ -84,22 +84,40 @@ class LeadersView(PermissionListMixin, ListView):
         context['filterset'] = self.filterset
 
         # Аннотируем суммой транзакций для фильтрованных лидеров.
-        leaders_list = self.absolute_leaders.filter(
-            id__in=self.filterset.qs.values_list('employee', flat=True).distinct())
-        leaders = leaders_list.annotate(
+        leaders = self.absolute_leaders.filter(
+            id__in=self.filterset.qs.values_list('employee', flat=True).distinct()
+        ).annotate(
             filter_bonus=Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=self.filterset.qs)), 0),
-            total_bonus = Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=self.get_queryset())), 0)
+            total_bonus=Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=self.get_queryset())), 0)
         ).order_by('-total_bonus')
 
-        # Присваиваем ранг каждому лидеру.
+        # Присваиваем ранг каждому лидеру для filter_bonus.
         rank = 1
+        previous_filter_bonus = None
         for leader in leaders:
-            leader.filter_rank = rank
-            rank += 1
-        for leader in leaders:
-            leader.total_rank = next((x.total_rank for x in self.absolute_leaders if x.id == leader.id), None)
+            if previous_filter_bonus is not None and leader.filter_bonus == previous_filter_bonus:
+                leader.filter_rank = previous_filter_rank
+            else:
+                leader.filter_rank = rank
+                rank += 1
 
-        context['leaders_list'] = leaders
+            previous_filter_bonus = leader.filter_bonus
+            previous_filter_rank = leader.filter_rank
+
+        # Присваиваем ранг каждому лидеру для total_bonus.
+        rank = 1
+        previous_total_bonus = None
+        for leader in leaders:
+            if previous_total_bonus is not None and leader.total_bonus == previous_total_bonus:
+                leader.total_rank = previous_total_rank
+            else:
+                leader.total_rank = rank
+                rank += 1
+
+            previous_total_bonus = leader.total_bonus
+            previous_total_rank = leader.total_rank
+
+        context['leaders'] = leaders
 
         # Добавляем пагинатор
         paginator = Paginator(leaders, 10)
