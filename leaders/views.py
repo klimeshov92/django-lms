@@ -67,7 +67,7 @@ class LeadersView(PermissionListMixin, ListView):
         # Добавляем ранг.
         rank = 1
         for leader in self.absolute_leaders:
-            leader.rank = rank
+            leader.total_rank = rank
             rank += 1
 
         # Добавляем модель фильтрации в выборку вью.
@@ -87,12 +87,17 @@ class LeadersView(PermissionListMixin, ListView):
         leaders_list = self.absolute_leaders.filter(
             id__in=self.filterset.qs.values_list('employee', flat=True).distinct())
         leaders = leaders_list.annotate(
-            total_bonus=Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=self.filterset.qs)), 0)
+            filter_bonus=Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=self.filterset.qs)), 0),
+            total_bonus = Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=self.get_queryset())), 0)
         ).order_by('-total_bonus')
 
         # Присваиваем ранг каждому лидеру.
+        rank = 1
         for leader in leaders:
-            leader.rank = next((x.rank for x in self.absolute_leaders if x.id == leader.id), None)
+            leader.filter_rank = rank
+            rank += 1
+        for leader in leaders:
+            leader.total_rank = next((x.total_rank for x in self.absolute_leaders if x.id == leader.id), None)
 
         context['leaders_list'] = leaders
 

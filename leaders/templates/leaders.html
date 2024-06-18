@@ -37,7 +37,7 @@
             {% for obj in page_obj %}
                 <div class="long-list-grid-item">
                     <div class="long-list-grid-item-header">
-                        <p class="text-align-right"><span class="bonus-mark">{{ obj.rank }}</span></p>
+                        <p class="text-align-right"><span class="bonus-mark">{% if request.GET %}{{ obj.filter_rank }} | {{ obj.total_rank }}{% else %}{{ obj.filter_rank }}{% endif %}</span></p>
                     </div>
                     <div class="long-list-grid-item-content-with-image">
                         <div class="long-list-grid-item-content-with-image-image-container">
@@ -51,7 +51,7 @@
                         </div>
                         <div class="long-list-grid-item-content-with-image-text-container">
                             <h3>{{obj}}</h3>
-                            <p><span class="description-item">Бонусы:</span> {{obj.total_bonus}}</p>
+                            <p><span class="description-item">{% if request.GET %}Бонусы (по выборке | общие):</span> {{obj.filter_bonus}} | {{obj.total_bonus}}{% else %}Бонусы:</span> {{obj.filter_bonus}}{% endif %}</p>
                         </div>
                     </div>
                 </div>
