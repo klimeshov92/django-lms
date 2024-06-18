@@ -1054,11 +1054,14 @@ a.informers-grid-item-button-failed:focus {
 
 /* Отзыв */
 .bonus-sum {
-    display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
+    font-weight: normal; /* Обычный (нормальный) шрифт */
     color: var(--color-completed-rgb); /* Цвет текста */
-    border-radius: 10px; /* Радиус углов рамки */
-    padding: 5px 10px; /* Внутренний отступ */
+    border-radius: 15px; /* Радиус углов рамки */
+    padding: 10px 15px; /* Внутренний отступ */
     border: 2px solid var(--color-completed-rgb); /* Граница */
+    text-align: center;
+    display: block; /* Блочное отображение */
+    font-size: 1.1rem; /* Размер шрифта */
 }
 
 .bonus-sum-sub {
