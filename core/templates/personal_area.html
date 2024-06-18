@@ -62,15 +62,6 @@
                     {% if object.is_superuser %}
                         <p><span class="description-item">Суперпользователь</span></p>
                     {% endif %}
-                    {% if object.groups.exists %}
-                        <p><span class="description-item">Группы:</span>
-                            {% for group in object.groups.all %}
-                                <span>
-                                    <a href="{% url 'core:employees' %}?groups={{group.id}}" class="link" target="_blank">{{group}}</a>{% if not forloop.last %}, {% endif %}
-                                </span>
-                            {% endfor %}
-                        </p>
-                    {% endif %}
                 </div>
             </div>
             {# Управление #}
