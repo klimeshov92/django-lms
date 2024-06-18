@@ -106,7 +106,7 @@
                                     <th>Дительность (дней)</th>
                                     <th>Необходимо пройти (контрольных задач)</th>
                                     <th>Описание</th>
-                                    {% if user|perms:"learning_path.change_learningcomplexpath" or user|perms:"learning_path.delete_learningcomplexpath" in perms %}
+                                    {% if user|perms:"learning_path.change_learningcomplexpath" or user|perms:"learning_path.delete_learningcomplexpath" %}
                                         <th>Действия</th>
                                     {% endif %}
                                 </tr>

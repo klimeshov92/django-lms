@@ -98,7 +98,7 @@
     {# Управление #}
     <div class="submenu-container">
         <nav class="submenu">
-            {% if 'core.add_employeeexcelimport' in perms %}
+            {% if user|perms:"core.add_employeeexcelimport" %}
                 <a href="{% url 'core:employee_excel_import_create' %}">Создать</a>
             {% endif %}
         </nav>

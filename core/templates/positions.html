@@ -87,7 +87,7 @@
     {# Управление #}
     <div class="submenu-container">
         <nav class="submenu">
-            {% if 'core.add_position' in perms %}
+            {% if user|perms:"core.add_position" %}
                 <a href="{% url 'core:position_create' %}">Создать</a>
             {% endif %}
         </nav>

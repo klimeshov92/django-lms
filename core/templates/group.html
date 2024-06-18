@@ -39,10 +39,10 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
-                    {% if 'core.change_employeesgroup' in perms %}
+                    {% if user|perms:"core.change_employeesgroup" %}
                         <a href="{% url 'core:group_update' pk=object.id %}">Изменить</a>
                     {% endif %}
-                    {% if 'core.delete_employeesgroup' in perms and object.type == 'custom' %}
+                    {% if user|perms:"core.delete_employeesgroup" and object.type == 'custom' %}
                         <a href="{% url 'core:group_delete' pk=object.id %}">Удалить</a>
                     {% endif %}
                     <a href="{% url 'core:group_copy_emails' pk=object.id %}">Копировать адреса</a>
@@ -67,13 +67,13 @@
         <nav class="tab-menu">
             <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
             <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Сотрудники [{{qs_count}}]</a>
-            {% if 'core.change_employeesgroup' in perms %}
+            {% if user|perms:"core.change_employeesgroup" %}
                 {% if object.groups_generator %}
                     <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Настройки</a>
                 {% endif %}
                 <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Глобальные права [{{global_permissions_qs_count}}]</a>
             {% endif %}
-            {% if 'core.view_employeesgroupobjectpermission' in perms %}
+            {% if user|perms:"core.view_employeesgroupobjectpermission" %}
                 <a href="#tab5" class="tab-menu-link" onclick="openTab(event, 'tab5')">Объектные права [{{group_object_permissions_qs_count}}]</a>
             {% endif %}
         </nav>
@@ -158,7 +158,7 @@
                 {# Управление #}
                 <div class="submenu-container">
                     <nav class="submenu">
-                        {% if 'core.change_employeesgroup' in perms %}
+                        {% if user|perms:"core.change_employeesgroup" %}
                             {% if object.groups_generator %}
                                 <a href="{% url 'core:groups_generator_update' pk=object.groups_generator.id %}">Изменить сотрудников</a>
                             {% elif not object.groups_generator and object.type == 'custom' %}
@@ -222,7 +222,7 @@
             {% endif %}
         </div>
 
-        {% if 'core.change_employeesgroup' in perms %}
+        {% if user|perms:"core.change_employeesgroup" %}
             <div id="tab4" class="tab-content">
                 {# Вывод элементов #}
                 {% if global_permissions_page_obj %}
@@ -276,7 +276,7 @@
             </div>
         {% endif %}
 
-         {% if 'core.view_employeesgroupobjectpermission' in perms %}
+         {% if user|perms:"core.view_employeesgroupobjectpermission" %}
             <div id="tab5" class="tab-content">
                 {# Фильтр элементов #}
                 <div class="filters-header">
@@ -301,7 +301,7 @@
                                     <th>Группа</th>
                                     <th>Права</th>
                                     <th>Объект</th>
-                                    {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                    {% if user|perms:"core.delete_employeesgroupobjectpermission" %}
                                         <th>Действия</th>
                                     {% endif %}
                                 </tr>
@@ -312,7 +312,7 @@
                                         <td>{{obj.group}}</td>
                                         <td>{{obj.permission.name}}</td>
                                         <td>{{obj.content_object}}</td>
-                                        {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                        {% if user|perms:"core.delete_employeesgroupobjectpermission" %}
                                             <td>
                                                 <a href="{% url 'core:employees_group_object_permissions_delete' type='group' pk=object.id employees_group_object_permission_pk=obj.id %}">Удалить</a>
                                             </td>

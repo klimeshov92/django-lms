@@ -74,16 +74,16 @@
                                 <td>{{obj.creator}}</td>
                                 <td>{{obj.score}}</td>
                                 <td>{{obj.text}}</td>
-                                {% if user|perms:"reviews.change_review" or user|perms:"reviews.delete_review" %}
-                                    <td>
-                                        {% if 'reviews.change_review' in perms %}
+                                <td>
+                                    {% if user|perms:"reviews.change_review" or user|perms:"reviews.delete_review" %}
+                                        {% if user|perms:"reviews.change_review" %}
                                             <a href="{% url 'reviews:review_update' pk=obj.id %}">Изменить</a>
                                         {% endif %}
-                                        {% if 'reviews.delete_review' in perms %}
+                                        {% if user|perms:"reviews.delete_review" %}
                                             <a href="{% url 'reviews:review_delete' pk=obj.id %}">Удалить</a>
                                         {% endif %}
-                                    </td>
-                                {% endif %}
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>

@@ -112,7 +112,7 @@
     {# Управление #}
     <div class="submenu-container">
         <nav class="submenu">
-        {% if 'core.add_employee' in perms %}
+        {% if user|perms:"core.add_employee" %}
             <a href="{% url 'core:employee_create' %}">Создать</a>
         {% endif %}
         </nav>

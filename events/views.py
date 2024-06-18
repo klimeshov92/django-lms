@@ -38,11 +38,11 @@ from django.db.models import Sum
 # Миксины.
 from core.mixins import PreviousPageGetMixinL0, PreviousPageSetMixinL0, PreviousPageGetMixinL1, PreviousPageSetMixinL1, PreviousPageGetMixinL2, PreviousPageSetMixinL2
 from reviews.models import Review
-from core.models import EmployeesGroupObjectPermission
+from core.models import EmployeesGroupObjectPermission, EmployeesObjectPermission
 from reviews.filters import ObjectsReviewFilter
 from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
-from core.filters import EmployeesGroupObjectPermissionFilter
+from core.filters import EmployeesGroupObjectPermissionFilter, EmployeesObjectPermissionFilter
 
 # Импортируем логи
 import logging
@@ -234,6 +234,25 @@ class EventView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequir
         # Добавляем во вью.
         context['group_object_permissions_filter'] = group_object_permissions_filter
         context['group_object_permissions_page_obj'] = group_object_permissions_page_obj
+
+        # Добавляем объектные права.
+        if EmployeesObjectPermission.objects.filter(object_pk=self.kwargs.get('pk'), content_type=content_type).prefetch_related('content_object').exists():
+            object_permissions_queryset = EmployeesObjectPermission.objects.filter(
+                object_pk=self.kwargs.get('pk'),
+                content_type=content_type
+            ).prefetch_related('content_object').order_by('-id')
+        else:
+            object_permissions_queryset = EmployeesObjectPermission.objects.none()
+        context['object_permissions_qs_count'] = len(object_permissions_queryset)
+        object_permissions_filter = EmployeesObjectPermissionFilter(self.request.GET, queryset=object_permissions_queryset, request=self.request)
+        object_permissions = object_permissions_filter.qs
+        # Добавляем пагинатор.
+        object_permissions_paginator = Paginator(object_permissions, 6)
+        object_permissions_page_number = self.request.GET.get('object_permissions_page')
+        object_permissions_page_obj = object_permissions_paginator.get_page(object_permissions_page_number)
+        # Добавляем во вью.
+        context['object_permissions_filter'] = object_permissions_filter
+        context['object_permissions_page_obj'] = object_permissions_page_obj
 
         # Возвращаем новый набор переменных в контролер.
         return context

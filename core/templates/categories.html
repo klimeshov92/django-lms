@@ -99,7 +99,7 @@
     {# Управление #}
     <div class="submenu-container">
         <nav class="submenu">
-            {% if 'core.add_category' in perms %}
+            {% if user|perms:"core.add_category" %}
                 <a href="{% url 'core:category_create' %}">Создать</a>
             {% endif %}
         </nav>

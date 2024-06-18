@@ -92,7 +92,7 @@
     {# Управление #}
     <div class="submenu-container">
         <nav class="submenu">
-            {% if 'core.add_employeesgroup' in perms %}
+            {% if user|perms:"core.add_employeesgroup" %}
                 <a href="{% url 'core:group_create' %}">Создать</a>
             {% endif %}
         </nav>

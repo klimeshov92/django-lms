@@ -78,10 +78,10 @@
                                 <td>{{obj.text}}</td>
                                 {% if user|perms:"reviews.change_review" or user|perms:"reviews.delete_review" %}
                                     <td>
-                                        {% if 'reviews.change_review' in perms %}
+                                        {% if user|perms:"reviews.change_review" %}
                                             <a href="{% url 'reviews:review_update' pk=obj.id %}">Изменить</a>
                                         {% endif %}
-                                        {% if 'reviews.delete_review' in perms %}
+                                        {% if user|perms:"reviews.delete_review" %}
                                             <a href="{% url 'reviews:review_delete' pk=obj.id %}">Удалить</a>
                                         {% endif %}
                                     </td>
@@ -126,7 +126,7 @@
     <div class="submenu-container">
         <nav class="submenu">
             {% if haves_review == False %}
-                {% if 'reviews.add_review' in perms %}
+                {% if user|perms:"reviews.add_review" %}
                     <a href="{% url 'reviews:review_create' type=type pk=object.id %}">Создать</a>
                 {% endif %}
             {% endif %}

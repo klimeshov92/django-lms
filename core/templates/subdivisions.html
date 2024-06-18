@@ -83,7 +83,7 @@
     {# Управление #}
     <div class="submenu-container">
         <nav class="submenu">
-            {% if 'core.add_subdivision' in perms %}
+            {% if user|perms:"core.add_subdivision" %}
                 <a href="{% url 'core:subdivision_create' %}">Создать</a>
             {% endif %}
         </nav>

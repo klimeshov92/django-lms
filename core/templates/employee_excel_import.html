@@ -42,10 +42,10 @@
         </div>
         <div class="submenu-container">
             <nav class="submenu">
-                {% if 'core.change_employeeexcelimport' in perms %}
+                {% if user|perms:"core.change_employeeexcelimport" %}
                     <a href="{% url 'core:employee_excel_import_update' pk=object.id %}">Изменить</a>
                 {% endif %}
-                {% if 'core.delete_employeeexcelimport' in perms %}
+                {% if user|perms:"core.delete_employeeexcelimport" %}
                     <a href="{% url 'core:employee_excel_import_delete' pk=object.id %}">Удалить</a>
                 {% endif %}
                 {% if object.processed == False %}

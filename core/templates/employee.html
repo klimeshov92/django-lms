@@ -56,7 +56,7 @@
                     {% if object.mobile_phone %}
                         <p><span class="description-item">Мобильный телефон:</span> {{object.mobile_phone}}</p>
                     {% endif %}
-                    {% if 'core.add_placement' in perms %}
+                    {% if user|perms:"core.add_placement" %}
                         <p><span class="description-item">Пользователь активен:</span> {{object.is_active|yesno}}</p>
                         <p><span class="description-item">Пользователь административной панели:</span> {{object.is_staff|yesno}}</p>
                         <p><span class="description-item">Суперпользователь:</span> {{object.is_superuser|yesno}}</p>
@@ -75,11 +75,11 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
-                    {% if 'core.change_employee' in perms %}
+                    {% if user|perms:"core.change_employee" %}
                         <a href="{% url 'core:update_password' pk=object.id %}">Обновить пароль</a>
                         <a href="{% url 'core:employee_update' pk=object.id %}">Изменить</a>
                     {% endif %}
-                    {% if 'core.delete_employee' in perms %}
+                    {% if user|perms:"core.delete_employee" %}
                         <a href="{% url 'core:employee_delete' pk=object.id %}">Удалить</a>
                     {% endif %}
                     <a href="{{ previous_page_l1 }}">Назад</a>
@@ -102,7 +102,7 @@
         <nav class="tab-menu">
             <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Должности сотрудника [{{qs_count}}]</a>
             <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Глобальные права [{{global_permissions_qs_count}}]</a>
-            {% if 'core.view_employeeobjectpermission' in perms %}
+            {% if user|perms:"core.view_employeesobjectpermission" %}
                 <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Объектные права [{{object_permissions_qs_count}}]</a>
             {% endif %}
         </nav>
@@ -142,10 +142,10 @@
                                     {% endif %}
                                     {% if user|perms:"core.change_placement" or user|perms:"core.delete_placement" %}
                                         <td>
-                                            {% if 'core.change_placement' in perms %}
+                                            {% if user|perms:"core.change_placement" %}
                                                 <a href="{% url 'core:placement_update' pk=obj.id %}">Изменить</a>
                                             {% endif %}
-                                            {% if 'core.delete_placement' in perms %}
+                                            {% if user|perms:"core.delete_placement" %}
                                                 <a href="{% url 'core:placement_delete' pk=obj.id %}">Удалить</a>
                                             {% endif %}
                                         </td>
@@ -187,14 +187,14 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
-                    {% if 'core.add_placement' in perms %}
+                    {% if user|perms:"core.add_placement" %}
                         <a href="{% url 'core:placement_create' pk=object.id %}">Создать назначение</a>
                     {% endif %}
                 </nav>
             </div>
         </div>
 
-        {% if 'core.change_employeesgroup' in perms %}
+        {% if user|perms:"core.change_employeesgroup" %}
             <div id="tab2" class="tab-content">
                 {# Вывод элементов #}
                 {% if global_permissions_page_obj %}
@@ -248,7 +248,7 @@
             </div>
         {% endif %}
 
-        {% if 'core.view_employeeobjectpermission' in perms %}
+        {% if user|perms:"core.view_employeesobjectpermission" %}
             <div id="tab3" class="tab-content">
                 {# Вывод элементов #}
                 {% if object_permissions_page_obj %}
@@ -259,7 +259,7 @@
                                     <th>Сотрудник</th>
                                     <th>Права</th>
                                     <th>Объект</th>
-                                    {% if 'core.delete_employeesobjectpermission' in perms %}
+                                    {% if user|perms:"core.delete_employeesobjectpermission" %}
                                         <th>Действия</th>
                                     {% endif %}
                                 </tr>
@@ -270,7 +270,7 @@
                                         <td>{{obj.user}}</td>
                                         <td>{{obj.permission.name}}</td>
                                         <td>{{obj.content_object}}</td>
-                                        {% if 'core.delete_employeesobjectpermission' in perms %}
+                                        {% if user|perms:"core.delete_employeesobjectpermission" %}
                                             <td>
                                                 <a href="{% url 'core:employees_object_permissions_delete' type='employee' pk=object.id employees_object_permission_pk=obj.id %}">Удалить</a>
                                             </td>

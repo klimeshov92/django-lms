@@ -96,7 +96,7 @@
     <div class="tab-menu-container">
         <nav class="tab-menu">
             <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
-            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Повторы[{{repeats_count}}]</a>
+            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Повторы [{{repeats_count}}]</a>
         </nav>
     </div>
 
@@ -139,10 +139,10 @@
                                 {% endif %}
                                 {% if user|perms:"learning_path.change_assignment" or user|perms:"learning_path.delete_assignment" %}
                                     <div class="submenu-mini submenu-mini-end">
-                                        {% if 'learning_path.change_assignment' in perms %}
+                                        {% if user|perms:"learning_path.change_assignment" %}
                                             <a href="{% url 'learning_path:assignment_repeat_update' pk=obj.id %}">Изменить</a>
                                         {% endif %}
-                                        {% if 'learning_path.delete_assignment' in perms %}
+                                        {% if user|perms:"learning_path.delete_assignment" %}
                                             <a href="{% url 'learning_path:assignment_repeat_delete' pk=obj.id %}">Удалить</a>
                                         {% endif %}
                                     </div>
@@ -184,7 +184,7 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
-                    {% if 'learning_path.add_assignment' in perms %}
+                    {% if user|perms:"learning_path.add_assignment" %}
                         <a href="{% url 'learning_path:assignment_repeat_create' pk=object.id %}">Создать</a>
                     {% endif %}
                 </nav>

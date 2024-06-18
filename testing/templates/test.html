@@ -147,10 +147,10 @@
                 <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Вопросы [{{qs_count}}]</a>
                 <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Настройки</a>
             {% endif %}
-            {% if 'core.view_employeesgroupobjectpermission' in perms %}
+            {% if user|perms:"core.view_employeesgroupobjectpermission" %}
                 <a href="#tab5" class="tab-menu-link" onclick="openTab(event, 'tab5')">Права групп [{{group_object_permissions_qs_count}}]</a>
             {% endif %}
-            {% if 'core.view_employeeobjectpermission' in perms %}
+            {% if user|perms:"core.view_employeesobjectpermission" %}
                 <a href="#tab6" class="tab-menu-link" onclick="openTab(event, 'tab6')">Права сотрудников [{{object_permissions_qs_count}}]</a>
             {% endif %}
         </nav>
@@ -194,10 +194,10 @@
                                     <p>{{obj.text}}</p>
                                     {% if user|perms:"reviews.change_review" or user|perms:"reviews.delete_review" %}
                                         <div class="submenu-mini submenu-mini-end">
-                                            {% if 'reviews.change_review' in perms %}
+                                            {% if user|perms:"reviews.change_review" %}
                                                 <a href="{% url 'reviews:review_update' pk=obj.id %}">Изменить</a>
                                             {% endif %}
-                                            {% if 'reviews.delete_review' in perms %}
+                                            {% if user|perms:"reviews.delete_review" %}
                                                 <a href="{% url 'reviews:review_delete' pk=obj.id %}">Удалить</a>
                                             {% endif %}
                                         </div>
@@ -241,7 +241,7 @@
                     <nav class="submenu">
                         {% if result %}
                             {% if haves_review == False %}
-                                {% if 'reviews.add_review' in perms %}
+                                {% if user|perms:"reviews.add_review" %}
                                     <a href="{% url 'reviews:review_create' type='test' pk=object.id %}">Создать</a>
                                 {% endif %}
                             {% endif %}
@@ -412,7 +412,7 @@
             </div>
         {% endif %}
 
-        {% if 'core.view_employeesgroupobjectpermission' in perms %}
+        {% if user|perms:"core.view_employeesgroupobjectpermission" %}
             <div id="tab5" class="tab-content">
                 {# Фильтр элементов #}
                 <div class="filters-header">
@@ -437,7 +437,7 @@
                                     <th>Группа</th>
                                     <th>Права</th>
                                     <th>Объект</th>
-                                    {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                    {% if user|perms:"core.delete_employeesgroupobjectpermission" %}
                                         <th>Действия</th>
                                     {% endif %}
                                 </tr>
@@ -448,7 +448,7 @@
                                         <td>{{obj.group}}</td>
                                         <td>{{obj.permission.name}}</td>
                                         <td>{{obj.content_object}}</td>
-                                        {% if 'core.delete_employeesgroupobjectpermission' in perms %}
+                                        {% if user|perms:"core.delete_employeesgroupobjectpermission" %}
                                             <td>
                                                 <a href="{% url 'core:employees_group_object_permissions_delete' type='test' pk=object.id employees_group_object_permission_pk=obj.id %}">Удалить</a>
                                             </td>
@@ -490,7 +490,7 @@
                 {# Управление #}
                 <div class="submenu-container">
                     <nav class="submenu">
-                        {% if 'core.add_employeesgroupobjectpermission' in perms %}
+                        {% if user|perms:"core.add_employeesgroupobjectpermission" %}
                             <a href="{% url 'core:employees_group_object_permissions_create' type='test' pk=object.id %}">Создать</a>
                         {% endif %}
                     </nav>
@@ -498,7 +498,7 @@
             </div>
         {% endif %}
 
-        {% if 'core.view_employeeobjectpermission' in perms %}
+        {% if user|perms:"core.view_employeesobjectpermission" %}
             <div id="tab6" class="tab-content">
                 {# Фильтр элементов #}
                 <div class="filters-header">
@@ -523,7 +523,7 @@
                                     <th>Сотрудник</th>
                                     <th>Права</th>
                                     <th>Объект</th>
-                                    {% if 'core.delete_employeesobjectpermission' in perms %}
+                                    {% if user|perms:"core.delete_employeesobjectpermission" %}
                                         <th>Действия</th>
                                     {% endif %}
                                 </tr>
@@ -534,7 +534,7 @@
                                         <td>{{obj.user}}</td>
                                         <td>{{obj.permission.name}}</td>
                                         <td>{{obj.content_object}}</td>
-                                        {% if 'core.delete_employeesobjectpermission' in perms %}
+                                        {% if user|perms:"core.delete_employeesobjectpermission" %}
                                             <td>
                                                 <a href="{% url 'core:employees_object_permissions_delete' type='test' pk=object.id employees_object_permission_pk=obj.id %}">Удалить</a>
                                             </td>
@@ -576,7 +576,7 @@
                 {# Управление #}
                 <div class="submenu-container">
                     <nav class="submenu">
-                        {% if 'core.add_employeeobjectpermission' in perms %}
+                        {% if user|perms:"core.add_employeesobjectpermission" %}
                             <a href="{% url 'core:employees_object_permissions_create' type='test' pk=object.id %}">Создать</a>
                         {% endif %}
                     </nav>
