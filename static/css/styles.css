@@ -1791,7 +1791,8 @@ label[for$="clear_id"] {
 /* Медиа-запросы для мобильных устройств */
 @media screen and (max-width: 799px) {
     .informers-grid  {
-        grid-template-columns: minmax(0, 250px); /* Ширина грида */
+        /*grid-template-columns: minmax(0, 250px); /* Ширина грида */
+        grid-template-columns: 100%; /* Ширина грида */
     }
     .list-grid {
         /*grid-template-columns: minmax(0, 300px); /* Ширина грида */
