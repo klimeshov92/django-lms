@@ -56,11 +56,9 @@
                     {% if object.mobile_phone %}
                         <p><span class="description-item">Мобильный телефон:</span> {{object.mobile_phone}}</p>
                     {% endif %}
-                    {% if user|perms:"core.add_placement" %}
-                        <p><span class="description-item">Пользователь активен:</span> {{object.is_active|yesno}}</p>
-                        <p><span class="description-item">Пользователь административной панели:</span> {{object.is_staff|yesno}}</p>
-                        <p><span class="description-item">Суперпользователь:</span> {{object.is_superuser|yesno}}</p>
-                    {% endif %}
+                    <p><span class="description-item">Пользователь активен:</span> {{object.is_active|yesno}}</p>
+                    <p><span class="description-item">Пользователь административной панели:</span> {{object.is_staff|yesno}}</p>
+                    <p><span class="description-item">Суперпользователь:</span> {{object.is_superuser|yesno}}</p>
                     {% if object.groups.exists %}
                         <p><span class="description-item">Группы:</span>
                             {% for group in object.groups.all %}

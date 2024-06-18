@@ -1,0 +1,506 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Сотрудник
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+<div class="detail-container">
+
+    {# Вывод элемента #}
+    <div class="detail-card-with-image-container">
+
+        <div class="content-type-div">
+            <span class="content-type-basic">Личный кабинет</span>
+        </div>
+
+        {% if object %}
+            <div class="detail-content-with-image">
+                <div class="detail-content-with-image-image-container">
+                    {% if object.avatar %}
+                       <img src="{{object.avatar.url}}">
+                    {% else %}
+                        <div class="detail-content-with-image-image-container-blank">
+
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="detail-content-with-image-text-container">
+                    <h1>
+                        {{object.username}}
+                    </h1>
+                    {% if object.last_name and object.first_name %}
+                        <h1>
+                            {{object.last_name}} {{object.first_name}}
+                        </h1>
+                    {% endif %}
+                    {% if object.mdm_id %}
+                        <p><span class="description-item">MDM ID:</span> {{object.mdm_id}}</p>
+                    {% endif %}
+                    {% if object.birthday %}
+                        <p><span class="description-item">Дата рождения:</span> {{object.birthday}}</p>
+                    {% endif %}
+                    {% if object.email %}
+                        <p><span class="description-item">Электронная почта:</span> {{object.email}}</p>
+                    {% endif %}
+                    {% if object.phone %}
+                        <p><span class="description-item">Телефон:</span> {{object.phone}}</p>
+                    {% endif %}
+                    {% if object.mobile_phone %}
+                        <p><span class="description-item">Мобильный телефон:</span> {{object.mobile_phone}}</p>
+                    {% endif %}
+                    {% if object.is_staff %}
+                        <p><span class="description-item">Пользователь административной панели</span></p>
+                    {% endif %}
+                    {% if object.is_superuser %}
+                        <p><span class="description-item">Суперпользователь</span></p>
+                    {% endif %}
+                    {% if object.groups.exists %}
+                        <p><span class="description-item">Группы:</span>
+                            {% for group in object.groups.all %}
+                                <span>
+                                    <a href="{% url 'core:employees' %}?groups={{group.id}}" class="link" target="_blank">{{group}}</a>{% if not forloop.last %}, {% endif %}
+                                </span>
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            {# Управление #}
+            <div class="submenu-container">
+                <nav class="submenu">
+                    {#<a href="{% url 'core:personal_info_update' pk=request.user.pk %}">Изменить данные</a>#}
+                    <a href="{% url 'password_change' %}">Изменить пароль</a>
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% else %}
+            {# Вывод сообщения, если элемента нет #}
+            <div class="not-found">
+                <p>Личный кабинет не найден!</p>
+            </div>
+            <div class="submenu-container">
+                <nav class="submenu">
+                    <a href="{{ previous_page_l1 }}">Назад</a>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="tab-menu-container">
+        <nav class="tab-menu">
+            <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Должности [{{qs_count}}]</a>
+            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Назначено [{{appointed_education_count}}]</a>
+            <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">В процессе [{{education_in_progress_count}}]</a>
+            <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Пройдено [{{completed_education_count}}]</a>
+            <a href="#tab5" class="tab-menu-link" onclick="openTab(event, 'tab5')">Провалено [{{failed_education_count}}]</a>
+        </nav>
+    </div>
+
+    <div class="tab-content-container">
+
+        <div id="tab1" class="tab-content">
+            {% if object_list %}
+                <div class="list-table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Организация</th>
+                                <th>Подразделение</th>
+                                <th>Должность</th>
+                                <th>Является руководителем</th>
+                                <th>Начало работы</th>
+                                <th>Окончание работы</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obj in object_list %}
+                                <tr>
+                                    <td>{{obj.position.subdivision.organization.legal_name}}</td>
+                                    <td>{{obj.position.subdivision.name}}</td>
+                                    <td>{{obj.position.name}}</td>
+                                    <td>{{obj.manager|yesno}}</td>
+                                    <td>{{obj.start_date}}</td>
+                                    {% if obj.end_date %}
+                                        <td>{{obj.end_date}}</td>
+                                    {% else %}
+                                        <td>-</td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {# Пагинация #}
+                <div class="pagination">
+                    {# Информация о предыдущих страницах #}
+                    {% if page_obj.has_previous %}
+                        <a href="?{% url_replace page=1 %}">1</a>
+                        {% if page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if page_obj.has_next %}
+                        <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if page_obj.paginator.num_pages != page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элемента нет #}
+                    <div class="not-found">
+                        <p>Назначения не найдены!</p>
+                    </div>
+            {% endif %}
+        </div>
+
+        <div id="tab2" class="tab-content">
+            {# Вывод элементов #}
+            {% if appointed_education_page_obj %}
+                <div class="tab-list-grid">
+                    {% for obj in appointed_education_page_obj %}
+                        <div class="tab-list-grid-item">
+                            <div class="tab-list-grid-item-content">
+                                <p class="text-align-right">
+                                    <span class="content-type-sub">
+                                        {{obj.get_type_display}}
+                                    </span>
+                                </p>
+                                <h3>
+                                    {% if obj.type == 'learning_path' %}
+                                        {{obj.learning_path.name}}
+                                    {% elif obj.type == 'material' %}
+                                        {{obj.material.name}}
+                                    {% elif obj.type == 'course' %}
+                                       {{obj.course.name}}
+                                    {% elif obj.type == 'test' %}
+                                        {{obj.test.name}}
+                                    {% elif obj.type == 'event' %}
+                                        {{obj.event.name}}
+                                    {% endif %}
+                                </h3>
+                                <p><span class="description-item">Планируемая дата завершения:</span>
+                                    {% if obj.planned_end_date %}
+                                        {{obj.planned_end_date}}
+                                    {% elif obj.learning_path_result.planned_end_date %}
+                                        {{obj.learning_path_result.planned_end_date}}
+                                    {% elif obj.date %}
+                                        {{obj.date}}
+                                    {% else %}
+                                        Отсутствует
+                                    {% endif %}
+                                </p>
+                                <div class="submenu-mini submenu-mini-end">
+                                    {% if obj.type == 'learning_path' %}
+                                        <a href="{% url 'learning_path:learning_path' pk=obj.learning_path.id %}">Подробнее</a>
+                                    {% elif obj.type == 'material' %}
+                                        <a href="{% url 'materials:material' pk=obj.material.id %}">Подробнее</a>
+                                    {% elif obj.type == 'course' %}
+                                        <a href="{% url 'courses:course' pk=obj.course.id %}">Подробнее</a>
+                                    {% elif obj.type == 'test' %}
+                                        <a href="{% url 'testing:test' pk=obj.test.id %}">Подробнее</a>
+                                    {% elif obj.type == 'event' %}
+                                        <a href="{% url 'events:event' pk=obj.event.id %}">Подробнее</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {# Пагинация #}
+                <div class="pagination">
+                    {# Информация о предыдущих страницах #}
+                    {% if appointed_education_page_obj.has_previous %}
+                        <a href="?{% url_replace appointed_education_page=1 %}">1</a>
+                        {% if appointed_education_page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace appointed_education_page=appointed_education_page_obj.previous_page_number %}">{{ appointed_education_page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ appointed_education_page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if appointed_education_page_obj.has_next %}
+                        <a href="?{% url_replace appointed_education_page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if appointed_education_page_obj.paginator.num_pages != appointed_education_page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace appointed_education_page=appointed_education_page_obj.paginator.num_pages %}">{{ appointed_education_page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элементов нет #}
+                    <div class="not-found">
+                        <p>Учебные задачи не найдены!</p>
+                    </div>
+            {% endif %}
+        </div>
+
+        <div id="tab3" class="tab-content">
+            {# Вывод элементов #}
+            {% if education_in_progress_page_obj %}
+                <div class="tab-list-grid">
+                    {% for obj in education_in_progress_page_obj %}
+                        <div class="tab-list-grid-item">
+                            <div class="tab-list-grid-item-content">
+                                <p class="text-align-right">
+                                    <span class="content-type-sub">
+                                        {{obj.get_type_display}}
+                                    </span>
+                                </p>
+                                <h3>
+                                    {% if obj.type == 'learning_path' %}
+                                        {{obj.learning_path.name}}
+                                    {% elif obj.type == 'material' %}
+                                        {{obj.material.name}}
+                                    {% elif obj.type == 'course' %}
+                                       {{obj.course.name}}
+                                    {% elif obj.type == 'test' %}
+                                        {{obj.test.name}}
+                                    {% elif obj.type == 'event' %}
+                                        {{obj.event.name}}
+                                    {% endif %}
+                                </h3>
+                                <p><span class="description-item">Планируемая дата завершения:</span>
+                                    {% if obj.planned_end_date %}
+                                        {{obj.planned_end_date}}
+                                    {% elif obj.learning_path_result.planned_end_date %}
+                                        {{obj.learning_path_result.planned_end_date}}
+                                    {% elif obj.date %}
+                                        {{obj.date}}
+                                    {% else %}
+                                        Отсутствует
+                                    {% endif %}
+                                </p>
+                                <div class="submenu-mini submenu-mini-end">
+                                    {% if obj.type == 'learning_path' %}
+                                        <a href="{% url 'learning_path:learning_path' pk=obj.learning_path.id %}">Подробнее</a>
+                                    {% elif obj.type == 'material' %}
+                                        <a href="{% url 'materials:material' pk=obj.material.id %}">Подробнее</a>
+                                    {% elif obj.type == 'course' %}
+                                        <a href="{% url 'courses:course' pk=obj.course.id %}">Подробнее</a>
+                                    {% elif obj.type == 'test' %}
+                                        <a href="{% url 'testing:test' pk=obj.test.id %}">Подробнее</a>
+                                    {% elif obj.type == 'event' %}
+                                        <a href="{% url 'events:event' pk=obj.event.id %}">Подробнее</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {# Пагинация #}
+                <div class="pagination">
+                    {# Информация о предыдущих страницах #}
+                    {% if education_in_progress_page_obj.has_previous %}
+                        <a href="?{% url_replace education_in_progress_page=1 %}">1</a>
+                        {% if education_in_progress_page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace education_in_progress_page=education_in_progress_page_obj.previous_page_number %}">{{ education_in_progress_page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ education_in_progress_page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if education_in_progress_page_obj.has_next %}
+                        <a href="?{% url_replace education_in_progress_page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if education_in_progress_page_obj.paginator.num_pages != education_in_progress_page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace education_in_progress_page=education_in_progress_page_obj.paginator.num_pages %}">{{ education_in_progress_page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элементов нет #}
+                    <div class="not-found">
+                        <p>Учебные задачи не найдены!</p>
+                    </div>
+            {% endif %}
+        </div>
+        <div id="tab4" class="tab-content">
+            {# Вывод элементов #}
+            {% if completed_education_page_obj %}
+                <div class="tab-list-grid">
+                    {% for obj in completed_education_page_obj %}
+                        <div class="tab-list-grid-item">
+                            <div class="tab-list-grid-item-content">
+                                <p class="text-align-right">
+                                    <span class="content-type-sub">
+                                        {{obj.get_type_display}}
+                                    </span>
+                                </p>
+                                <h3>
+                                    {% if obj.type == 'learning_path' %}
+                                        {{obj.learning_path.name}}
+                                    {% elif obj.type == 'material' %}
+                                        {{obj.material.name}}
+                                    {% elif obj.type == 'course' %}
+                                       {{obj.course.name}}
+                                    {% elif obj.type == 'test' %}
+                                        {{obj.test.name}}
+                                    {% elif obj.type == 'event' %}
+                                        {{obj.event.name}}
+                                    {% endif %}
+                                </h3>
+                                <p><span class="description-item">Дата завершения:</span>
+                                    {{obj.end_date}}
+                                </p>
+                                {% if obj.score_scaled %}
+                                    <p><span class="description-item">Полученный балл (%):</span>
+                                        {{obj.score_scaled}}
+                                    </p>
+                                {% endif %}
+                                <div class="submenu-mini submenu-mini-end">
+                                    {% if obj.type == 'learning_path' %}
+                                        <a href="{% url 'learning_path:learning_path' pk=obj.learning_path.id %}">Подробнее</a>
+                                    {% elif obj.type == 'material' %}
+                                        <a href="{% url 'materials:material' pk=obj.material.id %}">Подробнее</a>
+                                    {% elif obj.type == 'course' %}
+                                        <a href="{% url 'courses:course' pk=obj.course.id %}">Подробнее</a>
+                                    {% elif obj.type == 'test' %}
+                                        <a href="{% url 'testing:test' pk=obj.test.id %}">Подробнее</a>
+                                    {% elif obj.type == 'event' %}
+                                        <a href="{% url 'events:event' pk=obj.event.id %}">Подробнее</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {# Пагинация #}
+                <div class="pagination">
+                    {# Информация о предыдущих страницах #}
+                    {% if completed_education_page_obj.has_previous %}
+                        <a href="?{% url_replace completed_education_page=1 %}">1</a>
+                        {% if completed_education_page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace completed_education_page=completed_education_page_obj.previous_page_number %}">{{ completed_education_page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ completed_education_page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if completed_education_page_obj.has_next %}
+                        <a href="?{% url_replace completed_education_page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if completed_education_page_obj.paginator.num_pages != completed_education_page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace completed_education_page=completed_education_page_obj.paginator.num_pages %}">{{ completed_education_page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элементов нет #}
+                    <div class="not-found">
+                        <p>Учебные задачи не найдены!</p>
+                    </div>
+            {% endif %}
+        </div>
+
+        <div id="tab5" class="tab-content">
+            {# Вывод элементов #}
+            {% if failed_education_page_obj %}
+                <div class="tab-list-grid">
+                    {% for obj in failed_education_page_obj %}
+                        <div class="tab-list-grid-item">
+                            <div class="tab-list-grid-item-content">
+                                <p class="text-align-right">
+                                    <span class="content-type-sub">
+                                        {{obj.get_type_display}}
+                                    </span>
+                                </p>
+                                <h3>
+                                    {% if obj.type == 'learning_path' %}
+                                        {{obj.learning_path.name}}
+                                    {% elif obj.type == 'material' %}
+                                        {{obj.material.name}}
+                                    {% elif obj.type == 'course' %}
+                                       {{obj.course.name}}
+                                    {% elif obj.type == 'test' %}
+                                        {{obj.test.name}}
+                                    {% elif obj.type == 'event' %}
+                                        {{obj.event.name}}
+                                    {% endif %}
+                                </h3>
+                                <p><span class="description-item">Дата завершения:</span>
+                                    {{obj.end_date}}
+                                </p>
+                                {% if obj.score_scaled %}
+                                    <p><span class="description-item">Полученный балл (%):</span>
+                                        {{obj.score_scaled}}
+                                    </p>
+                                {% endif %}
+                                <div class="submenu-mini submenu-mini-end">
+                                    {% if obj.type == 'learning_path' %}
+                                        <a href="{% url 'learning_path:learning_path' pk=obj.learning_path.id %}">Подробнее</a>
+                                    {% elif obj.type == 'material' %}
+                                        <a href="{% url 'materials:material' pk=obj.material.id %}">Подробнее</a>
+                                    {% elif obj.type == 'course' %}
+                                        <a href="{% url 'courses:course' pk=obj.course.id %}">Подробнее</a>
+                                    {% elif obj.type == 'test' %}
+                                        <a href="{% url 'testing:test' pk=obj.test.id %}">Подробнее</a>
+                                    {% elif obj.type == 'event' %}
+                                        <a href="{% url 'events:event' pk=obj.event.id %}">Подробнее</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {# Пагинация #}
+                <div class="pagination">
+                    {# Информация о предыдущих страницах #}
+                    {% if failed_education_page_obj.has_previous %}
+                        <a href="?{% url_replace failed_education_page=1 %}">1</a>
+                        {% if failed_education_page_obj.previous_page_number != 1 %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace failed_education_page=failed_education_page_obj.previous_page_number %}">{{ failed_education_page_obj.previous_page_number }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Информация о текущей странице #}
+                    <span class="current-page">{{ failed_education_page_obj.number }}</span>
+
+                    {# Информация о следующих страницах #}
+                    {% if failed_education_page_obj.has_next %}
+                        <a href="?{% url_replace failed_education_page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        {% if failed_education_page_obj.paginator.num_pages != failed_education_page_obj.next_page_number %}
+                            <span class="pagination-gap">...</span>
+                            <a href="?{% url_replace failed_education_page=failed_education_page_obj.paginator.num_pages %}">{{ failed_education_page_obj.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+
+                </div>
+            {% else %}
+                {# Вывод сообщения, если элементов нет #}
+                    <div class="not-found">
+                        <p>Учебные задачи не найдены!</p>
+                    </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock content %}

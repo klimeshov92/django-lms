@@ -167,6 +167,18 @@ iframe {
     color: white; /* Цвет текста */
     padding: 0px 15px; /* Отступы */
     font-weight: 500; /* Толщина шрифта */
+    font-size: 1.1em;
+}
+
+/* Стили для кнопки гамбургер-меню */
+.header-username a:hover {
+     font-size: 1.15em; /* Увеличение при наведении */
+}
+
+/* Стили для имени пользователя */
+.header-username a {
+    color: white; /* Цвет текста */
+    text-decoration: none; /* Без подчеркивания */
 }
 
 /* Стили для меню */

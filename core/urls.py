@@ -13,7 +13,7 @@ from .views import EmployeeExcelImportsView, EmployeeExcelImportView, \
    OrganizationsView, OrganizationView, OrganizationCreateView, OrganizationUpdateView, OrganizationDeleteView, \
    SubdivisionsView, SubdivisionView, SubdivisionCreateView, SubdivisionUpdateView, SubdivisionDeleteView, \
    PositionsView, PositionView,PositionCreateView, PositionUpdateView, PositionDeleteView, update_password, \
-   EmployeesObjectPermissionCreateView, EmployeesObjectPermissionDeleteView
+   EmployeesObjectPermissionCreateView, EmployeesObjectPermissionDeleteView, PersonalArea, PersonalInfoUpdateView
 
 from rest_framework.routers import DefaultRouter
 from .views import EmployeeViewSet, OrganizationViewSet, SubdivisionViewSet, PlacementViewSet, PositionViewSet
@@ -227,12 +227,14 @@ urlpatterns = [
    path('employees/', EmployeesView.as_view(), name='employees'),
    # Маршрут вывода сотрудника.
    path('employees/<int:pk>/', EmployeeView.as_view(), name='employee'),
+   path('personal_area/<int:pk>/', PersonalArea.as_view(), name='personal_area'),
    # Маршрут обновления пароля.
    path('employees/<int:pk>/update_password', update_password, name='update_password'),
    # Маршрут создания сотрудника.
    path('employees/create/', EmployeeCreateView.as_view(), name='employee_create'),
    # Маршрут обновления сотрудника.
    path('employees/<int:pk>/update/', EmployeeUpdateView.as_view(), name='employee_update'),
+   path('personal_info/<int:pk>/update/', PersonalInfoUpdateView.as_view(), name='personal_info_update'),
    # Маршрут удаления сотрудника.
    path('employees/<int:pk>/delete/', EmployeeDeleteView.as_view(), name='employee_delete'),
    # Маршрут вывода списка организаций.

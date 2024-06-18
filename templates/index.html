@@ -34,7 +34,11 @@
         </div>
         <div class="header-username">
             {% if user.is_authenticated %}
-                {{request.user.username}}
+                {% if is_area %}
+                    {{request.user.username}}
+                {% else %}
+                    <a href="{% url 'core:personal_area' pk=request.user.pk %}">{{request.user.username}}</a>
+                {% endif %}
             {% else %}
                 Пользователь не авторизован!
             {% endif %}

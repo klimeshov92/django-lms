@@ -46,6 +46,30 @@ class EmployeeForm(forms.ModelForm):
             'user_permissions': Select2MultipleWidget(),
         }
 
+# Форма сотрудника.
+class PersonalInfoForm(forms.ModelForm):
+    class Meta:
+        # Модель.
+        model = Employee
+        # Поля.
+        fields = [
+            'avatar',
+            'username',
+            'last_name',
+            'first_name',
+            'fathers_name',
+            'birthday',
+            'email',
+            'phone',
+            'mobile_phone',
+            'creator'
+            ]
+        # Классы виджетов.
+        widgets = {
+            'creator': forms.HiddenInput(),
+            'birthday': forms.DateInput(attrs={'type': 'date'}),
+        }
+
 # Форма организации.
 class OrganizationForm(forms.ModelForm):
     class Meta:

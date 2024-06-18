@@ -16,7 +16,7 @@ from .filters import CategoryFilter, EmployeeExcelImportFilter, \
 # Импорт форм.
 from .forms import CategoryForm, EmployeeExcelImportForm, GroupForm, GroupsGeneratorForm, \
     EmployeesGroupObjectPermissionForm, EmployeeForm, PlacementForm, \
-    OrganizationForm, SubdivisionForm, PositionForm, EmployeesObjectPermissionForm
+    OrganizationForm, SubdivisionForm, PositionForm, EmployeesObjectPermissionForm, PersonalInfoForm
 # Импорт пандас.
 import pandas as pd
 # Импорт рендера, перенаправления, генерации адреса и других урл функций.
@@ -68,6 +68,7 @@ from django.db.models import OuterRef, Subquery
 from django.core.paginator import Paginator
 from django.contrib.auth.models import Permission
 from learning_path.models import LearningPath
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Импортируем логи
 import logging
@@ -481,6 +482,9 @@ class EmployeeUpdateView(PermissionRequiredMixin, UpdateView):
         initial = super().get_initial()
         # Добавляем создателя: юзера отправившего запрос.
         initial["creator"] = self.request.user
+        # Добавляем день рождения.
+        if self.object.birthday:
+            initial["birthday"] = self.object.birthday.strftime('%Y-%m-%d')
         # Возвращаем значения в форму.
         return initial
 
@@ -2114,6 +2118,152 @@ class EmployeesObjectPermissionDeleteView(PermissionRequiredMixin, DeleteView):
         elif self.kwargs.get('type') == 'employee':
             return reverse('core:employee', kwargs={'pk': self.kwargs.get('pk')})
 
+# Объект сотрудника.
+class PersonalArea(LoginRequiredMixin, PreviousPageGetMixinL1, DetailView):
+    # Модель.
+    model = Employee
+    # Шаблон.
+    template_name = 'personal_area.html'
+
+    # Проверяем тип группы.
+    def dispatch(self, request, *args, **kwargs):
+
+        # Забираем пользователя.
+        person = Employee.objects.get(pk=self.kwargs.get('pk'))
+        print(person)
+
+        # Если чужой кабинет.
+        if person == self.request.user:
+
+            # Идем дальше.
+            return super().dispatch(request, *args, **kwargs)
+
+        else:
+
+            # Запрет.
+            return HttpResponseForbidden('Нельзя заходить в чужой кабинет!')
+
+    # Переопределеяем переменные вью.
+    def get_context_data(self, **kwargs):
+
+        # Забираем изначальный набор переменных
+        context = super().get_context_data(**kwargs)
+
+        context['is_area'] = True
+
+        # Забираем назначения пользователя.
+        object_list = self.object.placements.all().order_by('start_date')
+        qs_count = object_list.count()
+
+        # Если назначения есть.
+        if object_list.exists():
+            # Добавляем пагинатор
+            paginator = Paginator(object_list, 6)
+            page_number = self.request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+        # Если нет...
+        else:
+            # Задаем пустую переменную для проверки в шаблоне.
+            page_obj = None
+
+        # Добавляем во вью.
+        context['object_list'] = object_list
+        context['page_obj'] = page_obj
+        context['qs_count'] = qs_count
+
+        # Запрос учебных задач.
+        employees_results = self.object.results.filter(
+            employee=self.request.user
+        ).order_by('-event__date', '-planned_end_date', '-id')
+        appointed_education = employees_results.filter(
+            status='appointed',
+        )
+        appointed_education_count = appointed_education.count()
+        appointed_education_paginator = Paginator(appointed_education, 6)
+        appointed_education_page_number = self.request.GET.get('appointed_education_page')
+        appointed_education_page_obj = appointed_education_paginator.get_page(appointed_education_page_number)
+        education_in_progress = employees_results.filter(
+            status='in_progress',
+        )
+        education_in_progress_count = education_in_progress.count()
+        education_in_progress_paginator = Paginator(education_in_progress, 6)
+        education_in_progress_page_number = self.request.GET.get('education_in_progress_page')
+        education_in_progress_page_obj = education_in_progress_paginator.get_page(education_in_progress_page_number)
+        completed_education = employees_results.filter(
+            status='completed',
+        )
+        completed_education_count = completed_education.count()
+        completed_education_paginator = Paginator(completed_education, 6)
+        completed_education_page_number = self.request.GET.get('completed_education_page')
+        completed_education_page_obj = completed_education_paginator.get_page(completed_education_page_number)
+        failed_education = employees_results.filter(
+            status='failed',
+        )
+        failed_education_count = failed_education.count()
+        failed_education_paginator = Paginator(failed_education, 6)
+        failed_education_page_number = self.request.GET.get('failed_education_page')
+        failed_education_page_obj = failed_education_paginator.get_page(failed_education_page_number)
+
+        # Добавляем во вью.
+        context['appointed_education_count'] = appointed_education_count
+        context['education_in_progress_count'] = education_in_progress_count
+        context['completed_education_count'] = completed_education_count
+        context['failed_education_count'] = failed_education_count
+        context['appointed_education_page_obj'] = appointed_education_page_obj
+        context['education_in_progress_page_obj'] = education_in_progress_page_obj
+        context['completed_education_page_obj'] = completed_education_page_obj
+        context['failed_education_page_obj'] = failed_education_page_obj
+
+        # Возвращаем новый набор переменных в контролер.
+        return context
+
+# Изменение сотрудника.
+class PersonalInfoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    # Права доступа.
+    permission_required = 'core.change_employee'
+    accept_global_perms = True
+    # Форма.
+    form_class = PersonalInfoForm
+    # Модель.
+    model = Employee
+    # Шаблон.
+    template_name = 'personal_info_edit.html'
+
+    # Проверяем тип группы.
+    def dispatch(self, request, *args, **kwargs):
+
+        # Забираем пользователя.
+        person = Employee.objects.get(pk=self.kwargs.get('pk'))
+        print(person)
+
+        # Если чужой кабинет.
+        if person == self.request.user:
+
+            # Идем дальше.
+            return super().dispatch(request, *args, **kwargs)
+
+        else:
+
+            # Запрет.
+            return HttpResponseForbidden('Нельзя изменять чужие данные!')
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Добавляем день рождения.
+        if self.object.birthday:
+            initial["birthday"] = self.object.birthday.strftime('%Y-%m-%d')
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        return reverse('core:personal_area', kwargs={'pk': self.object.pk})
+
 # Домашняя.
 def home (request):
     # Сохраняем полный URL предыдущей страницы в сессии при каждом запросе.
@@ -2150,39 +2300,6 @@ def home (request):
             status='failed',
         ).count()
 
-        # Запрос учебных задач.
-        employees_results = employee.results.filter(
-            employee=request.user
-        ).order_by('-event__date', '-planned_end_date', '-id')
-        appointed_education = employees_results.filter(
-            status='appointed',
-        )
-        appointed_education_count = appointed_education.count()
-        appointed_education_paginator = Paginator(appointed_education, 6)
-        appointed_education_page_number = request.GET.get('appointed_education_page')
-        appointed_education_page_obj = appointed_education_paginator.get_page(appointed_education_page_number)
-        education_in_progress = employees_results.filter(
-            status='in_progress',
-        )
-        education_in_progress_count = education_in_progress.count()
-        education_in_progress_paginator = Paginator(education_in_progress, 6)
-        education_in_progress_page_number = request.GET.get('education_in_progress_page')
-        education_in_progress_page_obj = education_in_progress_paginator.get_page(education_in_progress_page_number)
-        completed_education = employees_results.filter(
-            status='completed',
-        )
-        completed_education_count = completed_education.count()
-        completed_education_paginator = Paginator(completed_education, 6)
-        completed_education_page_number = request.GET.get('completed_education_page')
-        completed_education_page_obj = completed_education_paginator.get_page(completed_education_page_number)
-        failed_education = employees_results.filter(
-            status='failed',
-        )
-        failed_education_count = failed_education.count()
-        failed_education_paginator = Paginator(failed_education, 6)
-        failed_education_page_number = request.GET.get('failed_education_page')
-        failed_education_page_obj = failed_education_paginator.get_page(failed_education_page_number)
-
         # Отдаем контекст.
         context = {
             'employee': employee,
@@ -2190,14 +2307,6 @@ def home (request):
             'paths_in_progress_count': paths_in_progress_count,
             'completed_paths_count': completed_paths_count,
             'failed_paths_count': failed_paths_count,
-            'appointed_education_count': appointed_education_count,
-            'education_in_progress_count': education_in_progress_count,
-            'completed_education_count': completed_education_count,
-            'failed_education_count': failed_education_count,
-            'appointed_education_page_obj': appointed_education_page_obj,
-            'education_in_progress_page_obj': education_in_progress_page_obj,
-            'completed_education_page_obj': completed_education_page_obj,
-            'failed_education_page_obj': failed_education_page_obj,
         }
 
     else:
