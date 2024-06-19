@@ -183,18 +183,18 @@ class ParticipantsGenerator(models.Model):
         related_query_name='excluded_participants_generators'
     )
     # Дата начала работы.
-    days_worked_lte = models.IntegerField(
-        verbose_name='Отработано менее (дней)',
-        null=True,
-        blank=True,
-        default=90,
-        validators=[MinValueValidator(0)]
-    )
     days_worked_gte = models.IntegerField(
-        verbose_name='Отработано более (дней)',
+        verbose_name='Отработано от (дней)',
         null=True,
         blank=True,
         default=0,
+        validators=[MinValueValidator(0)]
+    )
+    days_worked_lte = models.IntegerField(
+        verbose_name='Отработано до (дней)',
+        null=True,
+        blank=True,
+        default=90,
         validators=[MinValueValidator(0)]
     )
     # Обновлять автоматически.
