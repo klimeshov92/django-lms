@@ -8,6 +8,7 @@ from .models import Employee, EmployeesGroup, GroupsGenerator, EmployeesGroupObj
     EmployeeExcelImport, Category
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
+from guardian.models import GroupObjectPermission
 
 # Регистрация моделей в админке.
 admin.site.register(Employee)
@@ -21,6 +22,7 @@ admin.site.unregister(Group)
 admin.site.register(EmployeesGroup)
 admin.site.register(GroupsGenerator)
 admin.site.register(EmployeesGroupObjectPermission)
+admin.site.register(GroupObjectPermission)
 
 # Класс отображения модели в админке.
 class PermissionAdmin(admin.ModelAdmin):
