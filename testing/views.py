@@ -1078,7 +1078,42 @@ def take_assigned_test(request, pk):
 
     # Если тест пройден.
     else:
+
         return HttpResponseForbidden('Этот тест уже пройден!')
+
+
+# Функция прохождения теста.
+def view_test_results(request, pk):
+
+    # Забираем результат теста и тест.
+    tests_result = Result.objects.get(pk=pk)
+    test = tests_result.test
+    if settings.DEBUG:
+        logger.info(f'Результат теста: {tests_result}\n')
+        logger.info(f'Тест: {test}\n')
+
+    # Если страницу открыл не тот, кому назначено, запрещаем доступ.
+    if tests_result.employee != request.user:
+        return HttpResponseForbidden('Этот тест назначен не Вам!')
+
+    # Забираем вопросы.
+    questions_results = tests_result.questions_results.all()
+    if settings.DEBUG:
+        logger.info(f'Результаты вопросов: {questions_results}\n')
+
+    # Применяем сортировку.
+    sorting_questions_results_id = json.loads(tests_result.sorting_questions_results)
+    if settings.DEBUG:
+        logger.info(f'Разджисоненный список вопросов: {sorting_questions_results_id}\n')
+    questions_results_list = sorted(questions_results, key=lambda qr: sorting_questions_results_id.index(qr.id))
+    if settings.DEBUG:
+        logger.info(f'Отсортированные результаты вопросов: {questions_results_list}\n')
+    questions_result = questions_results_list[0]
+    if settings.DEBUG:
+        logger.info(f'Вопрос теста: {questions_result}\n')
+
+    # Переходим
+    return redirect('testing:answer_to_question', pk=questions_result.id)
 
 # Функция ответа на вопрос теста.
 def answer_to_question(request, pk):
@@ -1110,7 +1145,7 @@ def answer_to_question(request, pk):
 
     # Если запрос отправил не тот, кому он назначен - закрываем доступ.
     if questions_result.tests_result.employee != request.user:
-        return HttpResponseForbidden('Назначенный вопрос не найден!')
+        return HttpResponseForbidden('Тест назначен не вам!')
 
     # Если дата уже наступила.
     if tests_result.learning_path_result and tests_result.learning_path_result.planned_end_date <= datetime.now().date():
@@ -1125,10 +1160,6 @@ def answer_to_question(request, pk):
         ]
         if any(blocking_task_results.status != 'completed' for blocking_task_results in blocking_tasks_results):
             return HttpResponseForbidden('Тест заблокирован!')
-
-    # Если тест уже пройден или провален.
-    if tests_result == 'completed' or tests_result == 'failed':
-        return HttpResponseForbidden('Тест уже пройден!')
 
     # Если статус вопроса "Назначен", меняем на "В процессе" и проставляем дату начала.
     if settings.DEBUG:
@@ -1251,7 +1282,6 @@ def answer_to_question(request, pk):
         logger.info(f'Следующий результат вопроса: {next_question_result}\n')
         logger.info(f'Предыдущий результат вопроса: {previous_question_result}\n')
 
-
     # Пагинация.
     paginator = Paginator(questions_results_list, 6)
     page_number = request.GET.get('page')
@@ -1263,12 +1293,19 @@ def answer_to_question(request, pk):
             for field in form.fields.values():
                 field.disabled = True
 
-
     # Проверяем пора ли заканчивать тест.
-    if not questions_results.filter(status='appointed').exists() and not questions_results.filter(status='in_progress').exists():
+    if not questions_results.filter(status='appointed').exists() and not questions_results.filter(status='in_progress').exists() and not tests_result.end_date:
         end_of_test = True
     else:
         end_of_test = False
+
+    # Если тест закончен - деактивируем поля.
+    if tests_result.status == 'completed' or tests_result.status == 'failed' and tests_result.end_date:
+        # Деактивация полей, если тест завершен.
+        if questions_result.status == 'appointed' or questions_result.status == 'in_progress':
+            for form in formset:
+                for field in form.fields.values():
+                    field.disabled = True
 
     # Отдаем контекст.
     context = {'formset': formset,
@@ -1331,6 +1368,7 @@ def retake_the_test(request, pk):
     tests_result.status = 'appointed'
     tests_result.score = 0
     tests_result.score_scaled = 0
+    tests_result.end_date = None
     tests_result.attempts_used += 1
     # сохраняем результат теста
     tests_result.save()

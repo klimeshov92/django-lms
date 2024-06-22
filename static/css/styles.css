@@ -202,19 +202,21 @@ iframe {
 
 /* Стили для меню */
 .menu a {
-    color: var(--color-accent-rgb); /* Цвет текста */
+    color: var(--color-text-rgb); /* Цвет текста */
     text-decoration: none; /* Без подчеркивания */
-    padding: 15px 25px; /* Отступы */
+    padding: 12px 25px; /* Отступы */
     display: inline-block; /* Блочно-строчное отображение */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
     word-wrap: break-word; /* Перенос */
     font-weight: 400; /* Жирность текста */
+    border-top: 3px solid transparent; /* Прозрачная граница */
+    border-bottom: 3px solid transparent; /* Прозрачная граница */
 }
 
 /* Стили для меню */
 .menu a.active, .menu a:hover, .menu a:focus {
-    background-color: var(--color-accent-rgb); /* Фон при активации */
-    color: white; /* Цвет текста */
+    border-bottom: 3px solid var(--color-accent-rgb); /* Линия снизу */
+    color: var(--color-accent-rgb); /* Цвет текста */
 }
 
 /* Список */
@@ -247,19 +249,21 @@ iframe {
 
 /* Стили для меню */
 .tab-menu-link {
-    color: var(--color-accent-rgb); /* Цвет текста */
+    color: var(--color-text-rgb); /* Цвет текста */
     text-decoration: none; /* Без подчеркивания */
-    padding: 15px 25px; /* Отступы */
+    padding: 12px 25px; /* Отступы */
     display: inline-block; /* Блочно-строчное отображение */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
     word-wrap: break-word; /* Перенос */
     font-weight: 400; /* Жирность текста */
+    border-top: 3px solid transparent; /* Прозрачная граница */
+    border-bottom: 3px solid transparent; /* Прозрачная граница */
 }
 
 /* Стили для меню */
 .tab-menu-link.active, .tab-menu-link:hover, .tab-menu-link:focus {
-    background-color: var(--color-accent-rgb); /* Фон при активации */
-    color: white; /* Цвет текста */
+    border-bottom: 3px solid var(--color-accent-rgb); /* Линия снизу */
+    color: var(--color-accent-rgb); /* Цвет текста */
 }
 
 /* Список */

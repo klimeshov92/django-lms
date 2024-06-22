@@ -96,6 +96,7 @@
                             {% endif %}
                             {% if result.status == 'failed' or result.status == 'completed' %}
                                 {% if overdue == False %}
+                                    <a href="{% url 'testing:view_test_results'  pk=result.id %}">Результаты</a>
                                     {% if object.amount_of_try > result.attempts_used %}
                                         <a href="{% url 'testing:retake_the_test'  pk=result.id %}">Пройти занаво</a>
                                     {% else %}

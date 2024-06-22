@@ -7,7 +7,7 @@ from .views import TestsView, TestView, TestCreateView, TestUpdateView, TestDele
    RelevantPointCreateView, RelevantPointUpdateView, \
    TestsQuestionsGeneratorCreateView, TestsQuestionsGeneratorUpdateView, \
    take_assigned_test, answer_to_question, attempt_end_timeout, retake_the_test, \
-   tests_questions_ordering, answers_ordering
+   tests_questions_ordering, answers_ordering, view_test_results
 # Имя приложения в адресах.
 app_name = 'testing'
 # Список маршрутов приложения.
@@ -52,6 +52,8 @@ urlpatterns = [
    path('relevant_point/<int:pk>/update/', RelevantPointUpdateView.as_view(), name='relevant_point_update'),
    # маршрут прохождения теста
    path('take_assigned_test/<int:pk>/', take_assigned_test, name='take_assigned_test'),
+   # маршрут результатов теста
+   path('view_test_results/<int:pk>/', view_test_results, name='view_test_results'),
    # маршрут ответа на вопрос теста
    path('answer_to_question/<int:pk>/', answer_to_question, name='answer_to_question'),
    # маршрут перезапуска теста

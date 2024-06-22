@@ -581,8 +581,6 @@ class Result(models.Model):
     attempts_used = models.IntegerField(verbose_name='Использовано попыток', default=0)
     # Время завершения попытки.
     attempt_end_time = models.DateTimeField(auto_now=False, null=True, blank=True, verbose_name='Время окончания попытки')
-    # ID задачи завершения теста по истечении времени.
-    attempt_end_tasks_id = models.CharField(verbose_name='ID задачи остановки теста', null=True, blank=True, max_length=256)
     '''
     Для курсов.
     '''
