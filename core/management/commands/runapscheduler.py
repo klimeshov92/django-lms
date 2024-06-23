@@ -1,8 +1,3 @@
-# Импортируем настройки Django
-import os
-import django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lms.settings')
-django.setup()
 
 # Асинхронных планировщик.
 from apscheduler.schedulers.background import BackgroundScheduler
