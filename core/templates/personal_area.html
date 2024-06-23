@@ -229,7 +229,7 @@
 
                     {# Информация о следующих страницах #}
                     {% if appointed_education_page_obj.has_next %}
-                        <a href="?{% url_replace appointed_education_page=appointed_education_page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                        <a href="?{% url_replace appointed_education_page=appointed_education_page_obj.next_page_number %}">{{ appointed_education_page_obj.next_page_number }}</a>
                         {% if appointed_education_page_obj.paginator.num_pages != appointed_education_page_obj.next_page_number %}
                             <span class="pagination-gap">...</span>
                             <a href="?{% url_replace appointed_education_page=appointed_education_page_obj.paginator.num_pages %}">{{ appointed_education_page_obj.paginator.num_pages }}</a>
