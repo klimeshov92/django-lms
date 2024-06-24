@@ -68,8 +68,8 @@ class ParticipantsGeneratorForm(forms.ModelForm):
                   'added_users',
                   'excluded_groups',
                   'excluded_users',
-                  'days_worked_lte',
                   'days_worked_gte',
+                  'days_worked_lte',
                   'autoupdate',
         ]
         # Классы виджетов.
