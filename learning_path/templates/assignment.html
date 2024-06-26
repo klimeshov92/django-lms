@@ -58,6 +58,7 @@
                             {% endfor %}
                         </p>
                     {% endif %}
+                    <p><span class="description-item">Тип:</span> {{object.get_type_display}}</p>
                     <p><span class="description-item">Назначил:</span> {{object.creator}}</p>
                     <p><span class="description-item">Дата и время создания:</span> {{object.created}}</p>
                     <p><span class="description-item">Группа:</span> {{object.group}}</p>
