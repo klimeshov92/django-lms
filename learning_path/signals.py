@@ -2,7 +2,7 @@
 from datetime import timedelta
 from django.http import HttpResponseServerError
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 from django.db import transaction
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -28,7 +28,7 @@ def create_learning_results(sender, instance, created, **kwargs):
         logger.info(f"Назначение комплексной программы {learning_complex} для {employee}.")
 
         # Проверка на переназначение.
-        if reassignment == 'not_passed' and Result.objects.filter(
+        if reassignment == 'did_not_pass' and Result.objects.filter(
             employee=employee,
             learning_complex=learning_complex,
             type='learning_complex',
@@ -60,7 +60,7 @@ def create_learning_results(sender, instance, created, **kwargs):
             logger.info(f"Назначение учебной траектории {learning_path} для {employee}.")
 
             # Проверка на переназначение.
-            if reassignment == 'not_passed' and Result.objects.filter(
+            if reassignment == 'did_not_pass' and Result.objects.filter(
                 employee=employee,
                 learning_path=learning_path,
                 type='learning_path',
@@ -91,7 +91,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                     material = learning_task.material
 
                     # Проверка на переназначение.
-                    if reassignment == 'not_passed' and Result.objects.filter(
+                    if reassignment == 'did_not_pass' and Result.objects.filter(
                             employee=employee,
                             material=material,
                             status='completed'
@@ -121,7 +121,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                     test = learning_task.test
 
                     # Проверка на переназначение.
-                    if reassignment == 'not_passed' and Result.objects.filter(
+                    if reassignment == 'did_not_pass' and Result.objects.filter(
                             employee=employee,
                             test=test,
                             status='completed'
@@ -151,7 +151,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                     course = learning_task.course
 
                     # Проверка на переназначение.
-                    if reassignment == 'not_passed' and Result.objects.filter(
+                    if reassignment == 'did_not_pass' and Result.objects.filter(
                             employee=employee,
                             course=course,
                             status='completed'
@@ -185,7 +185,7 @@ def create_learning_results(sender, instance, created, **kwargs):
         logger.info(f"Назначение учебной траектории {learning_path} для {employee}.")
 
         # Проверка на переназначение.
-        if reassignment == 'not_passed' and Result.objects.filter(
+        if reassignment == 'did_not_pass' and Result.objects.filter(
             employee=employee,
             learning_path=learning_path,
             type='learning_path',
@@ -214,7 +214,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                 material = learning_task.material
 
                 # Проверка на переназначение.
-                if reassignment == 'not_passed' and Result.objects.filter(
+                if reassignment == 'did_not_pass' and Result.objects.filter(
                         employee=employee,
                         material=material,
                         status='completed'
@@ -244,7 +244,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                 test = learning_task.test
 
                 # Проверка на переназначение.
-                if reassignment == 'not_passed' and Result.objects.filter(
+                if reassignment == 'did_not_pass' and Result.objects.filter(
                         employee=employee,
                         test=test,
                         status='completed'
@@ -274,7 +274,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                 course = learning_task.course
 
                 # Проверка на переназначение.
-                if reassignment == 'not_passed' and Result.objects.filter(
+                if reassignment == 'did_not_pass' and Result.objects.filter(
                         employee=employee,
                         course=course,
                         status='completed'
@@ -300,30 +300,203 @@ def create_learning_results(sender, instance, created, **kwargs):
                 logger.info(f"Создан {learning_task_result}")
 
     # Создание прав доступа.
-    def create_perms(learning_paths, participants_group):
+    def create_groups_perms(type, object, participants_group):
 
-        # Создание результатов учебных задач.
-        for learning_path in learning_paths:
+        # Создание прав.
+        if type == 'learning_complex':
 
-            # Присвоение прав доступа к LearningPath для группы.
+            # Переменная.
+            learning_paths = object
+
+            # Для траекторий.
+            for learning_path in learning_paths:
+
+                # Присвоение прав доступа.
+                assign_perm('view_learningpath', participants_group, learning_path)
+                logger.info(f"Право на просмотр учебной траектории {learning_path} назначено группе {participants_group}.")
+
+                # Перебор задач учебного пути.
+                for learning_task in learning_path.learning_tasks.all():
+
+                    # Пррисвоение прав доступа.
+                    # assign_perm('view_learningtask', participants_group, learning_task)
+                    # logger.info(f"Право на просмотр учебной задачи {learning_task} назначено группе {participants_group}.")
+
+                    if learning_task.type == 'material':
+
+                        # Забираем материал.
+                        material=learning_task.material
+
+                        # Присвоение прав доступа.
+                        assign_perm('view_material', participants_group, material)
+                        logger.info(f"Право на просмотр материала {material} назначено группе {participants_group}.")
+
+                    if learning_task.type == 'test':
+
+                        # Забираем тест.
+                        test = learning_task.test
+
+                        # Присвоение прав доступа.
+                        assign_perm('view_test', participants_group, test)
+                        logger.info(f"Право на просмотр теста {test} назначено группе {participants_group}.")
+
+                    if learning_task.type == 'course':
+
+                        # Забираем курс.
+                        course = learning_task.course
+
+                        # Присвоение прав доступа.
+                        assign_perm('view_course', participants_group, course)
+                        logger.info(f"Право на просмотр курса {course} назначено группе {participants_group}.")
+
+                    # Добавьте обработку других объектов.
+
+        # Создание прав.
+        if type == 'learning_path':
+
+            # Переменная.
+            learning_path = object
+
+            # Присвоение прав доступа для группы.
             assign_perm('view_learningpath', participants_group, learning_path)
-            logger.info(f"Право на просмотр учебной траектории {learning_path} назначено группе {participants_group}.")
+            logger.info(
+                f"Право на просмотр учебной траектории {learning_path} назначено группе {participants_group}.")
 
             # Перебор задач учебного пути.
             for learning_task in learning_path.learning_tasks.all():
 
                 # Пррисвоение прав доступа.
-                assign_perm('view_learningtask', participants_group, learning_task)
-                logger.info(f"Право на просмотр учебной задачи {learning_task} назначено группе {participants_group}.")
+                # assign_perm('view_learningtask', participants_group, learning_task)
+                # logger.info(f"Право на просмотр учебной задачи {learning_task} назначено группе {participants_group}.")
+
+                if learning_task.type == 'material':
+                    # Забираем материал.
+                    material = learning_task.material
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_material', participants_group, material)
+                    logger.info(
+                        f"Право на просмотр материала {material} назначено группе {participants_group}.")
+
+                if learning_task.type == 'test':
+                    # Забираем тест.
+                    test = learning_task.test
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_test', participants_group, test)
+                    logger.info(f"Право на просмотр теста {test} назначено группе {participants_group}.")
+
+                if learning_task.type == 'course':
+                    # Забираем курс.
+                    course = learning_task.course
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_course', participants_group, course)
+                    logger.info(f"Право на просмотр курса {course} назначено группе {participants_group}.")
+
+        # Создание прав.
+        if type == 'material':
+
+            # Переменная.
+            material = object
+
+            # Присвоение прав доступа для группы.
+            assign_perm('view_material', participants_group, material)
+            logger.info(f"Право на просмотр материала {material} назначено группе {participants_group}.")
+
+        # Создание прав.
+        if type == 'test':
+            # Переменная.
+            test = object
+
+            # Присвоение прав доступа для группы.
+            assign_perm('view_test', participants_group, test)
+            logger.info(f"Право на просмотр теста {test} назначено группе {participants_group}.")
+
+        # Создание прав.
+        if type == 'course':
+            # Переменная.
+            course = object
+
+            # Присвоение прав доступа для группы.
+            assign_perm('view_course', participants_group, course)
+            logger.info(f"Право на просмотр курс {course} назначено группе {participants_group}.")
+
+    # Создание прав доступа.
+    def create_employees_perms(type, object, employee):
+
+        # Создание .
+        if type == 'learning_complex':
+
+            # Переменная прав.
+            learning_paths = object
+
+            # Создание прав учебных задач.
+            for learning_path in learning_paths:
+
+                # Присвоение прав доступа.
+                assign_perm('view_learningpath', employee, learning_path)
+                logger.info(f"Право на просмотр учебной траектории {learning_path} назначено {employee}.")
+
+                # Перебор задач учебного пути.
+                for learning_task in learning_path.learning_tasks.all():
+
+                    # Пррисвоение прав доступа.
+                    # assign_perm('view_learningtask', employee, learning_task)
+                    # logger.info(f"Право на просмотр учебной задачи {learning_task} назначено {employee}.")
+
+                    if learning_task.type == 'material':
+
+                        # Забираем материал.
+                        material=learning_task.material
+
+                        # Присвоение прав доступа.
+                        assign_perm('view_material', employee, material)
+                        logger.info(f"Право на просмотр материала {material} назначено {employee}.")
+
+                    if learning_task.type == 'test':
+
+                        # Забираем тест.
+                        test = learning_task.test
+
+                        # Присвоение прав доступа.
+                        assign_perm('view_test', employee, test)
+                        logger.info(f"Право на просмотр теста {test} назначено {employee}.")
+
+                    if learning_task.type == 'course':
+
+                        # Забираем курс.
+                        course = learning_task.course
+
+                        # Присвоение прав доступа.
+                        assign_perm('view_course', employee, course)
+                        logger.info(f"Право на просмотр курса {course} назначено {employee}.")
+
+        # Создание прав.
+        if type == 'learning_path':
+
+            # Переменная.
+            learning_path = object
+
+            # Присвоение прав доступа для группы.
+            assign_perm('view_learningpath', employee, learning_path)
+            logger.info(f"Право на просмотр учебной траектории {learning_path} назначено {employee}.")
+
+            # Перебор задач учебного пути.
+            for learning_task in learning_path.learning_tasks.all():
+
+                # Пррисвоение прав доступа.
+                # assign_perm('view_learningtask', employee, learning_task)
+                # logger.info(f"Право на просмотр учебной задачи {learning_task} назначено {employee}.")
 
                 if learning_task.type == 'material':
 
                     # Забираем материал.
-                    material=learning_task.material
+                    material = learning_task.material
 
                     # Присвоение прав доступа к тесту для группы.
-                    assign_perm('view_material', participants_group, material)
-                    logger.info(f"Право на просмотр материала {material} назначено группе {participants_group}.")
+                    assign_perm('view_material', employee, material)
+                    logger.info(f"Право на просмотр материала {material} назначено {employee}.")
 
                 if learning_task.type == 'test':
 
@@ -331,8 +504,8 @@ def create_learning_results(sender, instance, created, **kwargs):
                     test = learning_task.test
 
                     # Присвоение прав доступа к Material для группы.
-                    assign_perm('view_test', participants_group, test)
-                    logger.info(f"Право на просмотр теста {test} назначено группе {participants_group}.")
+                    assign_perm('view_test', employee, test)
+                    logger.info(f"Право на просмотр теста {test} назначено {employee}.")
 
                 if learning_task.type == 'course':
 
@@ -340,13 +513,38 @@ def create_learning_results(sender, instance, created, **kwargs):
                     course = learning_task.course
 
                     # Присвоение прав доступа к тесту для группы.
-                    assign_perm('view_course', participants_group, course)
-                    logger.info(f"Право на просмотр курса {course} назначено группе {participants_group}.")
+                    assign_perm('view_course', employee, course)
+                    logger.info(f"Право на просмотр курса {course} назначено {employee}.")
 
-                # Добавьте обработку других объектов.
+        # Создание прав.
+        if type == 'material':
 
-        logger.info("Массовое создание прав завершено.")
+            # Переменная.
+            material = object
 
+            # Присвоение прав доступа для группы.
+            assign_perm('view_material', employee, material)
+            logger.info(f"Право на просмотр материала {material} назначено {employee}.")
+
+        # Создание прав.
+        if type == 'test':
+
+            # Переменная.
+            test = object
+
+            # Присвоение прав доступа для группы.
+            assign_perm('view_test', employee, test)
+            logger.info(f"Право на просмотр теста {test} назначено {employee}.")
+
+        # Создание прав.
+        if type == 'course':
+
+            # Переменная.
+            course = object
+
+            # Присвоение прав доступа для группы.
+            assign_perm('view_course', employee, course)
+            logger.info(f"Право на просмотр курс {course} назначено {employee}.")
 
     # Перехват ошибок.
     try:
@@ -357,12 +555,18 @@ def create_learning_results(sender, instance, created, **kwargs):
 
             # Получение переменных.
             assignment = instance
-            group = instance.group
             reassignment = instance.reassignment
-            employees = Employee.objects.filter(groups=group, is_active=True).prefetch_related(
-                'results',
-            )
+            if instance.participants == 'employee':
+                employee = instance.employee
+            if instance.participants == 'group':
+                group = instance.group
+                employees = Employee.objects.filter(groups=group, is_active=True).prefetch_related(
+                    'results',
+                )
             planned_start_date = instance.planned_start_date
+            if instance.type == 'material' or instance.type == 'test' or instance.type == 'course':
+                duration = instance.duration
+                planned_end_date = planned_start_date + timedelta(days=duration)
 
             # Общие переменные.
             if instance.type == 'learning_complex':
@@ -371,64 +575,309 @@ def create_learning_results(sender, instance, created, **kwargs):
                     learning_complex_path.learning_path for learning_complex_path in
                     learning_complex.learning_complex_paths.all().order_by('learning_complex', 'position')
                 ]
-                participants_group_name = f"Назначение комплексной программы [{instance.pk}]: {instance.learning_complex.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
+                if instance.participants == 'group':
+                    participants_group_name = f"Назначение комплексной программы [{instance.pk}]: {instance.learning_complex.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
             if instance.type == 'learning_path':
                 learning_path = instance.learning_path
-                learning_paths=[learning_path]
-                participants_group_name = f"Назначение траектории обучения [{instance.pk}]: {instance.learning_path.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
+                if instance.participants == 'group':
+                    participants_group_name = f"Назначение траектории обучения [{instance.pk}]: {instance.learning_path.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
+            if instance.type == 'material':
+                material = instance.material
+                if instance.participants == 'group':
+                    participants_group_name = f"Назначение материала [{instance.pk}]: {instance.material.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
+            if instance.type == 'test':
+                test = instance.test
+                if instance.participants == 'group':
+                    participants_group_name = f"Назначение теста [{instance.pk}]: {instance.test.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
+            if instance.type == 'course':
+                course = instance.course
+                if instance.participants == 'group':
+                    participants_group_name = f"Назначение курса [{instance.pk}]: {instance.course.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
 
             # Забираем группу для отвественных и участников мероприятия.
-            participants_group, _ = EmployeesGroup.objects.get_or_create(name=participants_group_name, type='assignment')
-            instance.participants_group = participants_group
-            instance.save()
-            participants_group.user_set.set(employees)
-            logger.info(f"Была создана группа для назначения: {participants_group}.")
+            if instance.participants == 'group':
+                participants_group, _ = EmployeesGroup.objects.get_or_create(name=participants_group_name, type='assignment')
+                instance.participants_group = participants_group
+                instance.save()
+                participants_group.user_set.set(employees)
+                logger.info(f"Была создана группа для назначения: {participants_group}.")
 
             # Создание результатов.
             if instance.type == 'learning_complex':
 
-                # Нарезка.
-                chunk_size = 50
-                employees_chunks = [employees[i:i + chunk_size] for i in range(0, len(employees), chunk_size)]
+                # Создание результатов группы.
+                if instance.participants == 'group':
 
-                # Перебор сотрудников и создание результатов.
-                for employees_chunk in employees_chunks:
-                    for employee in employees_chunk:
+                    # Нарезка.
+                    chunk_size = 50
+                    employees_chunks = [employees[i:i + chunk_size] for i in range(0, len(employees), chunk_size)]
 
-                        # Действия.
-                        learning_path_results = create_learning_complex_results(
-                            assignment=assignment,
-                            employee=employee,
-                            learning_complex=learning_complex,
-                            learning_paths=learning_paths,
-                            planned_start_date=planned_start_date,
-                            reassignment=reassignment
-                        )
-                    logger.info("Массовое создание результатов завершено.")
+                    # Перебор сотрудников и создание результатов.
+                    for employees_chunk in employees_chunks:
+                        for employee in employees_chunk:
+
+                            # Действия.
+                            learning_complex_results = create_learning_complex_results(
+                                assignment=assignment,
+                                employee=employee,
+                                learning_complex=learning_complex,
+                                learning_paths=learning_paths,
+                                planned_start_date=planned_start_date,
+                                reassignment=reassignment
+                            )
+                        logger.info("Массовое создание результатов завершено.")
+
+                    # Создание прав.
+                    create_groups_perms(instance.type, learning_paths, participants_group)
+
+                # Создание результатов сотрудника.
+                if instance.participants == 'employee':
+
+                    # Действия.
+                    learning_complex_results = create_learning_complex_results(
+                        assignment=assignment,
+                        employee=employee,
+                        learning_complex=learning_complex,
+                        learning_paths=learning_paths,
+                        planned_start_date=planned_start_date,
+                        reassignment=reassignment
+                    )
+                    logger.info("Cоздание результатов завершено.")
+
+                    # Создание прав.
+                    create_employees_perms(instance.type, learning_paths, employee)
 
             # Создание результатов.
             if instance.type == 'learning_path':
 
-                # Нарезка.
-                chunk_size = 50
-                employees_chunks = [employees[i:i + chunk_size] for i in range(0, len(employees), chunk_size)]
+                # Создание результатов группы.
+                if instance.participants == 'group':
 
-                # Перебор сотрудников и создание результатов.
-                for employees_chunk in employees_chunks:
-                    for employee in employees_chunk:
+                    # Нарезка.
+                    chunk_size = 50
+                    employees_chunks = [employees[i:i + chunk_size] for i in range(0, len(employees), chunk_size)]
 
-                        # Действия.
-                        learning_path_result = create_learning_path_results(
-                            assignment=assignment,
+                    # Перебор сотрудников и создание результатов.
+                    for employees_chunk in employees_chunks:
+                        for employee in employees_chunk:
+
+                            # Действия.
+                            learning_path_result = create_learning_path_results(
+                                assignment=assignment,
+                                employee=employee,
+                                learning_path=learning_path,
+                                planned_start_date=planned_start_date,
+                                reassignment=reassignment
+                            )
+                        logger.info("Массовое создание результатов завершено.")
+
+                    # Создание прав.
+                    create_groups_perms(instance.type, learning_path, participants_group)
+
+                # Создание результатов сотрудника.
+                if instance.participants == 'employee':
+
+                    # Действия.
+                    learning_path_result = create_learning_path_results(
+                        assignment=assignment,
+                        employee=employee,
+                        learning_path=learning_path,
+                        planned_start_date=planned_start_date,
+                        reassignment=reassignment
+                    )
+                    logger.info("Создание результатов завершено.")
+
+                    # Создание прав.
+                    create_employees_perms(instance.type, learning_path, employee)
+
+            # Создание результатов.
+            if instance.type == 'material':
+
+                # Создание результатов группы.
+                if instance.participants == 'group':
+
+                    # Нарезка.
+                    chunk_size = 50
+                    employees_chunks = [employees[i:i + chunk_size] for i in range(0, len(employees), chunk_size)]
+
+                    # Перебор сотрудников и создание результатов.
+                    for employees_chunk in employees_chunks:
+                        for employee in employees_chunk:
+
+                            # Проверка на переназначение.
+                            if reassignment == 'did_not_pass' and Result.objects.filter(
+                                    employee=employee,
+                                    material=material,
+                                    status='completed'
+                            ).exists():
+                                logger.info(f"Пропускаем для {employee}: уже сдан")
+                                continue
+
+                            # Создание объекта результата для задачи.
+                            material_result = Result.objects.create(
+                                employee=employee,
+                                material=material,
+                                assignment=assignment,
+                                planned_end_date=planned_end_date,
+                                type='material'
+                            )
+                            logger.info(f"Создан {material_result}")
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_material', participants_group, material)
+                    logger.info(f"Право на просмотр материала {material} назначено группе {participants_group}.")
+
+                # Создание результатов сотрудника.
+                if instance.participants == 'employee':
+
+                    # Проверка на переназначение.
+                    if reassignment == 'did_not_pass' and Result.objects.filter(
                             employee=employee,
-                            learning_path=learning_path,
-                            planned_start_date=planned_start_date,
-                            reassignment=reassignment
-                        )
-                    logger.info("Массовое создание результатов завершено.")
+                            material=material,
+                            status='completed'
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже сдан")
 
-            # Создание прав.
-            create_perms(learning_paths, participants_group)
+                    # Создание объекта результата для задачи.
+                    material_result = Result.objects.create(
+                        employee=employee,
+                        material=material,
+                        assignment=assignment,
+                        planned_end_date=planned_end_date,
+                        type='material'
+                    )
+                    logger.info(f"Создан {material_result}")
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_material', employee, material)
+                    logger.info(f"Право на просмотр материала {material} назначено {employee}.")
+
+            # Создание результатов.
+            if instance.type == 'test':
+
+                # Создание результатов группы.
+                if instance.participants == 'group':
+
+                    # Нарезка.
+                    chunk_size = 50
+                    employees_chunks = [employees[i:i + chunk_size] for i in range(0, len(employees), chunk_size)]
+
+                    # Перебор сотрудников и создание результатов.
+                    for employees_chunk in employees_chunks:
+                        for employee in employees_chunk:
+
+                            # Проверка на переназначение.
+                            if reassignment == 'did_not_pass' and Result.objects.filter(
+                                    employee=employee,
+                                    test=test,
+                                    status='completed'
+                            ).exists():
+                                logger.info(f"Пропускаем для {employee}: уже сдан")
+                                continue
+
+                            # Создание объекта результата для задачи.
+                            test_result = Result.objects.create(
+                                employee=employee,
+                                test=test,
+                                assignment=assignment,
+                                planned_end_date=planned_end_date,
+                                type='test'
+                            )
+                            logger.info(f"Создан {test_result}")
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_test', participants_group, test)
+                    logger.info(f"Право на просмотр теста {test} назначено группе {participants_group}.")
+
+
+                # Создание результатов сотрудника.
+                if instance.participants == 'employee':
+
+                    # Проверка на переназначение.
+                    if reassignment == 'did_not_pass' and Result.objects.filter(
+                            employee=employee,
+                            test=test,
+                            status='completed'
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже сдан")
+
+                    # Создание объекта результата для задачи.
+                    test_result = Result.objects.create(
+                        employee=employee,
+                        test=test,
+                        assignment=assignment,
+                        planned_end_date=planned_end_date,
+                        type='test'
+                    )
+                    logger.info(f"Создан {test_result}")
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_test', employee, test)
+                    logger.info(f"Право на просмотр теста {test} назначено {employee}.")
+
+            # Создание результатов.
+            if instance.type == 'course':
+
+                # Создание результатов группы.
+                if instance.participants == 'group':
+
+                    # Нарезка.
+                    chunk_size = 50
+                    employees_chunks = [employees[i:i + chunk_size] for i in range(0, len(employees), chunk_size)]
+
+                    # Перебор сотрудников и создание результатов.
+                    for employees_chunk in employees_chunks:
+                        for employee in employees_chunk:
+
+                            # Проверка на переназначение.
+                            if reassignment == 'did_not_pass' and Result.objects.filter(
+                                    employee=employee,
+                                    course=course,
+                                    status='completed'
+                            ).exists():
+                                logger.info(f"Пропускаем для {employee}: уже сдан")
+                                continue
+
+                            # Создание объекта результата для задачи.
+                            course_result = Result.objects.create(
+                                employee=employee,
+                                course=course,
+                                scorm_package=course.scorm_package,
+                                assignment=assignment,
+                                planned_end_date=planned_end_date,
+                                type='course'
+                            )
+                            logger.info(f"Создан {course_result}")
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_course', participants_group, course)
+                    logger.info(f"Право на просмотр курса {course} назначено группе {participants_group}.")
+
+                # Создание результатов сотрудника.
+                if instance.participants == 'employee':
+
+                    # Проверка на переназначение.
+                    if reassignment == 'did_not_pass' and Result.objects.filter(
+                            employee=employee,
+                            course=course,
+                            status='completed'
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже сдан")
+
+                    # Создание объекта результата для задачи.
+                    course_result = Result.objects.create(
+                        employee=employee,
+                        course=course,
+                        scorm_package=course.scorm_package,
+                        assignment=assignment,
+                        planned_end_date=planned_end_date,
+                        type='material'
+                    )
+                    logger.info(f"Создан {course_result}")
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_course', employee, course)
+                    logger.info(f"Право на просмотр курса {course} назначено {employee}.")
 
     # Логирование исключений, если они возникнут.
     except Exception as e:
@@ -441,18 +890,245 @@ def create_learning_results(sender, instance, created, **kwargs):
 
 # Сигнал сохранения участников меропрриятия.
 @receiver(post_delete, sender=Assignment)
-def delete_assignment_groups(sender, instance, **kwargs):
+def delete_assignment(sender, instance, **kwargs):
 
     # Проверка ошибок.
     try:
 
-        # Удаляем связанные группы.
-        instance.participants_group.delete()
-        logger.info(f"Удаляется связанная с обучением {instance} группа {instance.participants_group}.")
+        if instance.participants == 'group':
+
+            # Удаляем связанные группы.
+            instance.participants_group.delete()
+            logger.info(f"Удаляется связанная с обучением {instance} группа {instance.participants_group}.")
+
+        if instance.participants == 'employee':
+
+            # Получение переменных.
+            assignment = instance
+            employee = instance.employee
+
+            # Если это комплексная программа.
+            if instance.type == 'learning_complex':
+
+                # Забираем объект.
+                learning_complex=instance.learning_complex
+
+                # Убираем рпава доступа.
+                for learning_path in learning_complex.learning_complex_paths.all():
+
+                    result = Result.objects.get(
+                        employee=employee,
+                        assignment=assignment,
+                        learning_path=learning_path,
+                        type='learning_path'
+                    )
+
+                    if Result.objects.filter(
+                            employee=employee,
+                            learning_path=learning_path,
+                            type='learning_path'
+                    ).exclude(id=result.id).exists():
+                        logger.info(f"Пропускаем для {learning_path}: есть другое назначение")
+                        continue
+
+                    # Исключение прав.
+                    remove_perm('view_learningpath', employee, learning_path)
+                    logger.info(f"Право на просмотр траектории обучения {learning_path} удалено {employee}.")
+
+                    for learning_task in learning_path.learning_tasks.all():
+
+                        result = Result.objects.get(
+                            employee=employee,
+                            assignment=assignment,
+                            learning_task=learning_task,
+                        )
+
+                        if Result.objects.filter(
+                                employee=employee,
+                                learning_task=learning_task,
+                        ).exclude(id=result.id).exists():
+                            logger.info(f"Пропускаем для {learning_task}: есть другое назначение")
+                            continue
+
+                        # Исключение прав.
+                        remove_perm('view_learningtask', employee, learning_task)
+                        logger.info(f"Право на просмотр материал {learning_task} удалено {employee}.")
+
+                        # Создание результатов.
+                        if learning_task.type == 'material':
+
+                            # Забираем материал.
+                            material = learning_task.material
+
+                            # Исключение прав.
+                            remove_perm('view_material', employee, material)
+                            logger.info(f"Право на просмотр материал {material} удалено {employee}.")
+
+                        # Создание результатов.
+                        if learning_task.type == 'test':
+
+                            # Забираем материал.
+                            test = learning_task.test
+
+                            # Исключение прав.
+                            remove_perm('view_test', employee, test)
+                            logger.info(f"Право на просмотр тест {test} удалено {employee}.")
+
+                        # Создание результатов.
+                        if learning_task.type == 'course':
+
+                            # Забираем материал.
+                            course = learning_task.course
+
+                            # Исключение прав.
+                            remove_perm('view_course', employee, course)
+                            logger.info(f"Право на просмотр курс {course} удалено {employee}.")
+
+            if instance.type == 'learning_path':
+
+                # Забираем объект.
+                learning_path=instance.learning_path
+
+                result = Result.objects.get(
+                    employee=employee,
+                    assignment=assignment,
+                    learning_path=learning_path,
+                    type='learning_path'
+                )
+
+                if Result.objects.filter(
+                        employee=employee,
+                        learning_path=learning_path,
+                        type='learning_path'
+                ).exclude(id=result.id).exists():
+                    logger.info(f"Пропускаем для {learning_path}: есть другое назначение")
+                    return
+
+                # Исключение прав.
+                remove_perm('view_learningpath', employee, learning_path)
+                logger.info(f"Право на просмотр траектории обучения {learning_path} удалено {employee}.")
+
+                for learning_task in learning_path.learning_tasks.all():
+
+                    result = Result.objects.get(
+                        employee=employee,
+                        assignment=assignment,
+                        learning_task=learning_task,
+                    )
+
+                    if Result.objects.filter(
+                            employee=employee,
+                            learning_task=learning_task,
+                    ).exclude(id=result.id).exists():
+                        logger.info(f"Пропускаем для {learning_task}: есть другое назначение")
+                        continue
+
+                    # Исключение прав.
+                    remove_perm('view_learningtask', employee, learning_task)
+                    logger.info(f"Право на просмотр материал {learning_task} удалено {employee}.")
+
+                    # Создание результатов.
+                    if learning_task.type == 'material':
+                        # Забираем материал.
+                        material = learning_task.material
+
+                        # Исключение прав.
+                        remove_perm('view_material', employee, material)
+                        logger.info(f"Право на просмотр материал {material} удалено {employee}.")
+
+                    # Создание результатов.
+                    if learning_task.type == 'test':
+                        # Забираем материал.
+                        test = learning_task.test
+
+                        # Исключение прав.
+                        remove_perm('view_test', employee, test)
+                        logger.info(f"Право на просмотр тест {test} удалено {employee}.")
+
+                    # Создание результатов.
+                    if learning_task.type == 'course':
+                        # Забираем материал.
+                        course = learning_task.course
+
+                        # Исключение прав.
+                        remove_perm('view_course', employee, course)
+                        logger.info(f"Право на просмотр курс {course} удалено {employee}.")
+
+            if instance.type == 'material':
+
+                # Забираем объект.
+                material = instance.material
+
+                result = Result.objects.get(
+                    employee=employee,
+                    assignment=assignment,
+                    material=material,
+                    type='material'
+                )
+
+                if Result.objects.filter(
+                        employee=employee,
+                        material=material,
+                        type='material'
+                ).exclude(id=result.id).exists():
+                    logger.info(f"Пропускаем для {material}: есть другое назначение")
+                    return
+
+                # Исключение прав.
+                remove_perm('view_material', employee, material)
+                logger.info(f"Право на просмотр материала {material} удалено {employee}.")
+
+            if instance.type == 'test':
+
+                # Забираем объект.
+                test = instance.test
+
+                result = Result.objects.get(
+                    employee=employee,
+                    assignment=assignment,
+                    test=test,
+                    type='test'
+                )
+
+                if Result.objects.filter(
+                        employee=employee,
+                        test=test,
+                        type='test'
+                ).exclude(id=result.id).exists():
+                    logger.info(f"Пропускаем для {test}: есть другое назначение")
+                    return
+
+                # Исключение прав.
+                remove_perm('view_test', employee, test)
+                logger.info(f"Право на просмотр материала {test} удалено {employee}.")
+
+            if instance.type == 'course':
+
+                # Забираем объект.
+                course = instance.course
+
+                result = Result.objects.get(
+                    employee=employee,
+                    assignment=assignment,
+                    course=course,
+                    type='course'
+                )
+
+                if Result.objects.filter(
+                        employee=employee,
+                        course=course,
+                        type='course'
+                ).exclude(id=result.id).exists():
+                    logger.info(f"Пропускаем для {course}: есть другое назначение")
+                    return
+
+                # Исключение прав.
+                remove_perm('view_course', employee, course)
+                logger.info(f"Право на просмотр материала {course} удалено {employee}.")
 
     # Логирование исключений, если они возникнут.
     except Exception as e:
-        logger.error(f"Ошибка при обработке сигнала delete_assignment_groups для Assignment: {e}", exc_info=True)
+        logger.error(f"Ошибка при обработке сигнала delete_assignment для Assignment: {e}", exc_info=True)
         # Повторный вызов исключения в режиме отладки.
         if settings.DEBUG:
             raise

@@ -212,23 +212,29 @@ class LearningComplexDeleteView(PermissionRequiredMixin, DeleteView):
     # Шаблон.
     template_name = 'learning_complex_delete.html'
 
-    # Перенаправление после валидации формы.
+    # Перенаправление после валидации формы.PermissionListMixin
     def get_success_url(self):
         # Направляем по адресу объектов.
         return reverse('learning_path:learning_complexs')
 
 # Список траекторий программы.
-class LearningComplexPathsView(PreviousPageSetMixinL3, PermissionListMixin, ListView):
-    # Права доступа
-    permission_required = 'learning_path.view_learningcomplexpath'
+class LearningComplexPathsView(PreviousPageSetMixinL3, PermissionRequiredMixin, ListView):
+    # Права доступа.
+    permission_required = 'learning_path.view_learningcomplex'
+    accept_global_perms = True
     # Модель.
     model = LearningComplexPath
     # Поле сортировки.
     ordering = 'position'
     # Шаблон.
     template_name = 'learning_complex_paths.html'
-    # Количество объектов на странице
+    # Количество объектов на странице.
     paginate_by = 3
+
+    # Определяем объект проверки.
+    def get_permission_object(self):
+        learning_complex = LearningComplex.objects.get(pk=self.kwargs.get('pk'))
+        return learning_complex
 
     # Переопределяем выборку вью.
     def get_queryset(self):
@@ -239,20 +245,19 @@ class LearningComplexPathsView(PreviousPageSetMixinL3, PermissionListMixin, List
 
     # Переопределеяем переменные вью.
     def get_context_data(self, **kwargs):
-        # забираем изначальный набор переменных
+        # Забираем изначальный набор переменных.
         context = super().get_context_data(**kwargs)
         # Забираем путь.
-        object = LearningComplex.objects.get(pk=self.kwargs.get('pk'))
+        object = self.get_permission_object()
         # Добавляем во вью.
         context['object'] = object
-
         # Возвращаем новый набор переменных в контролер.
         return context
 
 # Создание траектории.
 class LearningComplexPathCreateView(GPermissionRequiredMixin, CreateView):
     # Права доступа.
-    permission_required = 'learning_path.add_learningcomplexpath'
+    permission_required = 'learning_path.add_learningcomplex'
     # Форма.
     form_class = LearningComplexPathForm
     # Модель.
@@ -260,12 +265,17 @@ class LearningComplexPathCreateView(GPermissionRequiredMixin, CreateView):
     # Шаблон.
     template_name = 'learning_complex_path_edit.html'
 
+    # Определяем объект проверки.
+    def get_permission_object(self):
+        learning_complex = LearningComplex.objects.get(pk=self.kwargs.get('pk'))
+        return learning_complex
+
     # Заполнение полей данными.
     def get_initial(self):
         # Забираем изначальный набор.
         initial = super().get_initial()
         # Добавляем позицию.
-        learning_complex = LearningComplex.objects.get(pk=self.kwargs.get('pk'))
+        learning_complex = self.get_permission_object()
         last_position = learning_complex.learning_complex_paths.order_by('position').values_list('position', flat=True).last()
         if last_position:
             position = last_position + 1
@@ -285,7 +295,7 @@ class LearningComplexPathCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('learning_path:learning_complex', kwargs={'pk': self.object.learning_complex.pk})
 
 # Сортировка траекторий комплексной программы.
-@permission_required('testing.change_learningcomplexpath')
+@permission_required('testing.change_learningcomplex')
 def learning_paths_ordering(request, pk):
 
     #Кверисет.
@@ -328,7 +338,7 @@ def learning_paths_ordering(request, pk):
 # Изменение траектории.
 class LearningComplexPathUpdateView(PermissionRequiredMixin, UpdateView):
     # Права доступа.
-    permission_required = 'learning_path.change_learningcomplexpath'
+    permission_required = 'learning_path.change_learningcomplex'
     accept_global_perms = True
     # Форма.
     form_class = LearningComplexPathForm
@@ -336,6 +346,11 @@ class LearningComplexPathUpdateView(PermissionRequiredMixin, UpdateView):
     model = LearningComplexPath
     # Шаблон.
     template_name = 'learning_complex_path_edit.html'
+
+    # Определяем объект проверки.
+    def get_permission_object(self):
+        learning_complex = self.get_object().learning_complex
+        return learning_complex
 
     # Заполнение полей данными.
     def get_initial(self):
@@ -354,12 +369,17 @@ class LearningComplexPathUpdateView(PermissionRequiredMixin, UpdateView):
 # Удаление траектории.
 class LearningComplexPathDeleteView(PermissionRequiredMixin, DeleteView):
     # Права доступа.
-    permission_required = 'learning_path.delete_learningcomplexpath'
+    permission_required = 'learning_path.delete_learningcomplex'
     accept_global_perms = True
     # Модель.
     model = LearningComplexPath
     # Шаблон.
     template_name = 'learning_complex_path_delete.html'
+
+    # Определяем объект проверки.
+    def get_permission_object(self):
+        learning_complex = self.get_object().learning_complex
+        return learning_complex
 
     # Перенаправление после валидации формы.
     def get_success_url(self):
@@ -368,7 +388,7 @@ class LearningComplexPathDeleteView(PermissionRequiredMixin, DeleteView):
 
 # Список траекторий.
 class LearningPathsView(PreviousPageSetMixinL3, PermissionListMixin, ListView):
-    # Права доступа
+    # Права доступа.
     permission_required = 'learning_path.view_learningpath'
     # Модель.
     model = LearningPath
@@ -376,7 +396,7 @@ class LearningPathsView(PreviousPageSetMixinL3, PermissionListMixin, ListView):
     ordering = 'name'
     # Шаблон.
     template_name = 'learning_paths.html'
-    # Количество объектов на странице
+    # Количество объектов на странице.
     paginate_by = 6
 
     # Переопределяем выборку вью.
@@ -621,9 +641,9 @@ class LearningPathDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('learning_path:learning_paths')
 
 # Список задач.
-class LearningPathTasksView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class LearningPathTasksView(PreviousPageSetMixinL1, PermissionRequiredMixin, ListView):
     # Права доступа
-    permission_required = 'learning_path.view_learningtask'
+    permission_required = 'learning_path.view_learningpath'
     # Модель.
     model = LearningTask
     # Поле сортировки.
@@ -632,6 +652,11 @@ class LearningPathTasksView(PreviousPageSetMixinL1, PermissionListMixin, ListVie
     template_name = 'learning_path_tasks.html'
     # Количество объектов на странице
     paginate_by = 3
+
+    # Определяем объект проверки.
+    def get_permission_object(self):
+        learning_path = LearningPath.objects.get(pk=self.kwargs.get('pk'))
+        return learning_path
 
     # Переопределяем выборку вью.
     def get_queryset(self):
@@ -729,13 +754,18 @@ class LearningPathTasksView(PreviousPageSetMixinL1, PermissionListMixin, ListVie
 # Создание задачи.
 class LearningTaskCreateView(GPermissionRequiredMixin, CreateView):
     # Права доступа.
-    permission_required = 'learning_path.add_task'
+    permission_required = 'learning_path.add_learningpath'
     # Форма.
     form_class = LearningTaskForm
     # Модель.
     model = LearningTask
     # Шаблон.
     template_name = 'learning_task_edit.html'
+
+    # Определяем объект проверки.
+    def get_permission_object(self):
+        learning_path = LearningPath.objects.get(pk=self.kwargs.get('pk'))
+        return learning_path
 
     # Заполнение полей данными.
     def get_initial(self):
@@ -762,7 +792,7 @@ class LearningTaskCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('learning_path:learning_path', kwargs={'pk': self.object.learning_path.pk})
 
 # Сортировка задач траектории.
-@permission_required('testing.change_learningtask')
+@permission_required('testing.change_learningpath')
 def learning_tasks_ordering(request, pk):
 
     #Кверисет.
@@ -804,7 +834,7 @@ def learning_tasks_ordering(request, pk):
 # Изменение задачи.
 class LearningTaskUpdateView(PermissionRequiredMixin, UpdateView):
     # Права доступа.
-    permission_required = 'learning_path.change_learningtask'
+    permission_required = 'learning_path.change_learningpath'
     # Форма.
     form_class = LearningTaskForm
     accept_global_perms = True
@@ -812,6 +842,11 @@ class LearningTaskUpdateView(PermissionRequiredMixin, UpdateView):
     model = LearningTask
     # Шаблон.
     template_name = 'learning_task_edit.html'
+
+    # Определяем объект проверки.
+    def get_permission_object(self):
+        learning_path = self.get_object().learning_path
+        return learning_path
 
     # Заполнение полей данными.
     def get_initial(self):
@@ -830,12 +865,17 @@ class LearningTaskUpdateView(PermissionRequiredMixin, UpdateView):
 # Удаление задач.
 class LearningTaskDeleteView(PermissionRequiredMixin, DeleteView):
     # Права доступа.
-    permission_required = 'learning_path.delete_learningtask'
+    permission_required = 'learning_path.delete_learningpath'
     accept_global_perms = True
     # Модель.
     model = LearningTask
     # Шаблон.
     template_name = 'learning_task_delete.html'
+
+    # Определяем объект проверки.
+    def get_permission_object(self):
+        learning_path = self.get_object().learning_path
+        return learning_path
 
     # Перенаправление после валидации формы.
     def get_success_url(self):

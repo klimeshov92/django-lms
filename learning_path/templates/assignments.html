@@ -41,7 +41,7 @@
             {% for obj in object_list %}
                 <div class="list-grid-item">
                     <div class="list-grid-item-image-container">
-                        {% if obj.learning_complex %}
+                        {% if obj.type == 'learning_complex' %}
                             {% if obj.learning_complex.avatar %}
                                <img src="{{obj.learning_complex.avatar.url}}">
                             {% else %}
@@ -49,9 +49,33 @@
 
                                 </div>
                             {% endif %}
-                        {% else %}
+                        {% elif obj.type == 'learning_path' %}
                             {% if obj.learning_path.avatar %}
                                <img src="{{obj.learning_path.avatar.url}}">
+                            {% else %}
+                                <div class="list-grid-item-image-container-blank">
+
+                                </div>
+                            {% endif %}
+                        {% elif obj.type == 'material' %}
+                            {% if obj.material.avatar %}
+                               <img src="{{obj.material.avatar.url}}">
+                            {% else %}
+                                <div class="list-grid-item-image-container-blank">
+
+                                </div>
+                            {% endif %}
+                        {% elif obj.type == 'test' %}
+                            {% if obj.test.avatar %}
+                               <img src="{{obj.test.avatar.url}}">
+                            {% else %}
+                                <div class="list-grid-item-image-container-blank">
+
+                                </div>
+                            {% endif %}
+                        {% elif obj.type == 'course' %}
+                            {% if obj.course.avatar %}
+                               <img src="{{obj.course.avatar.url}}">
                             {% else %}
                                 <div class="list-grid-item-image-container-blank">
 
@@ -60,10 +84,16 @@
                         {% endif %}
                     </div>
                     <div class="list-grid-item-header">
-                        {% if obj.learning_complex %}
+                        {% if obj.type == 'learning_complex' %}
                             <h3>{{obj.learning_complex.name}}</h3>
-                        {% else %}
+                        {% elif obj.type == 'learning_path' %}
                             <h3>{{obj.learning_path.name}}</h3>
+                        {% elif obj.type == 'material' %}
+                            <h3>{{obj.material.name}}</h3>
+                        {% elif obj.type == 'test' %}
+                            <h3>{{obj.test.name}}</h3>
+                        {% elif obj.type == 'course' %}
+                            <h3>{{obj.course.name}}</h3>
                         {% endif %}
                     </div>
                     <div class="list-grid-item-content">
@@ -76,7 +106,12 @@
                                 {% endfor %}
                             </p>
                         {% endif %}
-                        <p><span class="description-item">Группа:</span> {{obj.group}}</p>
+                        <p><span class="description-item">Участники:</span> {{obj.get_participants_display}}</p>
+                        {% if obj.participants == 'group'  %}
+                            <p><span class="description-item">Группа:</span> {{obj.group}}</p>
+                        {% elif obj.participants == 'employee'  %}
+                            <p><span class="description-item">Сотрудник:</span> {{obj.employee}}</p>
+                        {% endif %}
                         <p><span class="description-item">Дата начала:</span> {{obj.planned_start_date}}</p>
                     </div>
                     <div class="list-grid-item-footer">

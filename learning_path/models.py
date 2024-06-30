@@ -266,8 +266,17 @@ class Assignment(models.Model):
         ('', 'Выберите тип назначения'),
         ('learning_complex', 'Назначение комплексной программы'),
         ('learning_path', 'Назначение траектории обучения'),
+        ('material', 'Материал'),
+        ('course', 'Курс'),
+        ('test', 'Тест'),
     ]
     type = models.CharField(max_length=255, choices=TYPES, default='', verbose_name='Тип')
+    PARTICIPANTS = [
+        ('', 'Выберите участников'),
+        ('employee', 'Сотрудник'),
+        ('group', 'Группа'),
+    ]
+    participants = models.CharField(max_length=255, choices=PARTICIPANTS, default='', verbose_name='Аудитория')
     # Категории.
     categories = models.ManyToManyField(
         Category,
@@ -278,6 +287,16 @@ class Assignment(models.Model):
         db_index=True
     )
     # Контент.
+    learning_complex = models.ForeignKey(
+        LearningComplex,
+        verbose_name='Комплексная программа',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='assignments',
+        related_query_name='assignments',
+        db_index=True
+    )
     learning_path = models.ForeignKey(
         LearningPath,
         verbose_name='Траектория обучения',
@@ -288,9 +307,29 @@ class Assignment(models.Model):
         related_query_name='assignments',
         db_index=True
     )
-    learning_complex = models.ForeignKey(
-        LearningComplex,
-        verbose_name='Комплексная программа',
+    material = models.ForeignKey(
+        Material,
+        verbose_name='Материал',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='assignments',
+        related_query_name='assignments',
+        db_index=True
+    )
+    course = models.ForeignKey(
+        Course,
+        verbose_name='Курс',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='assignments',
+        related_query_name='assignments',
+        db_index=True
+    )
+    test = models.ForeignKey(
+        Test,
+        verbose_name='Тест',
         null=True,
         blank=True,
         on_delete=models.CASCADE,
@@ -311,16 +350,29 @@ class Assignment(models.Model):
         related_name='assignment_creators',
         related_query_name='assignment_creators'
     )
-    # Группа.
+    # Аудитория.
+    employee = models.ForeignKey(
+        Employee,
+        verbose_name='Сотрудник',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name='assignments',
+        related_query_name='assignments'
+    )
     group = models.ForeignKey(
         EmployeesGroup,
         verbose_name='Группа',
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
         related_name='assignments',
         related_query_name='assignments'
     )
     # Планируемая дата начала.
     planned_start_date = models.DateField(auto_now=False, verbose_name='Планируемая дата начала', db_index=True)
+    # Количество дней.
+    duration = models.IntegerField(verbose_name='Длительность (дней)', null=True, blank=True, validators=[MinValueValidator(1)])
     # Сроки обязательны или нет.
     deadlines = models.BooleanField(verbose_name='Соблюдение сроков обязательно', default=False)
     # Описание.
@@ -338,8 +390,8 @@ class Assignment(models.Model):
     # Переназначение.
     REASSIGNMENT = [
         ('', 'Выберите тип переназначения'),
-        ('everyone', 'Каждому'),
-        ('not_passed', 'Не сдавшим'),
+        ('anyway', 'В любом случае'),
+        ('did_not_pass', 'Если не сдал'),
     ]
     reassignment = models.CharField(max_length=255, choices=REASSIGNMENT, default='', verbose_name='Переназначение')
     # Это повтор.
@@ -355,10 +407,20 @@ class Assignment(models.Model):
                 object = self.learning_complex
             if self.type == 'learning_path':
                 object = self.learning_path
+            if self.type == 'material':
+                object = self.material
+            if self.type == 'test':
+                object = self.test
+            if self.type == 'course':
+                object = self.course
+            if self.participants == 'group':
+                participants = self.group
+            if self.participants == 'employee':
+                participants = self.employee
 
-            return f'[{self.id}] {object} для {self.group.name} с {self.planned_start_date.strftime("%d.%m.%Y")}'
-        except (LearningComplex.DoesNotExist, LearningPath.DoesNotExist):
-            return f"[{self.id}] [не найдено] для {self.group.name} с {self.planned_start_date.strftime('%d.%m.%Y')}"
+            return f'[{self.id}] {object} для {participants} с {self.planned_start_date.strftime("%d.%m.%Y")}'
+        except (LearningComplex.DoesNotExist, LearningPath.DoesNotExist, Material.DoesNotExist, Test.DoesNotExist, Course.DoesNotExist):
+            return f"[{self.id}] [не найдено] для {participants} с {self.planned_start_date.strftime('%d.%m.%Y')}"
 
 # Назначение
 class AssignmentRepeat(models.Model):

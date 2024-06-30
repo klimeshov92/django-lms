@@ -53,7 +53,11 @@ def autolearning():
         (Q(course__isnull=False) | Q(test__isnull=False) | Q(material__isnull=False))
         &
         # Планируемая дата завершения которых, была вчера.
-        Q(learning_path_result__planned_end_date__lte=datetime.now().date() - timedelta(days=1))
+        (
+            Q(learning_path_result__planned_end_date__lte=datetime.now().date() - timedelta(days=1))
+            |
+            Q(planned_end_date__lte=datetime.now().date() - timedelta(days=1))
+        )
         &
         # И в которых установлен дедлайн.
         Q(assignment__deadlines=True)
@@ -125,8 +129,12 @@ def autolearning():
                 # Создание назначения.
                 repeat_assignments = Assignment.objects.create(
                     type=assignment.type,
-                    learning_path=assignment.learning_path,
                     learning_complex=assignment.learning_complex,
+                    learning_path=assignment.learning_path,
+                    material=assignment.material,
+                    test=assignment.test,
+                    course=assignment.course,
+                    scorm_package=assignment.course.scorm_package,
                     group=assignment.group,
                     planned_start_date=datetime.now().date(),
                     reassignment=assignment.reassignment,
@@ -155,8 +163,12 @@ def autolearning():
                     # Создание назначения.
                     repeat_assignments = Assignment.objects.create(
                         type=assignment.type,
-                        learning_path=assignment.learning_path,
                         learning_complex=assignment.learning_complex,
+                        learning_path=assignment.learning_path,
+                        material=assignment.material,
+                        test=assignment.test,
+                        course=assignment.course,
+                        scorm_package=assignment.course.scorm_package,
                         group=assignment.group,
                         planned_start_date=datetime.now().date(),
                         reassignment=assignment.reassignment,
@@ -191,8 +203,12 @@ def autolearning():
                     # Создание назначения.
                     repeat_assignments = Assignment.objects.create(
                         type=assignment.type,
-                        learning_path=assignment.learning_path,
                         learning_complex=assignment.learning_complex,
+                        learning_path=assignment.learning_path,
+                        material=assignment.material,
+                        test=assignment.test,
+                        course=assignment.course,
+                        scorm_package=assignment.course.scorm_package,
                         group=assignment.group,
                         planned_start_date=datetime.now().date(),
                         reassignment=assignment.reassignment,

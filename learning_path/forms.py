@@ -7,6 +7,7 @@ from .models import LearningPath, LearningTask, Assignment, Result, LearningComp
 from django_select2.forms import Select2Widget, Select2MultipleWidget
 # Импорт групп и прав
 from django.contrib.auth.models import Group, Permission
+from django.core.exceptions import ValidationError
 
 # Форма создания комплексной программы.
 class LearningComplexForm(forms.ModelForm):
@@ -99,25 +100,70 @@ class AssignmentForm(forms.ModelForm):
         # Поля.
         fields = ['type',
                   'creator',
-                  'learning_path',
                   'learning_complex',
+                  'learning_path',
+                  'material',
+                  'course',
+                  'test',
                   'categories',
+                  'participants',
+                  'employee',
                   'group',
                   'planned_start_date',
+                  'duration',
                   'reassignment',
                   'deadlines',
                   'desc',
         ]
         # Классы виджетов.
         widgets = {
-            'type': forms.Select(attrs={'class': 'type-select-1'}),
             'creator': forms.HiddenInput(),
-            'learning_path': Select2Widget(attrs={'class': 'learning-path-select toggle-field', 'data-show-if-type-1': '["learning_path"]'}),
-            'learning_complex': Select2Widget(attrs={'class': 'learning-complex-select toggle-field', 'data-show-if-type-1': '["learning_complex"]'}),
+            'type': forms.Select(attrs={'class': 'type-select-1'}),
+            'learning_complex': Select2Widget(
+                attrs={'class': 'learning-complex-select toggle-field', 'data-show-if-type-1': '["learning_complex"]'}
+            ),
+            'learning_path': Select2Widget(
+                attrs={'class': 'learning-path-select toggle-field', 'data-show-if-type-1': '["learning_path"]'}
+            ),
+            'material': Select2Widget(
+                attrs={'class': 'material-select toggle-field', 'data-show-if-type-1': '["material"]'}
+            ),
+            'course': Select2Widget(
+                attrs={'class': 'course-select toggle-field', 'data-show-if-type-1': '["course"]'}
+            ),
+            'test': Select2Widget(
+                attrs={'class': 'test-select toggle-field', 'data-show-if-type-1': '["test"]'}
+            ),
             'categories': Select2MultipleWidget(),
-            'group': Select2Widget(),
-            'planned_start_date': forms.DateInput(attrs={'type': 'date'}),
+            'participants': forms.Select(attrs={'class': 'type-select-2'}),
+            'employee': Select2Widget(
+                attrs={'class': 'employee-select toggle-field', 'data-show-if-type-2': '["employee"]'}
+            ),
+            'group': Select2Widget(
+                attrs={'class': 'group-select toggle-field', 'data-show-if-type-2': '["group"]'}
+            ),
+            'planned_start_date': forms.DateInput(
+                attrs={'type': 'date', 'class': 'planned-start-date-select toggle-field', 'data-show-if-type-1': '["learning_complex", "learning_path", "material", "course", "test"]'}
+            ),
+            'duration': forms.NumberInput(
+              attrs={'class': 'duration-select toggle-field', 'data-show-if-type-1': '["material", "course", "test"]'}
+            ),
         }
+
+    # Проверки.
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        # Переменные.
+        employee = cleaned_data.get('employee')
+        group = cleaned_data.get('group')
+
+        # Проверка аудитории.
+        if not employee and not group:
+            raise ValidationError('Нужно выбрать аудиторию')
+
+        return cleaned_data
 
     # Особенность формы для апдейта.
     def __init__(self, *args, **kwargs):

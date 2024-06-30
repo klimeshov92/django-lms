@@ -25,7 +25,7 @@
         {% if object %}
             <div class="detail-content-with-image ">
                 <div class="detail-content-with-image-image-container">
-                    {% if object.learning_complex %}
+                    {% if object.type == 'learning_complex' %}
                         {% if object.learning_complex.avatar %}
                            <img src="{{object.learning_complex.avatar.url}}">
                         {% else %}
@@ -33,9 +33,33 @@
 
                             </div>
                         {% endif %}
-                    {% else %}
+                    {% elif object.type == 'learning_path' %}
                         {% if object.learning_path.avatar %}
                            <img src="{{object.learning_path.avatar.url}}">
+                        {% else %}
+                            <div class="detail-content-with-image-image-container-blank">
+
+                            </div>
+                        {% endif %}
+                    {% elif object.type == 'material' %}
+                        {% if object.material.avatar %}
+                           <img src="{{object.material.avatar.url}}">
+                        {% else %}
+                            <div class="detail-content-with-image-image-container-blank">
+
+                            </div>
+                        {% endif %}
+                    {% elif object.type == 'test' %}
+                        {% if object.test.avatar %}
+                           <img src="{{object.test.avatar.url}}">
+                        {% else %}
+                            <div class="detail-content-with-image-image-container-blank">
+
+                            </div>
+                        {% endif %}
+                    {% elif object.type == 'course' %}
+                        {% if object.course.avatar %}
+                           <img src="{{object.course.avatar.url}}">
                         {% else %}
                             <div class="detail-content-with-image-image-container-blank">
 
@@ -44,10 +68,16 @@
                     {% endif %}
                 </div>
                 <div class="detail-content-with-image-text-container">
-                    {% if object.learning_complex %}
+                    {% if object.type == 'learning_complex' %}
                         <h1>{{object.learning_complex.name}}</h1>
-                    {% else %}
+                    {% elif object.type == 'learning_path' %}
                         <h1>{{object.learning_path.name}}</h1>
+                    {% elif object.type == 'material' %}
+                        <h1>{{object.material.name}}</h1>
+                    {% elif object.type == 'test' %}
+                        <h1>{{object.test.name}}</h1>
+                    {% elif object.type == 'course' %}
+                        <h1>{{object.course.name}}</h1>
                     {% endif %}
                     {% if object.categories.exists  %}
                         <p><span class="description-item">Категории:</span>
@@ -61,7 +91,12 @@
                     <p><span class="description-item">Тип:</span> {{object.get_type_display}}</p>
                     <p><span class="description-item">Назначил:</span> {{object.creator}}</p>
                     <p><span class="description-item">Дата и время создания:</span> {{object.created}}</p>
-                    <p><span class="description-item">Группа:</span> {{object.group}}</p>
+                    <p><span class="description-item">Участники:</span> {{object.get_participants_display}}</p>
+                    {% if object.participants == 'group'  %}
+                        <p><span class="description-item">Группа:</span> {{object.group}}</p>
+                    {% elif object.participants == 'employee'  %}
+                        <p><span class="description-item">Сотрудник:</span> {{object.employee}}</p>
+                    {% endif %}
                     <p><span class="description-item">Дата начала: </span> {{object.planned_start_date}}</p>
                     <p><span class="description-item">Соблюдение сроков обязательно:</span> {{object.deadlines|yesno}}</p>
                     {% if object.desc %}
