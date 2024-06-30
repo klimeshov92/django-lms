@@ -325,19 +325,19 @@ class EmployeesGroupObjectPermissionForm(forms.ModelForm):
         # Определяем перечень прав для выбора.
         if type == 'learning_path':
             content_type = ContentType.objects.get_for_model(LearningPath)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'material':
             content_type = ContentType.objects.get_for_model(Material)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'course':
             content_type = ContentType.objects.get_for_model(Course)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'test':
             content_type = ContentType.objects.get_for_model(Test)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'event':
             content_type = ContentType.objects.get_for_model(Event)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
 
 # Форма создания импорта.
 class EmployeesObjectPermissionForm(forms.ModelForm):
@@ -377,19 +377,19 @@ class EmployeesObjectPermissionForm(forms.ModelForm):
         # Определяем перечень прав для выбора.
         if type == 'learning_path':
             content_type = ContentType.objects.get_for_model(LearningPath)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'material':
             content_type = ContentType.objects.get_for_model(Material)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'course':
             content_type = ContentType.objects.get_for_model(Course)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'test':
             content_type = ContentType.objects.get_for_model(Test)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'event':
             content_type = ContentType.objects.get_for_model(Event)
-            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
 
 
 
