@@ -20,25 +20,25 @@ def context_processor(request):
     ).order_by('-id').values('id')[:1]
 
     latest_materials_results = request.user.results.filter(
-        learning_path=OuterRef('material'),
+        material=OuterRef('material'),
         type='material',
         employee=request.user
     ).order_by('-id').values('id')[:1]
 
     latest_tests_results = request.user.results.filter(
-        learning_path=OuterRef('test'),
+        test=OuterRef('test'),
         type='test',
         employee=request.user
     ).order_by('-id').values('id')[:1]
 
     latest_courses_results = request.user.results.filter(
-        learning_path=OuterRef('course'),
+        course=OuterRef('course'),
         type='course',
         employee=request.user
     ).order_by('-id').values('id')[:1]
 
     latest_events_results = request.user.results.filter(
-        learning_path=OuterRef('event'),
+        event=OuterRef('event'),
         type='event',
         employee=request.user
     ).order_by('-id').values('id')[:1]
