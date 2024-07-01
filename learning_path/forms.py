@@ -172,9 +172,15 @@ class AssignmentForm(forms.ModelForm):
         # Скрываем поле 'type'
         if self.instance and self.instance.pk:
             self.fields['type'].widget = forms.HiddenInput()
-            self.fields['learning_path'].widget = forms.HiddenInput()
             self.fields['learning_complex'].widget = forms.HiddenInput()
+            self.fields['learning_path'].widget = forms.HiddenInput()
+            self.fields['material'].widget = forms.HiddenInput()
+            self.fields['course'].widget = forms.HiddenInput()
+            self.fields['test'].widget = forms.HiddenInput()
+            self.fields['duration'].widget = forms.HiddenInput()
+            self.fields['participants'].widget = forms.HiddenInput()
             self.fields['group'].widget = forms.HiddenInput()
+            self.fields['employee'].widget = forms.HiddenInput()
             self.fields['planned_start_date'].widget = forms.HiddenInput()
             self.fields['reassignment'].widget = forms.HiddenInput()
 
