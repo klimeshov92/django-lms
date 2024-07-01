@@ -1214,7 +1214,7 @@ a.status-button-failed:hover {
 /* Материал */
 .material-content {
     padding: 25px; /* Отступы внутри */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Добавляет тень для эффекта глубины */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Добавляет тень для эффекта глубины */
     border-radius: 25px; /* Радиус скругления границ элементов формы */
     word-wrap: break-word; /* Перенос слов */
     width: 100%; /* Полная ширина родительского элемента */
