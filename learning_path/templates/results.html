@@ -99,14 +99,14 @@
                                                 {% endif %}
                                         {% endif %}
                                     {% else %}
-                                        {% if obj.presence_mark == 'registered' %}
-                                                {{obj.get_presence_mark_display}}
+                                        {% if obj.status == 'registered' %}
+                                                {{obj.get_status_display}}
                                         {% endif %}
-                                        {% if obj.presence_mark == 'present' %}
-                                                {{obj.get_presence_mark_display}}
+                                        {% if obj.status == 'present' %}
+                                                {{obj.get_status_display}}
                                         {% endif %}
-                                        {% if obj.presence_mark == 'refused' or obj.presence_mark == 'absent' %}
-                                                {{obj.get_presence_mark_display}}
+                                        {% if obj.status == 'refused' or obj.status == 'absent' %}
+                                                {{obj.get_status_display}}
                                         {% endif %}
                                     {% endif %}
                                 </td>

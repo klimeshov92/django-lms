@@ -30,14 +30,14 @@
             </div>
             <div class="detail-content">
                 {% if result %}
-                    {% if result.presence_mark == 'registered' %}
-                        <p class="status-big">{{result.get_presence_mark_display}}</p>
+                    {% if result.status == 'registered' %}
+                        <p class="status-big">{{result.get_status_display}}</p>
                     {% endif %}
-                    {% if result.presence_mark == 'present' %}
-                        <p class="status-big status-completed">{{result.get_presence_mark_display}}</p>
+                    {% if result.status == 'present' %}
+                        <p class="status-big status-completed">{{result.get_status_display}}</p>
                     {% endif %}
-                    {% if result.presence_mark == 'refused' or result.presence_mark == 'absent' %}
-                        <p class="status-big status-failed">{{result.get_presence_mark_display}}</p>
+                    {% if result.status == 'refused' or result.status == 'absent' %}
+                        <p class="status-big status-failed">{{result.get_status_display}}</p>
                     {% endif %}
                 {% endif %}
                 <p><span class="description-item">Тип:</span> {{object.get_type_display}}</p>
@@ -94,12 +94,12 @@
                 <nav class="submenu">
                     {% if object.status != 'completed' and object.status != 'canceled' %}
                         {% if result %}
-                            {% if result.presence_mark != 'present' and result.presence_mark != 'absent' %}
-                                {% if result.presence_mark != 'refused' and object.mandatory == False %}
-                                    <a href="{% url 'events:participants_mark' pk=result.id presence_mark='refused' %}">Отказаться от участия</a>
+                            {% if result.status != 'present' and result.status != 'absent' %}
+                                {% if result.status != 'refused' and object.mandatory == False %}
+                                    <a href="{% url 'events:participants_mark' pk=result.id status='refused' %}">Отказаться от участия</a>
                                 {% endif %}
-                                {% if result.presence_mark != 'registered' and result.presence_mark != 'absent' %}
-                                    <a href="{% url 'events:participants_mark' pk=result.id presence_mark='registered' %}">Вернуться к участию</a>
+                                {% if result.status != 'registered' and result.status != 'absent' %}
+                                    <a href="{% url 'events:participants_mark' pk=result.id status='registered' %}">Вернуться к участию</a>
                                 {% endif %}
                             {% endif %}
                         {% else %}
@@ -142,21 +142,21 @@
     <div class="tab-menu-container">
         <nav class="tab-menu">
             <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
-            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Участники [{{qs_count}}]</a>
+            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Участники [ {{qs_count}} ]</a>
             {% if user|perms:"events.change_event" %}
                 {% if object.participants_generator %}
                     <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Настройки</a>
                 {% endif %}
             {% endif %}
-            <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Пересечения [{{intersecting_events_count}}]</a>
+            <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Пересечения [ {{intersecting_events_count}} ]</a>
             {% if user|perms:"reviews.view_review" %}
-                <a href="#tab5" class="tab-menu-link" onclick="openTab(event, 'tab5')">Отзывы [{{reviews_qs_count}}]</a>
+                <a href="#tab5" class="tab-menu-link" onclick="openTab(event, 'tab5')">Отзывы [ {{reviews_qs_count}} ]</a>
             {% endif %}
             {% if user|perms:"core.view_employeesgroupobjectpermission" %}
-                <a href="#tab6" class="tab-menu-link" onclick="openTab(event, 'tab6')">Права групп [{{group_object_permissions_qs_count}}]</a>
+                <a href="#tab6" class="tab-menu-link" onclick="openTab(event, 'tab6')">Права групп [ {{group_object_permissions_qs_count}} ]</a>
             {% endif %}
             {% if user|perms:"core.view_employeesobjectpermission" %}
-                <a href="#tab7" class="tab-menu-link" onclick="openTab(event, 'tab7')">Права сотрудников [{{object_permissions_qs_count}}]</a>
+                <a href="#tab7" class="tab-menu-link" onclick="openTab(event, 'tab7')">Права сотрудников [ {{object_permissions_qs_count}} ]</a>
             {% endif %}
         </nav>
     </div>
@@ -199,13 +199,13 @@
                             {% for obj in object_list %}
                                 <tr>
                                     <td>{{obj.employee}}</td>
-                                    <td>{{obj.get_presence_mark_display}}</td>
+                                    <td>{{obj.get_status_display}}</td>
                                     {% if object.status != 'canceled' and user|perms:"events.change_event" %}
                                         <td>
-                                            {% if obj.presence_mark != 'registered' and obj.presence_mark != 'present'%}
+                                            {% if obj.status != 'registered' and obj.status != 'present'%}
                                                 <p><a href="{% url 'events:responsibles_mark' pk=obj.id status='present' %}">Отметить присутствие</a></p>
                                             {% endif %}
-                                            {% if obj.presence_mark != 'absent' and obj.presence_mark != 'refused' %}
+                                            {% if obj.status != 'absent' and obj.status != 'refused' %}
                                                 <p><a href="{% url 'events:responsibles_mark' pk=obj.id status='absent'%}">Отметить отсутствие</a></p>
                                             {% endif %}
                                         </td>

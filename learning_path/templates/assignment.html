@@ -96,8 +96,9 @@
                         <p><span class="description-item">Сотрудник:</span> {{object.employee}}</p>
                     {% endif %}
                     <p><span class="description-item">Дата начала: </span> {{object.planned_start_date}}</p>
-                    <p><span class="description-item">Повтор:</span> {{object.is_repeat|yesno}}</p>
                     <p><span class="description-item">Соблюдение сроков обязательно:</span> {{object.deadlines|yesno}}</p>
+                    <p><span class="description-item">Переназначение:</span> {{object.get_reassignment_display}}</p>
+                    <p><span class="description-item">Повтор:</span> {{object.is_repeat|yesno}}</p>
                     {% if object.desc %}
                         <p>{{object.desc}}</p>
                     {% endif %}
@@ -131,7 +132,7 @@
     <div class="tab-menu-container">
         <nav class="tab-menu">
             <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
-            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Повторы [{{repeats_count}}]</a>
+            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Повторы [ {{repeats_count}} ]</a>
         </nav>
     </div>
 

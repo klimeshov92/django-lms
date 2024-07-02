@@ -100,7 +100,13 @@
                     <h3>Детали</h3>
                 </div>
                 <div class="content-grid-item-sub-content">
-                    <p>{{object.desc}}</p>
+                    <p>
+                        {% if object.desc %}
+                            {{object.desc}}
+                        {% else %}
+                            Описания нет!
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>

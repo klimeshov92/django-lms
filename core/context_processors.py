@@ -11,8 +11,6 @@ def context_processor(request):
     if not request.user.is_authenticated:
         return {}
 
-    print('залупа')
-
     latest_paths_results = request.user.results.filter(
         learning_path=OuterRef('learning_path'),
         type='learning_path',

@@ -75,7 +75,7 @@
     <div class="tab-menu-container">
         <nav class="tab-menu">
             {% if user|perms:"testing.change_test" %}
-                <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Ответы [{{qs_count}}]</a>
+                <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Ответы [ {{qs_count}} ]</a>
                 <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Настройки</a>
             {% endif %}
         </nav>

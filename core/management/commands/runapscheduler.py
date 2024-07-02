@@ -21,7 +21,7 @@ from materials.models import Material
 from testing.models import Test
 from testing.views import completion_of_test
 from courses.models import Course
-from core.models import GroupsGenerator
+from core.models import GroupsGenerator, Employee
 from events.models import ParticipantsGenerator
 # Импортируем Q-фильтрацию.
 from django.db.models import Q
@@ -39,6 +39,185 @@ logger = logging.getLogger('project')
 # Тест планировщика.
 def test():
     logger.info(f'Тест планировщика: {datetime.now()}')
+
+# Обработка повтора.
+def assignment_treatment(assignments_repeat, assignment, employees):
+
+    if assignment.type == 'learning_complex':
+
+        # Проверка на переназначение.
+        if assignment.reassignment == 'not_completed' and Result.objects.filter(
+                employee__in=employees,
+                learning_complex=assignment.learning_complex,
+                type='learning_complex',
+                status='completed'
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже сдан")
+            return
+        if assignment.reassignment == 'not_appoint' and Result.objects.filter(
+                employee__in=employees,
+                learning_complex=assignment.learning_complex,
+                type='learning_complex'
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже назначен")
+            return
+
+        # Создание назначения.
+        repeat_assignments = Assignment.objects.create(
+            type=assignment.type,
+            learning_complex=assignment.learning_complex,
+            participants=assignment.participants,
+            group=assignment.group,
+            employee=assignment.employee,
+            planned_start_date=datetime.now().date(),
+            reassignment=assignment.reassignment,
+            deadlines=assignment.deadlines,
+            desc=assignment.desc,
+            is_repeat=True,
+        )
+
+    if assignment.type == 'learning_path':
+
+        # Проверка на переназначение.
+        if assignment.reassignment == 'not_completed' and Result.objects.filter(
+                employee__in=employees,
+                learning_path=assignment.learning_path,
+                type='learning_path',
+                status='completed'
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже сдан")
+            return
+        if assignment.reassignment == 'not_appoint' and Result.objects.filter(
+                employee__in=employees,
+                learning_path=assignment.learning_path,
+                type='learning_path'
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже назначен")
+            return
+
+        # Создание назначения.
+        repeat_assignments = Assignment.objects.create(
+            type=assignment.type,
+            learning_complex=assignment.learning_complex,
+            learning_path=assignment.learning_path,
+            participants=assignment.participants,
+            group=assignment.group,
+            employee=assignment.employee,
+            planned_start_date=datetime.now().date(),
+            reassignment=assignment.reassignment,
+            deadlines=assignment.deadlines,
+            desc=assignment.desc,
+            is_repeat=True,
+        )
+
+    if assignment.type == 'material':
+
+        # Проверка на переназначение.
+        if assignment.reassignment == 'not_completed' and Result.objects.filter(
+                employee__in=employees,
+                material=assignment.material,
+                status='completed'
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже сдан")
+            return
+        if assignment.reassignment == 'not_appoint' and Result.objects.filter(
+                employee__in=employees,
+                material=assignment.material
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже назначен")
+            return
+
+        # Создание назначения.
+        repeat_assignments = Assignment.objects.create(
+            type=assignment.type,
+            learning_complex=assignment.learning_complex,
+            learning_path=assignment.learning_path,
+            material=assignment.material,
+            participants=assignment.participants,
+            group=assignment.group,
+            employee=assignment.employee,
+            planned_start_date=datetime.now().date(),
+            duration=assignment.duration,
+            reassignment=assignment.reassignment,
+            deadlines=assignment.deadlines,
+            desc=assignment.desc,
+            is_repeat=True,
+        )
+
+    if assignment.type == 'test':
+
+        # Проверка на переназначение.
+        if assignment.reassignment == 'not_completed' and Result.objects.filter(
+                employee__in=employees,
+                test=test,
+                status='completed'
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже сдан.")
+            return
+        if assignment.reassignment == 'not_appoint' and Result.objects.filter(
+                employee__in=employees,
+                test=test
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже назначен.")
+            return
+
+        # Создание назначения.
+        repeat_assignments = Assignment.objects.create(
+            type=assignment.type,
+            learning_complex=assignment.learning_complex,
+            learning_path=assignment.learning_path,
+            test=assignment.test,
+            participants=assignment.participants,
+            group=assignment.group,
+            employee=assignment.employee,
+            planned_start_date=datetime.now().date(),
+            duration=assignment.duration,
+            reassignment=assignment.reassignment,
+            deadlines=assignment.deadlines,
+            desc=assignment.desc,
+            is_repeat=True,
+        )
+
+    if assignment.type == 'course':
+
+        # Проверка на переназначение.
+        if assignment.reassignment == 'not_completed' and Result.objects.filter(
+                employee__in=employees,
+                course=assignment.course,
+                status='completed'
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже сдан")
+            return
+        if assignment.reassignment == 'not_appoint' and Result.objects.filter(
+                employee__in=employees,
+                course=assignment.course
+        ).exists():
+            logger.info(f"Пропускаем для {assignment.group}: уже назначен")
+            return
+
+        # Создание назначения.
+        repeat_assignments = Assignment.objects.create(
+            type=assignment.type,
+            learning_complex=assignment.learning_complex,
+            learning_path=assignment.learning_path,
+            course=assignment.course,
+            scorm_package=assignment.course.scorm_package,
+            participants=assignment.participants,
+            group=assignment.group,
+            employee=assignment.employee,
+            planned_start_date=datetime.now().date(),
+            duration=assignment.duration,
+            reassignment=assignment.reassignment,
+            deadlines=assignment.deadlines,
+            desc=assignment.desc,
+            is_repeat=True,
+        )
+
+    repeat_assignments.categories.set(assignment.categories.all())
+
+    # Отметка о выполении.
+    assignments_repeat.last_repeats_date = datetime.now().date()
+    assignments_repeat.save()
 
 # Провал обучения по срокам.
 def autolearning():
@@ -117,7 +296,15 @@ def autolearning():
     # Обрабатываем каждое назначение.
     for assignments_repeat in assignments_repeats:
 
+        # Переменные
         assignment = assignments_repeat.assignment
+        if assignment.participants == 'group':
+            group = assignment.group
+            employees = Employee.objects.filter(groups=group, is_active=True).prefetch_related(
+                'results',
+            )
+        if assignment.participants == 'employee':
+            employees = [assignment.employee]
 
         # Пропускаем первый день старта назначения.
         if datetime.now().date() >= assignment.planned_start_date + timedelta(days=1):
@@ -126,98 +313,8 @@ def autolearning():
             if assignments_repeat.type == 'daily':
                 logger.info(f'Обработка и запуск ежедневного назначения: {assignments_repeat}')
 
-                if assignment.type == 'learning_complex':
-
-                    # Создание назначения.
-                    repeat_assignments = Assignment.objects.create(
-                        type=assignment.type,
-                        learning_complex=assignment.learning_complex,
-                        participants=assignment.participants,
-                        group=assignment.group,
-                        employee=assignment.employee,
-                        planned_start_date=datetime.now().date(),
-                        reassignment=assignment.reassignment,
-                        deadlines=assignment.deadlines,
-                        desc=assignment.desc,
-                        is_repeat=True,
-                    )
-
-                if assignment.type == 'learning_path':
-                    # Создание назначения.
-                    repeat_assignments = Assignment.objects.create(
-                        type=assignment.type,
-                        learning_complex=assignment.learning_complex,
-                        learning_path=assignment.learning_path,
-                        participants=assignment.participants,
-                        group=assignment.group,
-                        employee=assignment.employee,
-                        planned_start_date=datetime.now().date(),
-                        reassignment=assignment.reassignment,
-                        deadlines=assignment.deadlines,
-                        desc=assignment.desc,
-                        is_repeat=True,
-                    )
-
-                if assignment.type == 'material':
-                    # Создание назначения.
-                    repeat_assignments = Assignment.objects.create(
-                        type=assignment.type,
-                        learning_complex=assignment.learning_complex,
-                        learning_path=assignment.learning_path,
-                        material=assignment.material,
-                        participants=assignment.participants,
-                        group=assignment.group,
-                        employee=assignment.employee,
-                        planned_start_date=datetime.now().date(),
-                        duration=assignment.duration,
-                        reassignment=assignment.reassignment,
-                        deadlines=assignment.deadlines,
-                        desc=assignment.desc,
-                        is_repeat=True,
-                    )
-
-                if assignment.type == 'test':
-                    # Создание назначения.
-                    repeat_assignments = Assignment.objects.create(
-                        type=assignment.type,
-                        learning_complex=assignment.learning_complex,
-                        learning_path=assignment.learning_path,
-                        test=assignment.test,
-                        participants=assignment.participants,
-                        group=assignment.group,
-                        employee=assignment.employee,
-                        planned_start_date=datetime.now().date(),
-                        duration=assignment.duration,
-                        reassignment=assignment.reassignment,
-                        deadlines=assignment.deadlines,
-                        desc=assignment.desc,
-                        is_repeat=True,
-                    )
-
-                if assignment.type == 'course':
-                    # Создание назначения.
-                    repeat_assignments = Assignment.objects.create(
-                        type=assignment.type,
-                        learning_complex=assignment.learning_complex,
-                        learning_path=assignment.learning_path,
-                        course=assignment.course,
-                        scorm_package=assignment.course.scorm_package,
-                        participants=assignment.participants,
-                        group=assignment.group,
-                        employee=assignment.employee,
-                        planned_start_date=datetime.now().date(),
-                        duration=assignment.duration,
-                        reassignment=assignment.reassignment,
-                        deadlines=assignment.deadlines,
-                        desc=assignment.desc,
-                        is_repeat=True,
-                    )
-
-                repeat_assignments.categories.set(assignment.categories.all())
-
-                # Отметка о выполении.
-                assignments_repeat.last_repeats_date = datetime.now().date()
-                assignments_repeat.save()
+                # Если время пришло - запускаем.
+                assignment_treatment(assignments_repeat, assignment, employees)
 
             # Если повторяется еженедельно.
             if assignments_repeat.type == 'weekly':
@@ -225,103 +322,14 @@ def autolearning():
                 # Получаем день недели из назначения.
                 repeat_day_of_week = assignments_repeat.day_of_week
                 logger.info(f'День недели повтора: {repeat_day_of_week}')
-                # Получаем текущий день недели
+                # Получаем текущий день недели.
                 current_day_of_week = datetime.now().strftime('%A').lower()
                 logger.info(f'Текущий день недели: {current_day_of_week}')
                 if current_day_of_week == repeat_day_of_week:
                     logger.info(f'Запуск: {assignments_repeat}')
 
-                    if assignment.type == 'learning_complex':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    if assignment.type == 'learning_path':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            learning_path=assignment.learning_path,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    if assignment.type == 'material':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            learning_path=assignment.learning_path,
-                            material=assignment.material,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            duration=assignment.duration,
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    if assignment.type == 'test':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            learning_path=assignment.learning_path,
-                            test=assignment.test,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            duration=assignment.duration,
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    if assignment.type == 'course':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            learning_path=assignment.learning_path,
-                            course=assignment.course,
-                            scorm_package=assignment.course.scorm_package,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            duration=assignment.duration,
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    repeat_assignments.categories.set(assignment.categories.all())
-
-                    # Отметка о выполении.
-                    assignments_repeat.last_repeats_date = datetime.now().date()
-                    assignments_repeat.save()
+                    # Если время пришло - запускаем.
+                    assignment_treatment(assignments_repeat, assignment, employees)
 
             # Если повторяется ежемесячно.
             if assignments_repeat.type == 'monthly':
@@ -335,103 +343,14 @@ def autolearning():
                     repeats_date = assignment.planned_start_date + relativedelta(
                         months=assignments_repeat.month_interval)
                     logger.info(f'День месяца повтора (повтора еще не было): {repeats_date}')
-                # Получаем текущий день недели.
+                # Получаем текущий день.
                 current_date = datetime.now().date()
                 logger.info(f'Текущий день месяца: {current_date}')
                 if current_date >= repeats_date:
                     logger.info(f'Запуск: {assignments_repeat}')
 
-                    if assignment.type == 'learning_complex':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    if assignment.type == 'learning_path':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            learning_path=assignment.learning_path,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    if assignment.type == 'material':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            learning_path=assignment.learning_path,
-                            material=assignment.material,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            duration=assignment.duration,
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    if assignment.type == 'test':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            learning_path=assignment.learning_path,
-                            test=assignment.test,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            duration=assignment.duration,
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    if assignment.type == 'course':
-                        # Создание назначения.
-                        repeat_assignments = Assignment.objects.create(
-                            type=assignment.type,
-                            learning_complex=assignment.learning_complex,
-                            learning_path=assignment.learning_path,
-                            course=assignment.course,
-                            scorm_package=assignment.course.scorm_package,
-                            participants=assignment.participants,
-                            group=assignment.group,
-                            employee=assignment.employee,
-                            planned_start_date=datetime.now().date(),
-                            duration=assignment.duration,
-                            reassignment=assignment.reassignment,
-                            deadlines=assignment.deadlines,
-                            desc=assignment.desc,
-                            is_repeat=True,
-                        )
-
-                    repeat_assignments.categories.set(assignment.categories.all())
-
-                    # Отметка о выполении.
-                    assignments_repeat.last_repeats_date = datetime.now().date()
-                    assignments_repeat.save()
+                    # Если время пришло - запускаем.
+                    assignment_treatment(assignments_repeat, assignment, employees)
 
 # Обновление участников мероприятий.
 def partisipiants_update():

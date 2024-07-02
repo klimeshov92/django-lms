@@ -391,7 +391,8 @@ class Assignment(models.Model):
     REASSIGNMENT = [
         ('', 'Выберите тип переназначения'),
         ('anyway', 'В любом случае'),
-        ('did_not_pass', 'Если не сдал'),
+        ('not_completed', 'Если не прошел'),
+        ('not_appoint', 'Если не проходил'),
     ]
     reassignment = models.CharField(max_length=255, choices=REASSIGNMENT, default='', verbose_name='Переназначение')
     # Это повтор.
@@ -539,6 +540,10 @@ class Result(models.Model):
         ('in_progress', 'В процессe'),
         ('completed', 'Пройдено'),
         ('failed', 'Провалено'),
+        ('registered', 'Зарегистрирован'),
+        ('refused', 'Отказался'),
+        ('present', 'Присутствовал'),
+        ('absent', 'Отсутствовал'),
     ]
     status = models.CharField(max_length=255, choices=STATUSES, default='appointed', verbose_name='Статус')
     # Cамоназначение.
@@ -686,15 +691,6 @@ class Result(models.Model):
         related_name='results',
         related_query_name='results'
     )
-    # Присутствия.
-    PRESENCE_MARKS = [
-        ('registered', 'Зарегистрирован'),
-        ('refused', 'Отказался'),
-        ('present', 'Присутствовал'),
-        ('absent', 'Отсутствовал'),
-    ]
-    presence_mark = models.CharField(max_length=255, choices=PRESENCE_MARKS, default='registered', verbose_name='Присутствие')
-
 
     class Meta:
         # Изменение имени модели.
@@ -720,11 +716,7 @@ class Result(models.Model):
         if self.type == 'event':
             object = self.event
         if object:
-            if self.type != 'event':
-                return f'{self.get_type_display()}: {object.name} | {self.employee} | {self.get_status_display()}'
-            else:
-                return f'{self.get_type_display()}: {object.name} | {self.employee} | {self.get_presence_mark_display()}'
-
+            return f'{self.get_type_display()}: {object.name} | {self.employee} | {self.get_status_display()}'
 
 # Результат вопроса.
 class QuestionsResult(models.Model):

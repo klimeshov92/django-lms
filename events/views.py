@@ -71,9 +71,9 @@ class EventsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         # Аннотируем queryset данными из последнего Result
         latest_result = Result.objects.filter(
             event_id=OuterRef('pk'), employee=self.request.user
-        ).order_by('-id').values('presence_mark')[:1]
+        ).order_by('-id').values('status')[:1]
         queryset = queryset.annotate(
-            latest_result_status=Coalesce(Subquery(latest_result.values('presence_mark')), Value('None'))
+            latest_result_status=Coalesce(Subquery(latest_result.values('status')), Value('None'))
         ).order_by('-date', '-start_time')
         # Добавляем модель фильтрации в выборку вью.
         self.filterset = EventFilter(self.request.GET, queryset, request=self.request)
@@ -471,7 +471,7 @@ class ParticipantsGeneratorUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('events:event', kwargs={'pk': self.object.event.pk})
 
 # Отметка отказа.
-def participants_mark(request, pk, presence_mark):
+def participants_mark(request, pk, status):
 
     # Забираем резульат.
     result = Result.objects.get(pk=pk)
@@ -482,14 +482,12 @@ def participants_mark(request, pk, presence_mark):
         return HttpResponseForbidden('Этот не Ваш результат мероприятия!')
 
     # Отмечаем выполнение.
-    if presence_mark == 'refused':
-        result.presence_mark = 'refused'
-        result.status = 'failed'
+    if status == 'refused':
+        result.status = 'refused'
         result.end_date = timezone.now()
         result.save()
-    if presence_mark == 'registered':
-        result.presence_mark = 'registered'
-        result.status = 'appointed'
+    if status == 'registered':
+        result.status = 'registered'
         result.end_date = None
         result.save()
 
@@ -506,13 +504,11 @@ def responsibles_mark(request, pk, status):
 
     # Отмечаем выполнение.
     if status == 'present':
-        result.presence_mark = 'present'
-        result.status = 'completed'
+        result.status = 'present'
         result.end_date = timezone.now()
         result.save()
     if status == 'absent':
-        result.presence_mark = 'absent'
-        result.status = 'failed'
+        result.status = 'absent'
         result.end_date = timezone.now()
         result.save()
 
@@ -546,9 +542,8 @@ def change_status(request, pk, status):
 
         # Отмечаем участие.
         for result in results:
-            if result.presence_mark == 'registered':
-                result.presence_mark = 'present'
-                result.status = 'completed'
+            if result.status == 'registered':
+                result.status = 'present'
                 result.end_date = timezone.now()
                 result.save()
 

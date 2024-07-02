@@ -27,7 +27,7 @@ urlpatterns = [
    # Маршрут отметки ответственного.
    path('<int:pk>/responsibles_mark/<str:status>/', responsibles_mark, name='responsibles_mark'),
    # Маршрут отметок участника.
-   path('<int:pk>/participants_mark/<str:presence_mark>/', participants_mark, name='participants_mark'),
+   path('<int:pk>/participants_mark/<str:status>/', participants_mark, name='participants_mark'),
    # Маршрут смены статуса.
    path('<int:pk>/change_status/<str:status>/', change_status, name='change_status'),
 ]

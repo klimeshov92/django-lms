@@ -43,13 +43,13 @@
                     <div class="list-grid-item-content">
                         {% if obj.latest_result_status %}
                             {% if obj.latest_result_status == 'registered' %}
-                                <p class="status">{{obj.latest_result_status|presence_mark_display}}</p>
+                                <p class="status">{{obj.latest_result_status|status_display}}</p>
                             {% endif %}
                             {% if obj.latest_result_status == 'completed'%}
-                                <p class="status status-completed">{{obj.latest_result_status|presence_mark_display}}</p>
+                                <p class="status status-completed">{{obj.latest_result_status|status_display}}</p>
                             {% endif %}
                             {% if obj.latest_result_status == 'absent' or obj.latest_result_status == 'refused' %}
-                                <p class="status status-failed">{{obj.latest_result_status|presence_mark_display}}</p>
+                                <p class="status status-failed">{{obj.latest_result_status|status_display}}</p>
                             {% endif %}
                         {% endif %}
                         <p><span class="description-item">Тип:</span> {{obj.get_type_display}}</p>

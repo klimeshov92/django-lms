@@ -174,6 +174,7 @@ def update_events_participants(sender, instance, **kwargs):
             # Проверяем результат участника.
             result, created = Result.objects.get_or_create(
                 type='event',
+                status='registered',
                 employee=employee,
                 event=event,
                 defaults=result_defaults,

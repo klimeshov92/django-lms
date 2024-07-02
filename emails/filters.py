@@ -17,8 +17,8 @@ from guardian.shortcuts import get_objects_for_user
 class EmailFilter(FilterSet):
 
     # Фильтрация по типу.
-    presence_mark = ChoiceFilter(
-        field_name='presence_mark',
+    type = ChoiceFilter(
+        field_name='type',
         choices=[
         ('password', 'Пароль'),
         ('assignment', 'Назначение'),

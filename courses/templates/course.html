@@ -125,13 +125,13 @@
         <nav class="tab-menu">
             <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
             {% if user|perms:"reviews.view_review" %}
-                <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Отзывы [{{reviews_qs_count}}]</a>
+                <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Отзывы [ {{reviews_qs_count}} ]</a>
             {% endif %}
             {% if user|perms:"core.view_employeesgroupobjectpermission" %}
-                <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Права групп [{{group_object_permissions_qs_count}}]</a>
+                <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Права групп [ {{group_object_permissions_qs_count}} ]</a>
             {% endif %}
             {% if user|perms:"core.view_employeesobjectpermission" %}
-                <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Права сотрудников [{{object_permissions_qs_count}}]</a>
+                <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Права сотрудников [ {{object_permissions_qs_count}} ]</a>
             {% endif %}
         </nav>
     </div>

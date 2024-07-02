@@ -202,13 +202,6 @@ class ResultFilter(FilterSet):
             ('in_progress', 'В процессе'),
             ('completed', 'Пройдено'),
             ('failed', 'Провалено'),
-        ],
-        widget=Select2Widget,
-    )
-    # Фильтрация по присутствию.
-    presence_mark = ChoiceFilter(
-        field_name='presence_mark',
-        choices=[
             ('registered', 'Зарегистрирован'),
             ('refused', 'Отказался'),
             ('present', 'Присутствовал'),

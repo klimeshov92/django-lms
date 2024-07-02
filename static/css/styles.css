@@ -139,7 +139,7 @@ iframe {
     justify-content: space-between; /* Распределение элементов по краям контейнера */
     align-items: center; /* Выравниваем по центру по высоте */
     background-color: var(--color-primary-rgb); /* Задаем цвет фона шапки */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
 }
 
 /* Стилизуем шапку сайта */
@@ -347,7 +347,7 @@ a.button,
     padding: 10px 15px; /* Вертикальный и горизонтальный отступы кнопки */
     cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
 }
 
 /* Стили кнопок */
@@ -390,7 +390,7 @@ a.button:not(:first-of-type),
     padding: 7px 12px; /* Вертикальный и горизонтальный отступы кнопки */
     cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
 }
 
 /* Стили кнопок */
@@ -450,7 +450,7 @@ a.button-mini,
     padding: 5px 10px; /* Вертикальный и горизонтальный отступы кнопки */
     cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
 }
 
 /* Стили кнопок */
@@ -488,7 +488,7 @@ a.button-mini:not(:first-of-type),
     padding: 2px 7px; /* Вертикальный и горизонтальный отступы кнопки */
     cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
 }
 
 /* Стили кнопок */
@@ -568,7 +568,7 @@ a.informers-grid-item-button {
     text-decoration: none; /* Без подчеркивания */
     cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
 }
 
 /* Информеры */
@@ -673,7 +673,7 @@ a.informers-grid-item-button-failed:focus {
     background: white; /* Фон белый */
     border-radius: 25px; /* Скругленные углы */
     overflow: hidden; /* Скрываем выходящее за границы */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
     display: flex; /* Flexbox */
     flex-direction: column; /* Колонки */
@@ -739,7 +739,7 @@ a.informers-grid-item-button-failed:focus {
     background: white; /* Фон белый */
     border-radius: 15px; /* Скругленные углы */
     overflow: hidden; /* Скрываем выходящее за границы */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
     display: flex; /* Flexbox */
     flex-direction: column /* Колонки */
@@ -809,7 +809,7 @@ a.informers-grid-item-button-failed:focus {
     background: white; /* Фон белый */
     border-radius: 15px; /* Скругленные углы */
     overflow: hidden; /* Скрываем выходящее за границы */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
     display: flex; /* Flexbox */
     flex-direction: column; /* Колонки */
@@ -1118,7 +1118,7 @@ a.status-button {
     text-decoration: none; /* Без подчеркивания */
     cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
     display: block; /* Блочное отображение */
 }
 
@@ -1132,7 +1132,7 @@ a.status-button-big {
     text-decoration: none; /* Без подчеркивания */
     cursor: pointer; /* Курсор в виде указателя при наведении на кнопку */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
     display: block; /* Блочное отображение */
     font-size: 1.1rem; /* Размер шрифта */
 }
@@ -1214,7 +1214,7 @@ a.status-button-failed:hover {
 /* Материал */
 .material-content {
     padding: 25px; /* Отступы внутри */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Добавляет тень для эффекта глубины */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавляет тень для эффекта глубины */
     border-radius: 25px; /* Радиус скругления границ элементов формы */
     word-wrap: break-word; /* Перенос слов */
     width: 100%; /* Полная ширина родительского элемента */
@@ -1526,7 +1526,7 @@ label[for$="clear_id"] {
     background: white; /* Фон белый */
     border-radius: 25px; /* Скругленные углы */
     overflow: hidden; /* Скрываем выходящее за границы */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
     display: flex; /* Flexbox */
     flex-direction: column; /* Колонки */
@@ -1563,7 +1563,7 @@ label[for$="clear_id"] {
     background: white; /* Фон белый */
     border-radius: 25px; /* Скругленные углы */
     overflow: hidden; /* Скрываем выходящее за границы */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
     display: flex; /* Flexbox */
     flex-direction: column; /* Колонки */
@@ -1660,7 +1660,7 @@ label[for$="clear_id"] {
     background: white; /* Фон белый */
     border-radius: 25px; /* Скругленные углы */
     overflow: hidden; /* Скрываем выходящее за границы */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Тени */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тени */
     transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
     display: flex; /* Flexbox */
     flex-direction: column; /* Колонки */

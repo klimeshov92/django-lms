@@ -28,13 +28,20 @@ def create_learning_results(sender, instance, created, **kwargs):
         logger.info(f"Назначение комплексной программы {learning_complex} для {employee}.")
 
         # Проверка на переназначение.
-        if reassignment == 'did_not_pass' and Result.objects.filter(
+        if reassignment == 'not_completed' and Result.objects.filter(
             employee=employee,
             learning_complex=learning_complex,
             type='learning_complex',
             status='completed'
         ).exists():
             logger.info(f"Пропускаем для {employee}: уже сдан")
+            return
+        if reassignment == 'not_appoint' and Result.objects.filter(
+            employee=employee,
+            learning_complex=learning_complex,
+            type='learning_complex'
+        ).exists():
+            logger.info(f"Пропускаем для {employee}: уже назначен")
             return
 
         # Создание объекта результата для учебного пути.
@@ -60,13 +67,20 @@ def create_learning_results(sender, instance, created, **kwargs):
             logger.info(f"Назначение учебной траектории {learning_path} для {employee}.")
 
             # Проверка на переназначение.
-            if reassignment == 'did_not_pass' and Result.objects.filter(
+            if reassignment == 'not_completed' and Result.objects.filter(
                 employee=employee,
                 learning_path=learning_path,
                 type='learning_path',
                 status='completed'
             ).exists():
                 logger.info(f"Пропускаем для {employee}: уже сдан")
+                continue
+            if reassignment == 'not_appoint' and Result.objects.filter(
+                employee=employee,
+                learning_path=learning_path,
+                type='learning_path'
+            ).exists():
+                logger.info(f"Пропускаем для {employee}: уже назначен")
                 continue
 
             # Создание объекта результата для учебной траектории.
@@ -91,7 +105,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                     material = learning_task.material
 
                     # Проверка на переназначение.
-                    if reassignment == 'did_not_pass' and Result.objects.filter(
+                    if reassignment == 'not_completed' and Result.objects.filter(
                             employee=employee,
                             material=material,
                             status='completed'
@@ -101,6 +115,12 @@ def create_learning_results(sender, instance, created, **kwargs):
                             learning_path_result.completed_control_tasks +=1
                             learning_path_result.save()
                             logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
+                        continue
+                    if reassignment == 'not_appoint' and Result.objects.filter(
+                            employee=employee,
+                            material=material
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже назначен")
                         continue
 
                     # Создание объекта результата для задачи.
@@ -121,7 +141,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                     test = learning_task.test
 
                     # Проверка на переназначение.
-                    if reassignment == 'did_not_pass' and Result.objects.filter(
+                    if reassignment == 'not_completed' and Result.objects.filter(
                             employee=employee,
                             test=test,
                             status='completed'
@@ -131,6 +151,12 @@ def create_learning_results(sender, instance, created, **kwargs):
                             learning_path_result.completed_control_tasks +=1
                             learning_path_result.save()
                             logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
+                        continue
+                    if reassignment == 'not_appoint' and Result.objects.filter(
+                            employee=employee,
+                            test=test
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже назначен.")
                         continue
 
                     # Создание объекта результата для задачи.
@@ -151,7 +177,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                     course = learning_task.course
 
                     # Проверка на переназначение.
-                    if reassignment == 'did_not_pass' and Result.objects.filter(
+                    if reassignment == 'not_completed' and Result.objects.filter(
                             employee=employee,
                             course=course,
                             status='completed'
@@ -161,6 +187,12 @@ def create_learning_results(sender, instance, created, **kwargs):
                             learning_path_result.completed_control_tasks +=1
                             learning_path_result.save()
                             logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
+                        continue
+                    if reassignment == 'not_appoint' and Result.objects.filter(
+                            employee=employee,
+                            course=course
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже назначен")
                         continue
 
                     # Создание объекта результата для задачи.
@@ -185,13 +217,20 @@ def create_learning_results(sender, instance, created, **kwargs):
         logger.info(f"Назначение учебной траектории {learning_path} для {employee}.")
 
         # Проверка на переназначение.
-        if reassignment == 'did_not_pass' and Result.objects.filter(
+        if reassignment == 'not_completed' and Result.objects.filter(
             employee=employee,
             learning_path=learning_path,
             type='learning_path',
             status='completed'
         ).exists():
             logger.info(f"Пропускаем для {employee}: уже сдан")
+            return
+        if reassignment == 'not_appoint' and Result.objects.filter(
+            employee=employee,
+            learning_path=learning_path,
+            type='learning_path'
+        ).exists():
+            logger.info(f"Пропускаем для {employee}: уже назначен")
             return
 
         # Создание объекта результата для учебной траектории.
@@ -214,7 +253,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                 material = learning_task.material
 
                 # Проверка на переназначение.
-                if reassignment == 'did_not_pass' and Result.objects.filter(
+                if reassignment == 'not_completed' and Result.objects.filter(
                         employee=employee,
                         material=material,
                         status='completed'
@@ -224,6 +263,12 @@ def create_learning_results(sender, instance, created, **kwargs):
                         learning_path_result.completed_control_tasks += 1
                         learning_path_result.save()
                         logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
+                    continue
+                if reassignment == 'not_appoint' and Result.objects.filter(
+                        employee=employee,
+                        material=material
+                ).exists():
+                    logger.info(f"Пропускаем для {employee}: уже назначен")
                     continue
 
                 # Создание объекта результата для задачи.
@@ -244,7 +289,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                 test = learning_task.test
 
                 # Проверка на переназначение.
-                if reassignment == 'did_not_pass' and Result.objects.filter(
+                if reassignment == 'not_completed' and Result.objects.filter(
                         employee=employee,
                         test=test,
                         status='completed'
@@ -254,6 +299,12 @@ def create_learning_results(sender, instance, created, **kwargs):
                         learning_path_result.completed_control_tasks += 1
                         learning_path_result.save()
                         logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
+                    continue
+                if reassignment == 'not_appoint' and Result.objects.filter(
+                        employee=employee,
+                        test=test
+                ).exists():
+                    logger.info(f"Пропускаем для {employee}: уже назначен.")
                     continue
 
                 # Создание объекта результата для задачи.
@@ -274,7 +325,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                 course = learning_task.course
 
                 # Проверка на переназначение.
-                if reassignment == 'did_not_pass' and Result.objects.filter(
+                if reassignment == 'not_completed' and Result.objects.filter(
                         employee=employee,
                         course=course,
                         status='completed'
@@ -284,6 +335,12 @@ def create_learning_results(sender, instance, created, **kwargs):
                         learning_path_result.completed_control_tasks += 1
                         learning_path_result.save()
                         logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
+                    continue
+                if reassignment == 'not_appoint' and Result.objects.filter(
+                        employee=employee,
+                        course=course
+                ).exists():
+                    logger.info(f"Пропускаем для {employee}: уже назначен")
                     continue
 
                 # Создание объекта результата для задачи.
@@ -705,12 +762,18 @@ def create_learning_results(sender, instance, created, **kwargs):
                         for employee in employees_chunk:
 
                             # Проверка на переназначение.
-                            if reassignment == 'did_not_pass' and Result.objects.filter(
+                            if reassignment == 'not_completed' and Result.objects.filter(
                                     employee=employee,
                                     material=material,
                                     status='completed'
                             ).exists():
                                 logger.info(f"Пропускаем для {employee}: уже сдан")
+                                continue
+                            if reassignment == 'not_appoint' and Result.objects.filter(
+                                    employee=employee,
+                                    material=material
+                            ).exists():
+                                logger.info(f"Пропускаем для {employee}: уже назначен")
                                 continue
 
                             # Создание объекта результата для задачи.
@@ -731,12 +794,17 @@ def create_learning_results(sender, instance, created, **kwargs):
                 if instance.participants == 'employee':
 
                     # Проверка на переназначение.
-                    if reassignment == 'did_not_pass' and Result.objects.filter(
+                    if reassignment == 'not_completed' and Result.objects.filter(
                             employee=employee,
                             material=material,
                             status='completed'
                     ).exists():
                         logger.info(f"Пропускаем для {employee}: уже сдан")
+                    if reassignment == 'not_appoint' and Result.objects.filter(
+                            employee=employee,
+                            material=material
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже назначен")
 
                     # Создание объекта результата для задачи.
                     material_result = Result.objects.create(
@@ -767,12 +835,18 @@ def create_learning_results(sender, instance, created, **kwargs):
                         for employee in employees_chunk:
 
                             # Проверка на переназначение.
-                            if reassignment == 'did_not_pass' and Result.objects.filter(
+                            if reassignment == 'not_completed' and Result.objects.filter(
                                     employee=employee,
                                     test=test,
                                     status='completed'
                             ).exists():
                                 logger.info(f"Пропускаем для {employee}: уже сдан")
+                                continue
+                            if reassignment == 'not_appoint' and Result.objects.filter(
+                                    employee=employee,
+                                    test=test
+                            ).exists():
+                                logger.info(f"Пропускаем для {employee}: уже назначен")
                                 continue
 
                             # Создание объекта результата для задачи.
@@ -794,12 +868,17 @@ def create_learning_results(sender, instance, created, **kwargs):
                 if instance.participants == 'employee':
 
                     # Проверка на переназначение.
-                    if reassignment == 'did_not_pass' and Result.objects.filter(
+                    if reassignment == 'not_completed' and Result.objects.filter(
                             employee=employee,
                             test=test,
                             status='completed'
                     ).exists():
                         logger.info(f"Пропускаем для {employee}: уже сдан")
+                    if reassignment == 'not_appoint' and Result.objects.filter(
+                            employee=employee,
+                            test=test
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже назначен")
 
                     # Создание объекта результата для задачи.
                     test_result = Result.objects.create(
@@ -830,12 +909,18 @@ def create_learning_results(sender, instance, created, **kwargs):
                         for employee in employees_chunk:
 
                             # Проверка на переназначение.
-                            if reassignment == 'did_not_pass' and Result.objects.filter(
+                            if reassignment == 'not_completed' and Result.objects.filter(
                                     employee=employee,
                                     course=course,
                                     status='completed'
                             ).exists():
                                 logger.info(f"Пропускаем для {employee}: уже сдан")
+                                continue
+                            if reassignment == 'not_appoint' and Result.objects.filter(
+                                    employee=employee,
+                                    course=course
+                            ).exists():
+                                logger.info(f"Пропускаем для {employee}: уже назначен")
                                 continue
 
                             # Создание объекта результата для задачи.
@@ -857,12 +942,17 @@ def create_learning_results(sender, instance, created, **kwargs):
                 if instance.participants == 'employee':
 
                     # Проверка на переназначение.
-                    if reassignment == 'did_not_pass' and Result.objects.filter(
+                    if reassignment == 'not_completed' and Result.objects.filter(
                             employee=employee,
                             course=course,
                             status='completed'
                     ).exists():
                         logger.info(f"Пропускаем для {employee}: уже сдан")
+                    if reassignment == 'not_appoint' and Result.objects.filter(
+                            employee=employee,
+                            course=course
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже назначен")
 
                     # Создание объекта результата для задачи.
                     course_result = Result.objects.create(
@@ -1335,7 +1425,7 @@ def create_results_transaction(sender, instance, created, **kwargs):
                         logger.info(f"Обновлена транзакция {transaction}")
 
             # Если мероприятие пройдено.
-            if instance.presence_mark == 'present':
+            if instance.status == 'present':
 
                 # Создаем или обновляем транзакцию.
                 transaction, created = Transaction.objects.get_or_create(

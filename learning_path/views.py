@@ -1361,7 +1361,7 @@ class ResultsView(PreviousPageSetMixinL1, ListView):
                        str(result.event) if result.event else ''))),
                     result.planned_end_date.strftime('%d.%m.%Y') if result.planned_end_date else None,
                     result.end_date.strftime('%d.%m.%Y %H:%M') if result.end_date else None,
-                    result.get_status_display() if not result.event else result.get_presence_mark_display(),
+                    result.get_status_display() if not result.event else result.get_status_display(),
                     str(result.score_scaled) if result.score_scaled else '',
                 ]
 

@@ -42,24 +42,13 @@ def status_display(value):
         'appointed': 'Назначено',
         'in_progress': 'В процессe',
         'completed': 'Пройдено',
-        'failed': 'Провалено'
+        'failed': 'Провалено',
+        'registered': 'Зарегистрирован',
+        'refused': 'Отказался',
+        'present': 'Присутствовал',
+        'absent': 'Отсутствовал'
     }
 
     # Возвращаем если оно есть.
     return status_dict.get(value, value)
-
-# Проверка присутствия.
-@register.filter(name='presence_mark_display')
-def presence_mark_display(value):
-
-    # Определяем значение.
-    presence_mark_dict = {
-        'registered': 'Зарегистрирован',
-        'refused': 'Отказался',
-        'present': 'Присутствовал',
-        'absent': 'Отсутствовал',
-    }
-
-    # Возвращаем если оно есть.
-    return presence_mark_dict.get(value, value)
 
