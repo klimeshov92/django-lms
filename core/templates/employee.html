@@ -98,10 +98,10 @@
 
     <div class="tab-menu-container">
         <nav class="tab-menu">
-            <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Должности сотрудника [ {{qs_count}} ]</a>
-            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Глобальные права [ {{global_permissions_qs_count}} ]</a>
+            <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Должности сотрудника [{{qs_count}}]</a>
+            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Глобальные права [{{global_permissions_qs_count}}]</a>
             {% if user|perms:"core.view_employeesobjectpermission" %}
-                <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Объектные права [ {{object_permissions_qs_count}} ]</a>
+                <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Объектные права [{{object_permissions_qs_count}}]</a>
             {% endif %}
         </nav>
     </div>

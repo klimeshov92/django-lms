@@ -55,12 +55,12 @@
         {% endif %}
 
         {% if user|perms:"events.view_event" %}
-            <a href="{% url 'events:events' %}">Мероприятия ( {{active_events_count}} )</a>
+            <a href="{% url 'events:events' %}">Мероприятия ({{active_events_count}})</a>
 
         {% endif %}
 
         {% if user|perms:"learning_path.view_learningpath" %}
-            <a href="{% url 'learning_path:learning_paths' %}">Траектории обучения ( {{active_paths_count}} )</a>
+            <a href="{% url 'learning_path:learning_paths' %}">Траектории обучения ({{active_paths_count}})</a>
         {% endif %}
 
         {% if user|perms:"learning_path.view_learningcomplex" %}
@@ -68,15 +68,15 @@
         {% endif %}
 
         {% if user|perms:"materials.view_material" %}
-            <a href="{% url 'materials:materials' %}">Материалы ( {{active_materials_count}} )</a>
+            <a href="{% url 'materials:materials' %}">Материалы ({{active_materials_count}})</a>
         {% endif %}
 
         {% if user|perms:"courses.view_course" %}
-            <a href="{% url 'courses:courses' %}">Курсы ( {{active_courses_count}} )</a>
+            <a href="{% url 'courses:courses' %}">Курсы ({{active_courses_count}})</a>
         {% endif %}
 
         {% if user|perms:"testing.view_test" %}
-            <a href="{% url 'testing:tests' %}">Тесты ( {{active_tests_count}} )</a>
+            <a href="{% url 'testing:tests' %}">Тесты ({{active_tests_count}})</a>
         {% endif %}
 
         {% if user|perms:"testing.view_question" %}

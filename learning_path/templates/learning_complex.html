@@ -78,7 +78,7 @@
         <nav class="tab-menu">
             <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
             {% if user|perms:"learning_path.change_learningcomplex" %}
-                <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Траектории обучения [ {{qs_count}} ]</a>
+                <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Траектории обучения [{{qs_count}}]</a>
             {% endif %}
         </nav>
     </div>

@@ -142,21 +142,21 @@
     <div class="tab-menu-container">
         <nav class="tab-menu">
             <a href="#tab1" class="tab-menu-link" onclick="openTab(event, 'tab1')">Описание</a>
-            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Участники [ {{qs_count}} ]</a>
+            <a href="#tab2" class="tab-menu-link" onclick="openTab(event, 'tab2')">Участники [{{qs_count}}]</a>
             {% if user|perms:"events.change_event" %}
                 {% if object.participants_generator %}
                     <a href="#tab3" class="tab-menu-link" onclick="openTab(event, 'tab3')">Настройки</a>
                 {% endif %}
             {% endif %}
-            <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Пересечения [ {{intersecting_events_count}} ]</a>
+            <a href="#tab4" class="tab-menu-link" onclick="openTab(event, 'tab4')">Пересечения [{{intersecting_events_count}}]</a>
             {% if user|perms:"reviews.view_review" %}
-                <a href="#tab5" class="tab-menu-link" onclick="openTab(event, 'tab5')">Отзывы [ {{reviews_qs_count}} ]</a>
+                <a href="#tab5" class="tab-menu-link" onclick="openTab(event, 'tab5')">Отзывы [{{reviews_qs_count}}]</a>
             {% endif %}
             {% if user|perms:"core.view_employeesgroupobjectpermission" %}
-                <a href="#tab6" class="tab-menu-link" onclick="openTab(event, 'tab6')">Права групп [ {{group_object_permissions_qs_count}} ]</a>
+                <a href="#tab6" class="tab-menu-link" onclick="openTab(event, 'tab6')">Права групп [{{group_object_permissions_qs_count}}]</a>
             {% endif %}
             {% if user|perms:"core.view_employeesobjectpermission" %}
-                <a href="#tab7" class="tab-menu-link" onclick="openTab(event, 'tab7')">Права сотрудников [ {{object_permissions_qs_count}} ]</a>
+                <a href="#tab7" class="tab-menu-link" onclick="openTab(event, 'tab7')">Права сотрудников [{{object_permissions_qs_count}}]</a>
             {% endif %}
         </nav>
     </div>
