@@ -14,6 +14,7 @@ from courses.models import Course
 from testing.models import Test
 from events.models import Event
 from learning_path.models import LearningPath
+from django.contrib.auth.forms import UserCreationForm
 
 
 # Форма сотрудника.
@@ -392,4 +393,10 @@ class EmployeesObjectPermissionForm(forms.ModelForm):
             self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
 
 
+class SignUpForm(UserCreationForm):
+
+
+    class Meta:
+        model = Employee
+        fields = ('username', 'email', 'password1', 'password2')
 
