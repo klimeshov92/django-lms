@@ -16,6 +16,7 @@ from django.contrib.auth.hashers import make_password
 # Импортируем функцию get_random_string из модуля utils.crypto.
 from django.utils.crypto import get_random_string
 from datetime import datetime, timedelta
+from datetime import date
 
 # Импортируем логи.
 import logging
@@ -180,7 +181,7 @@ def employees_post_save(sender, instance, created, **kwargs):
             return
 
         # Действия для только что созданных сотрудников.
-        if created:
+        if created and not instance.self_registration:
             # Установка случайного пароля для новых сотрудников.
             random_password = get_random_string(length=8)
             instance.set_password(random_password)

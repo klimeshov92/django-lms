@@ -52,15 +52,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
     # Метод создания.
     def create(self, validated_data):
 
-        # Генерация случайного пароля.
-        random_password = get_random_string(length=8)
-
         # Создание сотрудника.
         employee = Employee.objects.create(**validated_data)
-
-        # Установка хешированного пароля.
-        employee.set_password(random_password)
-        logger.info(f"Добавлен сотрудник: {employee}")
 
         # Добавление сотрудника в группу, связанную с его импортом API.
         current_date = str(date.today().strftime('%d.%m.%Y'))

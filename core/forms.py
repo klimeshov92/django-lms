@@ -417,8 +417,13 @@ class SignUpForm(UserCreationForm):
             'password1',
             'password2',
             'agree_to_privacy_policy',
-            'agree_to_data_processing'
+            'agree_to_data_processing',
+            'self_registration'
         )
+        # Классы виджетов.
+        widgets = {
+            'self_registration': forms.HiddenInput()
+        }
 
     # Подкрашивание обязательных полей.
     def __init__(self, *args, **kwargs):

@@ -58,6 +58,8 @@ class Employee(AbstractUser):
         related_name='employees_creators',
         related_query_name='employees_creators'
     )
+    # Cамоназначение.
+    self_registration = models.BooleanField(verbose_name='Саморегистрация', default=False)
 
     class Meta:
         # Изменение имени модели.

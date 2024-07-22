@@ -2311,12 +2311,20 @@ def signup_view(request):
         form = SignUpForm(request.POST)
         # Проверяем, валидна ли форма.
         if form.is_valid():
+
             # Сохраняем пользователя, но не сохраняем его в базе данных сразу.
             user = form.save(commit=False)
             # Деактивируем пользователя до подтверждения по почте.
             user.is_active = False
+            # Проставляем саморегистрацию
+            user.self_registration = True
             # Сохраняем пользователя в базе данных.
             user.save()
+
+            # Добавление сотрудника в группу.
+            manager_group, _ = EmployeesGroup.objects.get_or_create(name='SelfRegistration', type='system')
+            manager_group.user_set.add(user)
+
             # Получаем текущий сайт (домен).
             current_site = get_current_site(request)
             # Тема письма.
@@ -2339,6 +2347,7 @@ def signup_view(request):
             except Exception as e:
                 logger.error(f"Error sending email: {e}")
             return render(request, 'registration/activation_sent.html')
+
     else:
         # Если запрос не POST, создаем пустую форму.
         form = SignUpForm()
