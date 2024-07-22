@@ -243,7 +243,7 @@ footer {
     flex-wrap: wrap; /* Разрешаем элементам обтекать */
     align-items: start; /* Выравниваем по вертикали */
     justify-content: start; /* Выравниваем по горизонтали */
-    text-align: center; /* Текст по центру */
+    text-align: left; /* Текст по центру */
     width: 100% !important; /* Ширина */
 }
 
