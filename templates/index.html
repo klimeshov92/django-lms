@@ -37,7 +37,7 @@
                 {% if is_area %}
                     {{request.user.username}}
                 {% else %}
-                    <a href="{% url 'core:personal_area' pk=request.user.pk %}">{{request.user.username}}</a>
+                    <a href="{% url 'core:personal_area' %}">{{request.user.username}}</a>
                 {% endif %}
             {% else %}
                 Пользователь не авторизован!
@@ -138,8 +138,19 @@
     </nav>
 
     {# Подключение контента #}
-    {% block content %}
-    {% endblock content %}
+    <main>
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    {# Подвал #}
+    <footer>
+        <nav class="footer-menu">
+            <a href="{% url 'core:contacts' %}">Контакты</a>
+            <a href="{% url 'core:privacy_policy' %}">Политика конфиденциальности</a>
+            <a href="{% url 'core:data_processing' %}">Политика в области обработки персональных данных</a>
+        </nav>
+    </footer>
 
     {# Подключение скриптов для медиа форм #}
     {{ form.media.js }}

@@ -6,58 +6,39 @@ from django.shortcuts import render
 
 # Create your views here.
 
-# Импорт настроек.
 from django.conf import settings
-# Импорт моделей вью.
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-# Импорт моделей ядра.
 from .models import LearningPath, LearningTask, Assignment, Result, LearningComplex, LearningComplexPath, AssignmentRepeat
-# Импорт модели фильтров.
 from .filters import LearningPathFilter, AssignmentFilter, ResultFilter, LearningComplexFilter
-# Импорт форм.
 from .forms import LearningPathForm, LearningTaskForm, AssignmentForm, LearningComplexForm, LearningComplexPathForm, AssignmentRepeatForm
-# Импорт пандас.
 import pandas as pd
-# Импорт рендера, перенаправления, генерации адреса и других урл функций.
 from django.shortcuts import render, redirect, reverse, get_object_or_404
-# Импорт простого ответа.
 from django.http import HttpResponse, JsonResponse
-# Проверка прав доступа для классов.
 from guardian.mixins import PermissionListMixin
 from guardian.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin as GPermissionRequiredMixin
-# Импорт моделей
 from materials.models import Material
 from courses.models import Course
 from testing.models import Test
 from events.models import Event
 from core.models import Subdivision, Employee, Placement
-# Сабквери.
 from django.db.models import OuterRef, Subquery, BooleanField, Count, IntegerField
 from django.db.models.functions import Coalesce
 from django.db.models import F
 from django.db.models import Case, When, Value
 from django.db import models
-# импорт Q
 from django.db.models import Q
-# Ответы.
 from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse
-# Система и экспорт.
 import sys
 import io
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Side
 from datetime import datetime
-# Импорт суммирования значений.
 from django.db.models import Sum
-# Импорт декораторов проверки прав.
 from django.contrib.auth.decorators import permission_required, login_required
-# Импорт формсета.
 from django.forms import modelformset_factory
 from django.forms.formsets import ORDERING_FIELD_NAME
-# Импорт форм.
 from django import forms
-# Миксины.
 from core.mixins import PreviousPageGetMixinL1, PreviousPageSetMixinL1, \
     PreviousPageGetMixinL2, PreviousPageSetMixinL2, \
     PreviousPageGetMixinL3, PreviousPageSetMixinL3, \
@@ -70,6 +51,9 @@ from reviews.filters import ObjectsReviewFilter
 from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
 from core.filters import EmployeesGroupObjectPermissionFilter, EmployeesObjectPermissionFilter
+from datetime import timedelta
+from datetime import date
+from django.contrib.auth.decorators import login_required
 
 # Импортируем логи
 import logging
@@ -1102,9 +1086,127 @@ class AssignmentRepeatDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('learning_path:assignment', kwargs={'pk': self.object.assignment.pk})
 
 # Самоназначение.
+@login_required
 def self_appointment(request, pk, type):
 
     appoint = True
+
+    # Если траектория.
+    if type == 'learning_path':
+
+        # Забираем.
+        learning_path = LearningPath.objects.get(pk=pk)
+
+        # Если нельзя назначить.
+        if not learning_path.self_appointment:
+            return HttpResponseForbidden('Эту траекторию нельзя назначить самому!')
+
+        # Если результаты есть.
+        if Result.objects.filter(employee=request.user, type='learning_path', learning_path=learning_path).exists():
+            last_result = Result.objects.filter(employee=request.user, type='learning_path', learning_path=learning_path).latest('id')
+
+            # Если уже идет.
+            if last_result.status == 'appointed' or last_result.status == 'in_progress':
+                appoint = False
+                if settings.DEBUG:
+                    logger.info(f"Существующий последний результат: {last_result}")
+                return HttpResponseForbidden('Вы уже обучаетесь! Перейдите в меню.')
+
+        # Если результата нет.
+        if appoint == True:
+
+            logger.info(f"Назначение учебной траектории {learning_path} для {request.user}.")
+
+            # Создание объекта результата для учебной траектории.
+            learning_path_result = Result.objects.create(
+                learning_path=learning_path,
+                employee=request.user,
+                type='learning_path'
+            )
+            logger.info(f"Создан {learning_path_result}")
+
+            # Перебор задач учебного пути.
+            for learning_task in learning_path.learning_tasks.all():
+                logger.info(f"Назначение учебной задачи {learning_task} для {request.user}.")
+
+                if learning_task.type == 'material':
+
+                    # Забираем материал.
+                    material = learning_task.material
+
+                    # Если результаты есть.
+                    if Result.objects.filter(employee=request.user, material=material).exists():
+                        last_result = Result.objects.filter(employee=request.user, material=material).latest('id')
+
+                        # Если уже идет.
+                        if last_result.status == 'appointed' or last_result.status == 'in_progress':
+                            logger.info(f"Пропускаем для {request.user}: уже назначен")
+                            continue
+
+                    # Создание объекта результата для задачи.
+                    learning_task_result = Result.objects.create(
+                        learning_path=learning_path,
+                        learning_path_result=learning_path_result,
+                        employee=request.user,
+                        material=material,
+                        learning_task=learning_task,
+                        type='material'
+                    )
+                    logger.info(f"Создан {learning_task_result}")
+
+                if learning_task.type == 'test':
+
+                    # Забираем тест.
+                    test = learning_task.test
+
+                    # Если результаты есть.
+                    if Result.objects.filter(employee=request.user, test=test).exists():
+                        last_result = Result.objects.filter(employee=request.user, test=test).latest('id')
+
+                        # Если уже идет.
+                        if last_result.status == 'appointed' or last_result.status == 'in_progress':
+                            logger.info(f"Пропускаем для {request.user}: уже назначен")
+                            continue
+
+                    # Создание объекта результата для задачи.
+                    learning_task_result = Result.objects.create(
+                        learning_path=learning_path,
+                        learning_path_result=learning_path_result,
+                        employee=request.user,
+                        test=test,
+                        learning_task=learning_task,
+                        type='test'
+                    )
+                    logger.info(f"Создан {learning_task_result}")
+
+                if learning_task.type == 'course':
+
+                    # Забираем курс.
+                    course = learning_task.course
+
+                    # Если результаты есть.
+                    if Result.objects.filter(employee=request.user, course=course).exists():
+                        last_result = Result.objects.filter(employee=request.user, course=course).latest('id')
+
+                        # Если уже идет.
+                        if last_result.status == 'appointed' or last_result.status == 'in_progress':
+                            logger.info(f"Пропускаем для {request.user}: уже назначен")
+                            continue
+
+                    # Создание объекта результата для задачи.
+                    learning_task_result = Result.objects.create(
+                        learning_path=learning_path,
+                        learning_path_result=learning_path_result,
+                        employee=request.user,
+                        course=course,
+                        scorm_package=course.scorm_package,
+                        learning_task=learning_task,
+                        type='course'
+                    )
+                    logger.info(f"Создан {learning_task_result}")
+
+            # Уходим.
+            return redirect('learning_path:learning_path', pk=pk)
 
     # Если материал.
     if type == 'material':
@@ -1125,7 +1227,7 @@ def self_appointment(request, pk, type):
                 appoint = False
                 if settings.DEBUG:
                     logger.info(f"Существующий последний результат: {last_result}")
-                return HttpResponseForbidden('Вы уже обучаетесь!')
+                return HttpResponseForbidden('Вы уже обучаетесь! Перейдите в меню.')
 
         # Если результата нет.
         if appoint == True:
@@ -1161,7 +1263,7 @@ def self_appointment(request, pk, type):
                 appoint = False
                 if settings.DEBUG:
                     logger.info(f"Существующий последний результат: {last_result}")
-                return HttpResponseForbidden('Вы уже обучаетесь!')
+                return HttpResponseForbidden('Вы уже обучаетесь! Перейдите в меню.')
 
         # Если результата нет.
         if appoint == True:
@@ -1198,7 +1300,7 @@ def self_appointment(request, pk, type):
                 appoint = False
                 if settings.DEBUG:
                     logger.info(f"Существующий последний результат: {last_result}")
-                return HttpResponseForbidden('Вы уже обучаетесь!')
+                return HttpResponseForbidden('Вы уже обучаетесь! Перейдите в меню.')
 
         # Если результата нет.
         if appoint == True:
@@ -1234,7 +1336,7 @@ def self_appointment(request, pk, type):
                 appoint = False
                 if settings.DEBUG:
                     logger.info(f"Существующий последний результат: {last_result}")
-                return HttpResponseForbidden('Вы уже обучаетесь!')
+                return HttpResponseForbidden('Вы уже обучаетесь! Перейдите в меню.')
 
         # Если результата нет.
         if appoint == True:

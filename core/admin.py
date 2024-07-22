@@ -5,7 +5,7 @@ from django.contrib import admin
 # Импорт моделей.
 from .models import Employee, EmployeesGroup, GroupsGenerator, EmployeesGroupObjectPermission,\
     Organization, Subdivision, Position, Placement, \
-    EmployeeExcelImport, Category
+    EmployeeExcelImport, Category, PrivacyPolicy, DataProcessing
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from guardian.models import GroupObjectPermission
@@ -22,6 +22,8 @@ admin.site.unregister(Group)
 admin.site.register(EmployeesGroup)
 admin.site.register(GroupsGenerator)
 admin.site.register(EmployeesGroupObjectPermission)
+admin.site.register(PrivacyPolicy)
+admin.site.register(DataProcessing)
 
 # Класс отображения модели в админке.
 class PermissionAdmin(admin.ModelAdmin):

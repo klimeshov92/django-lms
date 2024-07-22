@@ -192,7 +192,7 @@ iframe {
     text-align: center; /* Текст по центру */
     width: 100% !important; /* Ширина */
     font-size: 1.1rem; /* Размер шрифта */
-    background: white; /* Белый фон формы */
+    background: white; /* Фон */
 }
 
 /* Стили для меню */
@@ -216,6 +216,50 @@ iframe {
 /* Стили для меню */
 .menu a.active, .menu a:hover, .menu a:focus {
     border-bottom: 3px solid var(--color-accent-rgb); /* Линия снизу */
+    color: var(--color-accent-rgb); /* Цвет текста */
+}
+
+/* Тело страницы */
+body {
+    display: flex; /* Флекс */
+    flex-direction: column; /* Колонки */
+}
+
+/* Основной контент */
+main {
+    flex: 1; /* Параметры */
+}
+
+/* Стили для подвала */
+footer {
+    width: 100% !important; /* Ширина */
+    background: var(--color-divider-rgb); /* Фон */
+}
+
+/* Стили для подвала */
+.footer-menu {
+    flex: 1; /* Параметры */
+    display: flex; /* Флекс */
+    flex-wrap: wrap; /* Разрешаем элементам обтекать */
+    align-items: start; /* Выравниваем по вертикали */
+    justify-content: start; /* Выравниваем по горизонтали */
+    text-align: center; /* Текст по центру */
+    width: 100% !important; /* Ширина */
+}
+
+/* Стили для подвала */
+.footer-menu a {
+    color: var(--color-text-rgb); /* Цвет текста */
+    text-decoration: none; /* Без подчеркивания */
+    padding: 10px 20px; /* Отступы */
+    display: inline-block; /* Блочно-строчное отображение */
+    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
+    word-wrap: break-word; /* Перенос */
+    font-weight: 400; /* Жирность текста */
+}
+
+/* Стили для подвала */
+.footer-menu a.active, .footer-menu a:hover, .footer-menu a:focus {
     color: var(--color-accent-rgb); /* Цвет текста */
 }
 
@@ -244,7 +288,7 @@ iframe {
     border-bottom: 2px solid var(--color-divider-rgb); /* Линия снизу */
     width: 100% !important; /* Ширина */
     font-size: 1.1rem; /* Размер шрифта */
-    background: white; /* Белый фон формы */
+    background: white; /* Фон */
 }
 
 /* Стили для меню */
@@ -1397,6 +1441,11 @@ label {
     display: block;
 }
 
+/* Звездочка обязательного поля */
+.required-label {
+    color: var(--color-attention-rgb);
+}
+
 /* Изменение формата лейбла очистки */
 label[for$="clear_id"] {
     display: initial;
@@ -1436,7 +1485,7 @@ label[for$="clear_id"] {
     color: var(--color-text-rgb); /* Серый цвет текста элементов формы */
     border: 2px solid var(--color-text-rgb); /* Толщина границы элементов формы */
     border-radius: 5px; /* Радиус скругления границ элементов формы */
-    background: white; /* Белый фон формы */
+    background: white; /* Фон */
     font-size: 1rem; /* Размер шрифта */
     max-width: 100%; /* Ширина */
     box-sizing: border-box; /* Учитывает padding и border в размере элемента */
@@ -1474,7 +1523,7 @@ label[for$="clear_id"] {
     border: 2px solid var(--color-text-rgb); /* Сохранение толщины границы при нажатии */
     border-radius: 5px; /* Сохранение радиуса скругления границ при нажатии */
     max-width: 100%; /* Максимальная ширина */
-    background: white; /* Белый фон формы */
+    background: white; /* Фон */
 }
 
 /* Стили для формы */

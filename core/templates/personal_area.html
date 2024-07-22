@@ -185,17 +185,13 @@
                                         {{obj.event.name}}
                                     {% endif %}
                                 </h3>
-                                <p><span class="description-item">Планируемая дата завершения:</span>
-                                    {% if obj.planned_end_date %}
-                                        {{obj.planned_end_date}}
-                                    {% elif obj.learning_path_result.planned_end_date %}
-                                        {{obj.learning_path_result.planned_end_date}}
-                                    {% elif obj.date %}
-                                        {{obj.date}}
-                                    {% else %}
-                                        Отсутствует
-                                    {% endif %}
-                                </p>
+                                {% if obj.planned_end_date %}
+                                    <p><span class="description-item">Планируемая дата завершения:</span> {{obj.planned_end_date}}</p>
+                                {% elif obj.learning_path_result.planned_end_date %}
+                                    <p><span class="description-item">Планируемая дата завершения:</span> {{obj.learning_path_result.planned_end_date}}</p>
+                                {% elif obj.date %}
+                                    <p><span class="description-item">Планируемая дата:</span>{{obj.date}}</p>
+                                {% endif %}
                                 <div class="submenu-mini submenu-mini-end">
                                     {% if obj.type == 'learning_path' %}
                                         <a href="{% url 'learning_path:learning_path' pk=obj.learning_path.id %}">Подробнее</a>
@@ -269,17 +265,13 @@
                                         {{obj.event.name}}
                                     {% endif %}
                                 </h3>
-                                <p><span class="description-item">Планируемая дата завершения:</span>
-                                    {% if obj.planned_end_date %}
-                                        {{obj.planned_end_date}}
-                                    {% elif obj.learning_path_result.planned_end_date %}
-                                        {{obj.learning_path_result.planned_end_date}}
-                                    {% elif obj.date %}
-                                        {{obj.date}}
-                                    {% else %}
-                                        Отсутствует
-                                    {% endif %}
-                                </p>
+                                {% if obj.planned_end_date %}
+                                    <p><span class="description-item">Планируемая дата завершения:</span> {{obj.planned_end_date}}</p>
+                                {% elif obj.learning_path_result.planned_end_date %}
+                                    <p><span class="description-item">Планируемая дата завершения:</span> {{obj.learning_path_result.planned_end_date}}</p>
+                                {% elif obj.date %}
+                                    <p><span class="description-item">Планируемая дата:</span>{{obj.date}}</p>
+                                {% endif %}
                                 <div class="submenu-mini submenu-mini-end">
                                     {% if obj.type == 'learning_path' %}
                                         <a href="{% url 'learning_path:learning_path' pk=obj.learning_path.id %}">Подробнее</a>

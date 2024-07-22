@@ -2,6 +2,7 @@
 from django import forms
 # Импорт моделей.
 from .models import Email
+from learning_path.models import Assignment
 # Импорт select2.
 from django_select2.forms import Select2Widget, Select2MultipleWidget
 
@@ -44,13 +45,15 @@ class EmailForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EmailForm, self).__init__(*args, **kwargs)
 
+        # Только групповые назначения.
+        self.fields['assignment'].queryset = Assignment.objects.filter(participants='group')
+
         # Если форма связана с существующим экземпляром модели, скрываем поле 'type'.
         if self.instance and self.instance.pk:
             self.fields['group'].widget = forms.HiddenInput()
             self.fields['assignment'].widget = forms.HiddenInput()
             self.fields['event'].widget = forms.HiddenInput()
             self.fields['type'].widget = forms.HiddenInput()
-
 
 # Выбор типа рассылки.
 class EmailSendingForm(forms.Form):

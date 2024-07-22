@@ -13,7 +13,10 @@ from .views import EmployeeExcelImportsView, EmployeeExcelImportView, \
    OrganizationsView, OrganizationView, OrganizationCreateView, OrganizationUpdateView, OrganizationDeleteView, \
    SubdivisionsView, SubdivisionView, SubdivisionCreateView, SubdivisionUpdateView, SubdivisionDeleteView, \
    PositionsView, PositionView,PositionCreateView, PositionUpdateView, PositionDeleteView, update_password, \
-   EmployeesObjectPermissionCreateView, EmployeesObjectPermissionDeleteView, PersonalArea, PersonalInfoUpdateView
+   EmployeesObjectPermissionCreateView, EmployeesObjectPermissionDeleteView, PersonalArea, PersonalInfoUpdateView, \
+   PrivacyPolicyView, PrivacyPolicyCreateView, PrivacyPolicyUpdateView, \
+   DataProcessingView, DataProcessingCreateView, DataProcessingUpdateView, \
+   ContactsView, ContactsCreateView, ContactsUpdateView
 
 from rest_framework.routers import DefaultRouter
 from .views import EmployeeViewSet, OrganizationViewSet, SubdivisionViewSet, PlacementViewSet, PositionViewSet
@@ -227,14 +230,14 @@ urlpatterns = [
    path('employees/', EmployeesView.as_view(), name='employees'),
    # Маршрут вывода сотрудника.
    path('employees/<int:pk>/', EmployeeView.as_view(), name='employee'),
-   path('personal_area/<int:pk>/', PersonalArea.as_view(), name='personal_area'),
+   path('personal_area/', PersonalArea.as_view(), name='personal_area'),
    # Маршрут обновления пароля.
    path('employees/<int:pk>/update_password', update_password, name='update_password'),
    # Маршрут создания сотрудника.
    path('employees/create/', EmployeeCreateView.as_view(), name='employee_create'),
    # Маршрут обновления сотрудника.
    path('employees/<int:pk>/update/', EmployeeUpdateView.as_view(), name='employee_update'),
-   path('personal_info/<int:pk>/update/', PersonalInfoUpdateView.as_view(), name='personal_info_update'),
+   path('personal_info/update/', PersonalInfoUpdateView.as_view(), name='personal_info_update'),
    # Маршрут удаления сотрудника.
    path('employees/<int:pk>/delete/', EmployeeDeleteView.as_view(), name='employee_delete'),
    # Маршрут вывода списка организаций.
@@ -321,4 +324,22 @@ urlpatterns = [
    path('employees_object_permissions/<str:type>/<int:pk>/create', EmployeesObjectPermissionCreateView.as_view(), name='employees_object_permissions_create'),
    # Маршрут удаления объектных прав.
    path('employees_object_permissions/<str:type>/<int:pk>/<int:employees_object_permission_pk>/delete/', EmployeesObjectPermissionDeleteView.as_view(), name='employees_object_permissions_delete'),
+   # Маршрут вывода контактов.
+   path('contacts/', ContactsView.as_view(), name='contacts'),
+   # Маршрут создания контактов.
+   path('contacts/create/', ContactsCreateView.as_view(), name='contacts_create'),
+   # Маршрут обновления контактов.
+   path('contacts/update/', ContactsUpdateView.as_view(), name='contacts_update'),
+   # Маршрут вывода политики конфиденциальности.
+   path('privacy_policy/', PrivacyPolicyView.as_view(), name='privacy_policy'),
+   # Маршрут создания политики конфиденциальности.
+   path('privacy_policy/create/', PrivacyPolicyCreateView.as_view(), name='privacy_policy_create'),
+   # Маршрут обновления политики конфиденциальности.
+   path('privacy_policy/update/', PrivacyPolicyUpdateView.as_view(), name='privacy_policy_update'),
+   # Маршрут вывода политики обработки персональных данных.
+   path('data_processing/', DataProcessingView.as_view(), name='data_processing'),
+   # Маршрут создания политики обработки персональных данных.
+   path('data_processing/create/', DataProcessingCreateView.as_view(), name='data_processing_create'),
+   # Маршрут обновления политики обработки персональных данных.
+   path('data_processing/update/', DataProcessingUpdateView.as_view(), name='data_processing_update'),
 ]

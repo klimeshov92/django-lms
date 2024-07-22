@@ -1,0 +1,11 @@
+{% load i18n %}
+{% autoescape off %}
+Здравствуйте, {{ user.username }}!
+
+Пожалуйста, перейдите по следующей ссылке для подтверждения вашего аккаунта:
+
+{{ protocol }}://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+С наилучшими пожеланиями,
+Команда поддержки Лайт ЛМС
+{% endautoescape %}

@@ -242,8 +242,10 @@ def sending(request, pk):
                         employee.save()
 
                         # Формируем текст письма с учетом данных пользователя
-                        message = f'Добрый день, {employee.first_name}!\n\n' \
-                                  f'Ваше имя пользователя: {employee.username}, а пароль для входа: {new_password}'
+                        message = (
+                            f'Добрый день, {employee.first_name}!\n\n' \
+                            f'Ваше имя пользователя: {employee.username}, а пароль для входа: {new_password}'
+                        )
                         # Отправляем письмо пользователю
                         send_mail(subject, message, EMAIL_HOST_USER, [employee.email], html_message=message)
 
@@ -263,19 +265,42 @@ def sending(request, pk):
                 if email.assignment:
                     assignment = email.assignment
                     base_href = settings.BASE_URL
-                    learning_paths_href = reverse('learning_path:learning_path', kwargs={'pk': assignment.learning_path.pk})
-                    href = f'{base_href}{learning_paths_href}'
+                    sub_href = reverse('core:personal_area') + '#tab2'
+                    href = f'{base_href}{sub_href}'
                 else:
                     return HttpResponse(f"Назначение не найдено.")
 
                 # Тема и текст письма.
                 subject = 'Назначение обучения'
-                message = f'Добрый день, коллеги!\n\n'\
-                          f'Группе {assignment.group} было назначено обучение: {assignment.learning_path} c {assignment.planned_start_date.strftime("%d.%m.%Y")}'\
-                          f'<a href="{href}">Ссылка</a>'
+                if assignment.participants == 'group':
 
-                # Забираем адресатов.
-                recipients = group.user_set.filter(email__isnull=False)
+                    if assignment.type == 'learning_complex':
+
+                        message = (
+                            f'Добрый день, коллеги!\n\n'
+                            f'Группе {assignment.group} были назначены траектории обучения:'
+                        )
+
+                        learning_paths = [
+                            learning_complex_path.learning_path for learning_complex_path in
+                            assignment.learning_complex.learning_complex_paths.all().order_by('learning_complex', 'position')
+                        ]
+
+                        for learning_path in learning_paths:
+                            message += f'-{learning_path}\n'\
+
+                        message += f'Просмотрите <a href="{href}">назначенное обучение</a>'
+
+                    if assignment.type == 'learning_path':
+
+                        message = (
+                            f'Добрый день, коллеги!\n\n'\
+                            f'Группе {assignment.group} была назначена траектория обучения: {assignment.learning_path}\n'\
+                            f'Просмотрите <a href="{href}">назначенное обучение</a>'
+                        )
+
+                    # Забираем адресатов.
+                    recipients = group.user_set.filter(email__isnull=False)
 
                 # Если рассылка только для новых адресатов.
                 if sending_type == 'new':
@@ -343,10 +368,12 @@ def sending(request, pk):
                 vevent.add('description').value = event.desc
                 icalendar_content = icalendar.serialize()
 
-                message = f'Добрый день, коллеги!\n\n'\
-                          f'{event.planned_start_date.strftime("%d.%m.%Y %H:%M")} состоится мероприятие: {event}\n'\
-                          f'<a href="{href}">Ссылка</a>\n'\
-                          f'<pre>{icalendar_content}</pre>'
+                message = (
+                    f'Добрый день, коллеги!\n\n'\
+                    f'{event.planned_start_date.strftime("%d.%m.%Y %H:%M")} состоится мероприятие: {event}\n'\
+                    f'<a href="{href}">Ссылка</a>\n'\
+                    f'<pre>{icalendar_content}</pre>'
+                )
 
                 # Забираем адресатов.
                 recipients = group.user_set.filter(email__isnull=False)

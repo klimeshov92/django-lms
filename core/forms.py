@@ -1,13 +1,12 @@
-# Импорт форм.
+
 from django import forms
-# Импорт прав.
+from django.utils.safestring import mark_safe
 from guardian.forms import GroupObjectPermissionsForm
 from django.contrib.auth.models import Permission
-# Импорт select2.
 from django_select2.forms import Select2Widget, Select2MultipleWidget
-# Импорт моделей.
 from .models import EmployeeExcelImport, Category, EmployeesGroup, Employee, \
-    GroupsGenerator, EmployeesGroupObjectPermission, Placement, Organization, Subdivision, Position, EmployeesObjectPermission
+    GroupsGenerator, EmployeesGroupObjectPermission, Placement, Organization, Subdivision, Position, EmployeesObjectPermission, \
+    PrivacyPolicy, DataProcessing, Contacts
 from django.contrib.contenttypes.models import ContentType
 from materials.models import Material, File
 from courses.models import Course
@@ -15,6 +14,7 @@ from testing.models import Test
 from events.models import Event
 from learning_path.models import LearningPath
 from django.contrib.auth.forms import UserCreationForm
+from ckeditor.widgets import CKEditorWidget
 
 
 # Форма сотрудника.
@@ -393,10 +393,88 @@ class EmployeesObjectPermissionForm(forms.ModelForm):
             self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
 
 
+# Регистрация.
 class SignUpForm(UserCreationForm):
+    agree_to_privacy_policy = forms.BooleanField(
+        required=True,
+        label=mark_safe('Я согласен с <a href="/core/privacy_policy/" target="_blank">политикой конфиденциальности</a>')
+    )
+    agree_to_data_processing = forms.BooleanField(
+        required=True,
+        label=mark_safe('Я согласен на <a href="/core/data_processing/" target="_blank">обработку персональных данных</a>')
+    )
 
-
+    # Описание формы.
     class Meta:
         model = Employee
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = (
+            'avatar',
+            'username',
+            'first_name',
+            'last_name',
+            'fathers_name',
+            'email',
+            'password1',
+            'password2',
+            'agree_to_privacy_policy',
+            'agree_to_data_processing'
+        )
 
+    # Подкрашивание обязательных полей.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].required = True
+        for field_name, field in self.fields.items():
+            if field.required:
+                self.fields[field_name].label = mark_safe(f'{self.fields[field_name].label}<span class="required-label">*</span>')
+
+# Форма создания контактов.
+class ContactsForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorWidget(), label='Содержание')
+    class Meta:
+        # Модель.
+        model = Contacts
+        # Поля.
+        fields = [
+            'creator',
+            'name',
+            'content'
+        ]
+        # Классы виджетов.
+        widgets = {
+            'creator': forms.HiddenInput()
+        }
+
+# Форма создания политики.
+class PrivacyPolicyForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorWidget(), label='Содержание')
+    class Meta:
+        # Модель.
+        model = PrivacyPolicy
+        # Поля.
+        fields = [
+            'creator',
+            'name',
+            'content'
+        ]
+        # Классы виджетов.
+        widgets = {
+            'creator': forms.HiddenInput()
+        }
+
+# Форма создания обработки.
+class DataProcessingForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorWidget(), label='Содержание')
+    class Meta:
+        # Модель.
+        model = DataProcessing
+        # Поля.
+        fields = [
+            'creator',
+            'name',
+            'content'
+        ]
+        # Классы виджетов.
+        widgets = {
+            'creator': forms.HiddenInput()
+        }

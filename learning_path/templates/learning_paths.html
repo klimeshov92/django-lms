@@ -54,7 +54,7 @@
                     <div class="list-grid-item-content">
                         {% if obj.latest_result_status %}
                             {% if obj.latest_result_status == 'appointed' or obj.latest_result_status == 'in_progress' %}
-                                <p class="status"><span>{{obj.latest_result_status|status_display}} до {{obj.latest_result_planned_end_date}}</span></p>
+                                <p class="status"><span>{{obj.latest_result_status|status_display}}{% if obj.latest_result_planned_end_date %} до {{obj.latest_result_planned_end_date}}{% endif %}</span></p>
                             {% endif %}
                             {% if obj.latest_result_status == 'completed'%}
                                 <p class="status status-completed">{{obj.latest_result_status|status_display}} {{obj.latest_result_end_date}}</p>
@@ -77,7 +77,9 @@
                     </div>
                     <div class="list-grid-item-footer">
                         <div class="submenu-mini">
-                            <a href="{% url 'learning_path:learning_path_tasks' pk=obj.id%}">Просмотреть</a>
+                            {% if obj.latest_result_status == 'appointed' or obj.latest_result_status == 'in_progress' %}
+                                <a href="{% url 'learning_path:learning_path_tasks' pk=obj.id%}">Просмотреть</a>
+                            {% endif %}
                             <a href="{% url 'learning_path:learning_path' pk=obj.id %}">Подробнее</a>
                         </div>
                     </div>

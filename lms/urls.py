@@ -23,12 +23,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView, LogoutView, \
     PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from core.views import home
+from core.views import home, signup_view, activate
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Для select2.
     path('select2/', include('django_select2.urls')),
+    # Маршруты регистрации.
+    path('signup/', signup_view, name='signup'),
+    path('activate/<uidb64>/<token>/', activate, name='activate'),
     # Маршруты авторизации.
     path('login/', LoginView.as_view(), name='login'),
     path('', home, name='home'),

@@ -25,7 +25,7 @@
             <div class="auth-text">
                 <div>
                     <p>Вы авторизованы, можете открыть <a href="javascript:void(0);" onclick="document.querySelector('.hamburger-menu').click();">меню</a> для начала обучения!</p>
-                    <p>Или перейдите в <a href="{% url 'core:personal_area' pk=request.user.pk %}">личный кабинет</a> для просмотра результатов.</p>
+                    <p>Или перейдите в <a href="{% url 'core:personal_area' %}">личный кабинет</a> для просмотра результатов.</p>
                 </div>
                 <div class="informers-grid">
                     {% if appointed_paths_count != 0 %}
@@ -139,9 +139,9 @@
             <div class="auth-text">
                 <div>
                     <p>Это демо-стенд "Лайт ЛМС".</p>
-                    <p>Вы еще не авторизованы, <a href="{% url 'login' %}">войдите</a> в систему!</p>
-                    <p>Для получения логина и пароля обратитесь к <a href="https://t.me/Sergey_Klimeshov">администратору</a> демо-портала (это бесплатно).</p>
-
+                    <p>Если вы уже зарегистрированы, <a href="{% url 'login' %}">войдите</a> в систему!</p>
+                    <p>Иначе пройдите <a href="{% url 'signup' %}">регистрацию</a> на портале.</p>
+                    <p>Для получения обезличенной тестовой учетной записи и с другими дополнительными вопросами обращайтесь к <a href="https://t.me/Sergey_Klimeshov">администратору</a> демо-портала.</p>
                 </div>
             </div>
         {% endif %}

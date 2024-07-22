@@ -98,6 +98,8 @@ class LearningPath(models.Model):
         default=1,
         validators=[MinValueValidator(1)]
     )
+    # Cамоназначение.
+    self_appointment = models.BooleanField(verbose_name='Caмоназначение', default=False)
 
     class Meta:
         # Изменение имени модели.

@@ -294,10 +294,6 @@ class MaterialCreateView(GPermissionRequiredMixin, CreateView):
     # Шаблон.
     template_name = 'material_edit.html'
 
-    def get_permission_object(self):
-        # Возвращаем None, так как при создании объект еще не существует
-        return None
-
     # Заполнение полей данными.
     def get_initial(self):
         # Забираем изначальный набор.

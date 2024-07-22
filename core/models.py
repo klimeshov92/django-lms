@@ -12,7 +12,8 @@ from django.contrib.auth.models import Group
 from django.utils import timezone
 # Импорт поля контента с возможностью загрузки файлов.
 from ckeditor.fields import RichTextField
-
+# Импорт поля контента с возможностью загрузки файлов.
+from ckeditor.fields import RichTextField
 
 # Класс сотрудника на основе пользователя.
 class Employee(AbstractUser):
@@ -31,6 +32,11 @@ class Employee(AbstractUser):
     mdm_id = models.CharField(verbose_name='MDM ID сотрудника', unique=True, null=True, blank=True, max_length=32)
     # Фото сотрудника.
     avatar = models.ImageField(verbose_name='Аватар', null=True, blank=True, upload_to='employees_avatar/')
+    # Политики.
+    agree_to_privacy_policy = models.BooleanField(default=False, verbose_name="Согласие с политикой конфиденциальности")
+    agree_to_data_processing = models.BooleanField(default=False, verbose_name="Согласие на обработку персональных данных")
+    # Подтверждение почты.
+    email_confirmed = models.BooleanField(default=False, verbose_name="Подтверждение электронной почты")
     # Фамилия.
     fathers_name = models.CharField(verbose_name='Отчество', null=True, blank=True, max_length=255, db_index=True)
     # Телефон.
@@ -52,16 +58,6 @@ class Employee(AbstractUser):
         related_name='employees_creators',
         related_query_name='employees_creators'
     )
-    # Импортирован из эксель. Убрано из процесса, см. сигналы.
-    #excel_import = models.ForeignKey(
-        #'EmployeeExcelImport',
-        #verbose_name='Импортирован из эксель',
-        #null=True,
-        #blank=True,
-        #on_delete=models.PROTECT,
-        #related_name='employees',
-        #related_query_name='employees'
-    #)
 
     class Meta:
         # Изменение имени модели.
@@ -568,3 +564,96 @@ class EmployeeExcelImport(models.Model):
     def __str__(self):
         return f'{self.name} | {self.created.astimezone(timezone.get_current_timezone())}'
 
+# Класс контактов.
+class Contacts(models.Model):
+    # Создатель.
+    creator = models.ForeignKey(
+        Employee,
+        verbose_name='Создатель',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='сontacts_creator',
+        related_query_name='сontacts_creator'
+    )
+    # Название.
+    name = models.CharField(verbose_name='Название', max_length=255, db_index=True)
+    # Контент
+    content = RichTextField(verbose_name='Содержание', null=True, blank=True)
+    # Дата и время создания и изменения.
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания', db_index=True)
+    changed = models.DateTimeField(auto_now=True, verbose_name='Дата и время изменения', db_index=True)
+
+    class Meta:
+        # Изменение имени модели.
+        verbose_name = 'Контакты'
+        verbose_name_plural = 'Контакты'
+
+    # Ограничение одной записью.
+    def save(self, *args, **kwargs):
+        if not self.pk and Contacts.objects.exists():
+            raise ValueError("Может быть только одна запись в модели Contacts")
+        return super().save(*args, **kwargs)
+
+# Класс политики.
+class PrivacyPolicy(models.Model):
+    # Создатель.
+    creator = models.ForeignKey(
+        Employee,
+        verbose_name='Создатель',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='privacy_policy_creator',
+        related_query_name='privacy_policy_creator'
+    )
+    # Название.
+    name = models.CharField(verbose_name='Название', max_length=255, db_index=True)
+    # Контент
+    content = RichTextField(verbose_name='Содержание', null=True, blank=True)
+    # Дата и время создания и изменения.
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания', db_index=True)
+    changed = models.DateTimeField(auto_now=True, verbose_name='Дата и время изменения', db_index=True)
+
+    class Meta:
+        # Изменение имени модели.
+        verbose_name = 'Политика конфиденциальности'
+        verbose_name_plural = 'Политики конфиденциальности'
+
+    # Ограничение одной записью.
+    def save(self, *args, **kwargs):
+        if not self.pk and PrivacyPolicy.objects.exists():
+            raise ValueError("Может быть только одна запись в модели PrivacyPolicy")
+        return super().save(*args, **kwargs)
+
+
+# Класс обработки.
+class DataProcessing(models.Model):
+    # Создатель.
+    creator = models.ForeignKey(
+        Employee,
+        verbose_name='Создатель',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='data_processing_creator',
+        related_query_name='data_processing_creator'
+    )
+    # Название.
+    name = models.CharField(verbose_name='Название', max_length=255, db_index=True)
+    # Контент
+    content = RichTextField(verbose_name='Содержание', null=True, blank=True)
+    # Дата и время создания и изменения.
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания', db_index=True)
+    changed = models.DateTimeField(auto_now=True, verbose_name='Дата и время изменения', db_index=True)
+
+    class Meta:
+        # Изменение имени модели.
+        verbose_name = 'Политика в области обработки персональных данных'
+        verbose_name_plural = 'Политика в области обработки персональных данных'
+
+    # Ограничение одной записью.
+    def save(self, *args, **kwargs):
+        if not self.pk and DataProcessing.objects.exists():
+            raise ValueError("Может быть только одна запись в модели DataProcessing")
+        return super().save(*args, **kwargs)

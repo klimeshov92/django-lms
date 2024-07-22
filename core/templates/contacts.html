@@ -7,7 +7,7 @@
 
 {# Подключение заголовка #}
 {% block title %}
-Просмотр материала
+Контакты
 {% endblock title %}
 
 {# Подключение контента #}
@@ -17,7 +17,7 @@
 <div class="material-container-header">
 
     <div class="content-type-div">
-        <span class="content-type-basic">Просмотр материала</span>
+        <span class="content-type-basic">Контакты</span>
     </div>
 
     {% if object %}
@@ -40,7 +40,7 @@
 
         {# Вывод сообщения, если элемента нет #}
         <div class="not-found">
-            <p>Материал не найден!</p>
+            <p>Контакты не найдены!</p>
         </div>
 
     {% endif %}
@@ -49,31 +49,21 @@
 
 <div class="material-container-footer">
 
-    {% if object %}
-
-        <div class="submenu-container">
-            <nav class="submenu">
-                {% if result.status == 'in_progress' %}
-                    <a href="{% url 'materials:confirm_reading' pk=object.id %}">Подтвердить ознакомление</a>
+    {# Управление #}
+    <div class="submenu-container">
+        <nav class="submenu">
+            {% if object %}
+                {% if user|perms:"core.add_contacts" %}
+                    <a href="{% url 'core:contacts_update' %}">Изменить</a>
                 {% endif %}
-                <a href="{% url 'materials:material' pk=object.id %}">Назад</a>
-            </nav>
-        </div>
-
-    {% else %}
-
-        <div class="submenu-container">
-            <nav class="submenu">
-                <a href="{% url 'materials:material' pk=object.id %}">Назад</a>
-            </nav>
-        </div>
-
-    {% endif %}
+            {% else %}
+                {% if user|perms:"core.add_contacts" %}
+                    <a href="{% url 'core:contacts_create' %}">Создать</a>
+                {% endif %}
+            {% endif %}
+        </nav>
+    </div>
 
 </div>
-
-{# Увеличение изображений #}
-{% load static %}
-<script src="{% static 'js/show_img.js' %}"></script>
 
 {% endblock content %}

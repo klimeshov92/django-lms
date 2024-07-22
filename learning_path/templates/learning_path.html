@@ -38,7 +38,7 @@
                     <h1>{{object.name}}</h1>
                     {% if result %}
                         {% if result.status == 'appointed' or result.status == 'in_progress' %}
-                            <p class="status-big">{{result.get_status_display}} до {{result.planned_end_date}}</p>
+                            <p class="status-big">{{result.get_status_display}}{% if result.planned_end_date %} до {{result.planned_end_date}}{% endif %}</p>
                         {% endif %}
                         {% if result.status == 'completed' %}
                             <p class="status-big status-completed">{{result.get_status_display}} {{result.end_date}}</p>
@@ -72,6 +72,15 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
+                    {% if object.self_appointment == True %}
+                        {% if result %}
+                            {% if result.status == 'failed' %}
+                                    <a href="{% url 'learning_path:self_appointment' pk=object.id type='learning_path' %}">Самоназначение</a>
+                            {% endif %}
+                        {% else %}
+                                <a href="{% url 'learning_path:self_appointment' pk=object.id type='learning_path' %}">Самоназначение</a>
+                        {% endif %}
+                    {% endif %}
                     {% if user|perms:"learning_path.view_learningpath" %}
                         <a href="{% url 'learning_path:learning_path_tasks' pk=object.id%}">Просмотреть</a>
                     {% endif %}

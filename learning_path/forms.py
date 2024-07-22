@@ -39,7 +39,8 @@ class LearningPathForm(forms.ModelForm):
                   'name',
                   'duration',
                   'number_control_tasks',
-                  'desc'
+                  'desc',
+                  'self_appointment'
         ]
         # Классы виджетов.
         widgets = {

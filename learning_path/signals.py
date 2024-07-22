@@ -656,7 +656,8 @@ def create_learning_results(sender, instance, created, **kwargs):
                 participants_group, _ = EmployeesGroup.objects.get_or_create(name=participants_group_name, type='assignment')
                 instance.participants_group = participants_group
                 instance.save()
-                participants_group.user_set.set(employees)
+                # Теперь добавляем по одному.
+                # participants_group.user_set.set(employees)
                 logger.info(f"Была создана группа для назначения: {participants_group}.")
 
             # Создание результатов.
@@ -682,6 +683,8 @@ def create_learning_results(sender, instance, created, **kwargs):
                                 planned_start_date=planned_start_date,
                                 reassignment=reassignment
                             )
+                            participants_group.user_set.add(employee)
+                            logger.info(f"Сотрудник {employee} добавлен в группу участников назначения")
                         logger.info("Массовое создание результатов завершено.")
 
                     # Создание прав.
@@ -726,6 +729,8 @@ def create_learning_results(sender, instance, created, **kwargs):
                                 planned_start_date=planned_start_date,
                                 reassignment=reassignment
                             )
+                            participants_group.user_set.add(employee)
+                            logger.info(f"Сотрудник {employee} добавлен в группу участников назначения")
                         logger.info("Массовое создание результатов завершено.")
 
                     # Создание прав.
@@ -785,6 +790,9 @@ def create_learning_results(sender, instance, created, **kwargs):
                                 type='material'
                             )
                             logger.info(f"Создан {material_result}")
+
+                            participants_group.user_set.add(employee)
+                            logger.info(f"Сотрудник {employee} добавлен в группу участников назначения")
 
                     # Присвоение прав доступа.
                     assign_perm('view_material', participants_group, material)
@@ -858,6 +866,9 @@ def create_learning_results(sender, instance, created, **kwargs):
                                 type='test'
                             )
                             logger.info(f"Создан {test_result}")
+
+                            participants_group.user_set.add(employee)
+                            logger.info(f"Сотрудник {employee} добавлен в группу участников назначения")
 
                     # Присвоение прав доступа.
                     assign_perm('view_test', participants_group, test)
@@ -934,6 +945,9 @@ def create_learning_results(sender, instance, created, **kwargs):
                             )
                             logger.info(f"Создан {course_result}")
 
+                            participants_group.user_set.add(employee)
+                            logger.info(f"Сотрудник {employee} добавлен в группу участников назначения")
+
                     # Присвоение прав доступа.
                     assign_perm('view_course', participants_group, course)
                     logger.info(f"Право на просмотр курса {course} назначено группе {participants_group}.")
@@ -978,7 +992,7 @@ def create_learning_results(sender, instance, created, **kwargs):
         else:
             return HttpResponseServerError("Ошибка сервера, обратитесь к администратору")
 
-# Сигнал сохранения участников меропрриятия.
+# Сигнал удаления назначения.
 @receiver(post_delete, sender=Assignment)
 def delete_assignment(sender, instance, **kwargs):
 

@@ -9,14 +9,16 @@ from django.conf import settings
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 # Импорт моделей ядра.
 from .models import Organization, Subdivision, Position, Employee, Placement, \
-    EmployeeExcelImport, Category, EmployeesGroup, EmployeesGroupObjectPermission, GroupsGenerator, EmployeesObjectPermission
+    EmployeeExcelImport, Category, EmployeesGroup, EmployeesGroupObjectPermission, GroupsGenerator, \
+    EmployeesObjectPermission, PrivacyPolicy, DataProcessing, Contacts
 # Импорт модели фильтров.
 from .filters import CategoryFilter, EmployeeExcelImportFilter, \
     OrganizationFilter, SubdivisionFilter, PositionFilter, GroupFilter, EmployeeFilter, GroupsEmployeeFilter, EmployeesObjectPermissionFilter
 # Импорт форм.
 from .forms import CategoryForm, EmployeeExcelImportForm, GroupForm, GroupsGeneratorForm, \
     EmployeesGroupObjectPermissionForm, EmployeeForm, PlacementForm, \
-    OrganizationForm, SubdivisionForm, PositionForm, EmployeesObjectPermissionForm, PersonalInfoForm
+    OrganizationForm, SubdivisionForm, PositionForm, EmployeesObjectPermissionForm, PersonalInfoForm, \
+    PrivacyPolicyForm, DataProcessingForm, ContactsForm
 # Импорт пандас.
 import pandas as pd
 # Импорт рендера, перенаправления, генерации адреса и других урл функций.
@@ -69,6 +71,15 @@ from django.core.paginator import Paginator
 from django.contrib.auth.models import Permission
 from learning_path.models import LearningPath
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import EmailMessage
+from .forms import SignUpForm
 
 # Импортируем логи
 import logging
@@ -2125,23 +2136,10 @@ class PersonalArea(LoginRequiredMixin, PreviousPageGetMixinL1, DetailView):
     # Шаблон.
     template_name = 'personal_area.html'
 
-    # Проверяем тип группы.
-    def dispatch(self, request, *args, **kwargs):
-
-        # Забираем пользователя.
-        person = Employee.objects.get(pk=self.kwargs.get('pk'))
-        print(person)
-
-        # Если чужой кабинет.
-        if person == self.request.user:
-
-            # Идем дальше.
-            return super().dispatch(request, *args, **kwargs)
-
-        else:
-
-            # Запрет.
-            return HttpResponseForbidden('Нельзя заходить в чужой кабинет!')
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return self.request.user
 
     # Переопределеяем переменные вью.
     def get_context_data(self, **kwargs):
@@ -2229,23 +2227,10 @@ class PersonalInfoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Update
     # Шаблон.
     template_name = 'personal_info_edit.html'
 
-    # Проверяем тип группы.
-    def dispatch(self, request, *args, **kwargs):
-
-        # Забираем пользователя.
-        person = Employee.objects.get(pk=self.kwargs.get('pk'))
-        print(person)
-
-        # Если чужой кабинет.
-        if person == self.request.user:
-
-            # Идем дальше.
-            return super().dispatch(request, *args, **kwargs)
-
-        else:
-
-            # Запрет.
-            return HttpResponseForbidden('Нельзя изменять чужие данные!')
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return self.request.user
 
     # Заполнение полей данными.
     def get_initial(self):
@@ -2262,7 +2247,7 @@ class PersonalInfoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Update
     # Перенаправление после валидации формы.
     def get_success_url(self):
         # Направляем по адресу объекта.
-        return reverse('core:personal_area', kwargs={'pk': self.object.pk})
+        return reverse('core:personal_area')
 
 # Домашняя.
 def home (request):
@@ -2318,3 +2303,275 @@ def home (request):
 
     return render(request, 'home.html', context)
 
+# Регистрация.
+def signup_view(request):
+    # Проверяем, был ли запрос POST (форма отправлена).
+    if request.method == 'POST':
+        # Создаем экземпляр формы с данными из запроса.
+        form = SignUpForm(request.POST)
+        # Проверяем, валидна ли форма.
+        if form.is_valid():
+            # Сохраняем пользователя, но не сохраняем его в базе данных сразу.
+            user = form.save(commit=False)
+            # Деактивируем пользователя до подтверждения по почте.
+            user.is_active = False
+            # Сохраняем пользователя в базе данных.
+            user.save()
+            # Получаем текущий сайт (домен).
+            current_site = get_current_site(request)
+            # Тема письма.
+            mail_subject = 'Активируйте ваш аккаунт.'
+            # Генерируем текст письма на основе шаблона.
+            message = render_to_string('registration/account_activation_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'protocol': 'https' if request.is_secure() else 'http',  # Определяем протокол.
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),  # Кодируем UID пользователя.
+                'token': default_token_generator.make_token(user),  # Создаем токен для активации.
+            })
+            # Получаем email пользователя из формы.
+            to_email = form.cleaned_data.get('email')
+            # Создаем объект email-сообщения.
+            email = EmailMessage(mail_subject, message, to=[to_email])
+            try:
+                email.send()
+                logger.debug(f"Email sent to {to_email}")
+            except Exception as e:
+                logger.error(f"Error sending email: {e}")
+            return render(request, 'registration/activation_sent.html')
+    else:
+        # Если запрос не POST, создаем пустую форму.
+        form = SignUpForm()
+    # Рендерим страницу регистрации с формой.
+    return render(request, 'registration/signup.html', {'form': form})
+
+# Активация учетки.
+def activate(request, uidb64, token):
+    try:
+        # Декодируем UID пользователя.
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        # Получаем пользователя по UID.
+        user = Employee.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, Employee.DoesNotExist):
+        user = None
+    # Проверяем, что пользователь существует и токен валиден.
+    if user is not None and default_token_generator.check_token(user, token):
+        # Активируем пользователя.
+        user.is_active = True
+        # Подтверждаем email.
+        user.email_confirmed = True
+        # Сохраняем изменения.
+        user.save()
+        # Явно указываем бэкенд.
+        backend = 'django.contrib.auth.backends.ModelBackend'
+        # Авторизуем пользователя.
+        login(request, user, backend=backend)
+        # Перенаправляем на главную страницу.
+        return redirect('home')
+    else:
+        # рендерим страницу, уведомляющую о недействительной ссылке активации
+        return render(request, 'registration/activation_invalid.html')
+
+# Объект контактов.
+class ContactsView(PreviousPageSetMixinL1, DetailView):
+    # Модель.
+    model = Contacts
+    # Шаблон.
+    template_name = 'contacts.html'
+
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return Contacts.objects.first()
+
+# Создание контактов.
+class ContactsCreateView(GPermissionRequiredMixin, CreateView):
+    # Права доступа.
+    permission_required = 'core.add_contacts'
+    # Форма.
+    form_class = ContactsForm
+    # Модель.
+    model = Contacts
+    # Шаблон.
+    template_name = 'contacts_edit.html'
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        return reverse('core:contacts')
+
+# Изменение контактов.
+class ContactsUpdateView(PermissionRequiredMixin, UpdateView):
+    # Права доступа
+    permission_required = 'core.change_contacts'
+    accept_global_perms = True
+    # Форма.
+    form_class = ContactsForm
+    # Модель.
+    model = Contacts
+    # Шаблон.
+    template_name = 'contacts_edit.html'
+
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return Contacts.objects.first()
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        return reverse('core:contacts')
+
+# Объект политики конфиденциальности.
+class PrivacyPolicyView(PreviousPageSetMixinL1, DetailView):
+    # Модель.
+    model = PrivacyPolicy
+    # Шаблон.
+    template_name = 'privacy_policy.html'
+
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return PrivacyPolicy.objects.first()
+
+# Создание политики конфиденциальности.
+class PrivacyPolicyCreateView(GPermissionRequiredMixin, CreateView):
+    # Права доступа.
+    permission_required = 'core.add_privacypolicy'
+    # Форма.
+    form_class = PrivacyPolicyForm
+    # Модель.
+    model = PrivacyPolicy
+    # Шаблон.
+    template_name = 'privacy_policy_edit.html'
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        return reverse('core:privacy_policy')
+
+# Изменение политики конфиденциальности.
+class PrivacyPolicyUpdateView(PermissionRequiredMixin, UpdateView):
+    # Права доступа
+    permission_required = 'core.change_privacypolicy'
+    accept_global_perms = True
+    # Форма.
+    form_class = PrivacyPolicyForm
+    # Модель.
+    model = PrivacyPolicy
+    # Шаблон.
+    template_name = 'privacy_policy_edit.html'
+
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return PrivacyPolicy.objects.first()
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        return reverse('core:privacy_policy')
+
+# Объект политики конфиденциальности.
+class DataProcessingView(PreviousPageSetMixinL1, DetailView):
+    # Модель.
+    model = DataProcessing
+    # Шаблон.
+    template_name = 'data_processing.html'
+
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return DataProcessing.objects.first()
+
+# Создание политики конфиденциальности.
+class DataProcessingCreateView(GPermissionRequiredMixin, CreateView):
+    # Права доступа.
+    permission_required = 'core.add_dataprocessing'
+    # Форма.
+    form_class = DataProcessingForm
+    # Модель.
+    model = DataProcessing
+    # Шаблон.
+    template_name = 'data_processing_edit.html'
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        return reverse('core:data_processing')
+
+# Изменение политики конфиденциальности.
+class DataProcessingUpdateView(PermissionRequiredMixin, UpdateView):
+    # Права доступа
+    permission_required = 'core.change_dataprocessing'
+    accept_global_perms = True
+    # Форма.
+    form_class = DataProcessingForm
+    # Модель.
+    model = DataProcessing
+    # Шаблон.
+    template_name = 'data_processing_edit.html'
+
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return DataProcessing.objects.first()
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        return reverse('core:data_processing')
