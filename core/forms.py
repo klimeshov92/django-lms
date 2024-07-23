@@ -59,16 +59,16 @@ class PersonalInfoForm(forms.ModelForm):
             'last_name',
             'first_name',
             'fathers_name',
-            'birthday',
+            #'birthday',
             'email',
-            'phone',
-            'mobile_phone',
+            #'phone',
+            #'mobile_phone',
             'creator'
             ]
         # Классы виджетов.
         widgets = {
             'creator': forms.HiddenInput(),
-            'birthday': forms.DateInput(attrs={'type': 'date'}),
+            #'birthday': forms.DateInput(attrs={'type': 'date'})
         }
 
 # Форма организации.
@@ -85,7 +85,7 @@ class OrganizationForm(forms.ModelForm):
             ]
         # Классы виджетов.
         widgets = {
-            'creator': forms.HiddenInput(),
+            'creator': forms.HiddenInput()
         }
 
 # Форма подразделения.
@@ -105,7 +105,7 @@ class SubdivisionForm(forms.ModelForm):
         widgets = {
             'organization': Select2Widget(),
             'parent_subdivision': Select2Widget(),
-            'creator': forms.HiddenInput(),
+            'creator': forms.HiddenInput()
         }
 
 # Форма должности.
@@ -123,7 +123,7 @@ class PositionForm(forms.ModelForm):
         # Классы виджетов.
         widgets = {
             'subdivision': Select2Widget(),
-            'creator': forms.HiddenInput(),
+            'creator': forms.HiddenInput()
         }
 
 # Форма назначения.
@@ -146,7 +146,7 @@ class PlacementForm(forms.ModelForm):
             'position': Select2Widget(),
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
-            'creator': forms.HiddenInput(),
+            'creator': forms.HiddenInput()
         }
 
 # Форма создания импорта.
@@ -167,7 +167,7 @@ class EmployeeExcelImportForm(forms.ModelForm):
         widgets = {
             'type': forms.Select(),
             'creator': forms.HiddenInput(),
-            'categories': Select2MultipleWidget(),
+            'categories': Select2MultipleWidget()
         }
 
     # Особенность формы для апдейта.
@@ -193,7 +193,7 @@ class CategoryForm(forms.ModelForm):
         ]
         # Классы виджетов.
         widgets = {
-            'creator': forms.HiddenInput(),
+            'creator': forms.HiddenInput()
         }
 
 # Форма группы.
@@ -215,7 +215,7 @@ class GroupForm(forms.ModelForm):
             'type': forms.HiddenInput(),
             'categories': Select2MultipleWidget(),
             'creator': forms.HiddenInput(),
-            'permissions': Select2MultipleWidget(),
+            'permissions': Select2MultipleWidget()
         }
 
     # Инициализатор.
@@ -285,7 +285,7 @@ class GroupsGeneratorForm(forms.ModelForm):
             'added_groups': Select2MultipleWidget(),
             'added_users': Select2MultipleWidget(),
             'excluded_groups': Select2MultipleWidget(),
-            'excluded_users': Select2MultipleWidget(),
+            'excluded_users': Select2MultipleWidget()
         }
 
 # Форма создания импорта.
@@ -307,7 +307,7 @@ class EmployeesGroupObjectPermissionForm(forms.ModelForm):
             'content_type': forms.HiddenInput(),
             'object_pk': forms.HiddenInput(),
             'group': Select2Widget(),
-            'creator': forms.HiddenInput(),
+            'creator': forms.HiddenInput()
         }
         # Названия полей.
         labels = {
@@ -359,7 +359,7 @@ class EmployeesObjectPermissionForm(forms.ModelForm):
             'content_type': forms.HiddenInput(),
             'object_pk': forms.HiddenInput(),
             'user': Select2Widget(),
-            'creator': forms.HiddenInput(),
+            'creator': forms.HiddenInput()
         }
         # Названия полей.
         labels = {

@@ -67,7 +67,9 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
-                    {#<a href="{% url 'core:personal_info_update' pk=request.user.pk %}">Изменить данные</a>#}
+                    {% if self_registration == True %}
+                        <a href="{% url 'core:personal_info_update' pk=request.user.pk %}">Изменить данные</a>
+                    {% endif %}
                     <a href="{% url 'password_change' %}">Изменить пароль</a>
                     <a href="{{ previous_page_l1 }}">Назад</a>
                 </nav>

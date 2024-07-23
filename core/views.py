@@ -2150,6 +2150,10 @@ class PersonalArea(LoginRequiredMixin, PreviousPageGetMixinL1, DetailView):
         context['is_area'] = True
 
         # Забираем назначения пользователя.
+        self_registration = self.object.self_registration
+        context['self_registration'] = self_registration
+
+        # Забираем назначения пользователя.
         object_list = self.object.placements.all().order_by('start_date')
         qs_count = object_list.count()
 
