@@ -67,8 +67,10 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
-                    {% if self_registration == True %}
-                        <a href="{% url 'core:personal_info_update' %}">Изменить данные</a>
+                    {% if user|perms:"core.change_self_employee" %}
+                        {% if self_registration == True %}
+                            <a href="{% url 'core:personal_info_update' %}">Изменить данные</a>
+                        {% endif %}
                     {% endif %}
                     <a href="{% url 'password_change' %}">Изменить пароль</a>
                     <a href="{{ previous_page_l1 }}">Назад</a>

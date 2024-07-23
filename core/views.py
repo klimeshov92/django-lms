@@ -2222,7 +2222,7 @@ class PersonalArea(LoginRequiredMixin, PreviousPageGetMixinL1, DetailView):
 # Изменение сотрудника.
 class PersonalInfoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
-    permission_required = 'core.change_employee'
+    permission_required = 'core.change_self_employee'
     accept_global_perms = True
     # Форма.
     form_class = PersonalInfoForm

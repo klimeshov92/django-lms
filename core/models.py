@@ -65,6 +65,10 @@ class Employee(AbstractUser):
         # Изменение имени модели.
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
+        # Добавление прав.
+        permissions = (
+            ('change_self_employee', 'Can change self Сотрудник'),
+        )
 
     # Строковое представление.
     def __str__(self):
