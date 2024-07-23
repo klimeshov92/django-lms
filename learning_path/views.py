@@ -1106,7 +1106,7 @@ def self_appointment(request, pk, type):
             last_result = Result.objects.filter(employee=request.user, type='learning_path', learning_path=learning_path).latest('id')
 
             # Если уже идет.
-            if last_result.status == 'appointed' or last_result.status == 'in_progress':
+            if last_result.status == 'completed':
                 appoint = False
                 if settings.DEBUG:
                     logger.info(f"Существующий последний результат: {last_result}")
@@ -1139,8 +1139,12 @@ def self_appointment(request, pk, type):
                         last_result = Result.objects.filter(employee=request.user, material=material).latest('id')
 
                         # Если уже идет.
-                        if last_result.status == 'appointed' or last_result.status == 'in_progress':
+                        if last_result.status == 'completed':
                             logger.info(f"Пропускаем для {request.user}: уже назначен")
+                            if learning_task.control_task == True:
+                                learning_path_result.completed_control_tasks += 1
+                                learning_path_result.save()
+                                logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
                             continue
 
                     # Создание объекта результата для задачи.
@@ -1164,8 +1168,12 @@ def self_appointment(request, pk, type):
                         last_result = Result.objects.filter(employee=request.user, test=test).latest('id')
 
                         # Если уже идет.
-                        if last_result.status == 'appointed' or last_result.status == 'in_progress':
+                        if last_result.status == 'completed':
                             logger.info(f"Пропускаем для {request.user}: уже назначен")
+                            if learning_task.control_task == True:
+                                learning_path_result.completed_control_tasks += 1
+                                learning_path_result.save()
+                                logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
                             continue
 
                     # Создание объекта результата для задачи.
@@ -1189,8 +1197,12 @@ def self_appointment(request, pk, type):
                         last_result = Result.objects.filter(employee=request.user, course=course).latest('id')
 
                         # Если уже идет.
-                        if last_result.status == 'appointed' or last_result.status == 'in_progress':
+                        if last_result.status == 'completed':
                             logger.info(f"Пропускаем для {request.user}: уже назначен")
+                            if learning_task.control_task == True:
+                                learning_path_result.completed_control_tasks += 1
+                                learning_path_result.save()
+                                logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
                             continue
 
                     # Создание объекта результата для задачи.
