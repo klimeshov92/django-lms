@@ -1603,7 +1603,7 @@ label[for$="clear_id"] {
 /* Контент */
 .content-grid-item-list-grid {
     display: grid; /* Сетка */
-    grid-gap: 25px; /* Расстояние между элементами */
+    grid-gap: 50px; /* Расстояние между элементами */
     grid-template-columns: 1fr; /* Одна колонка для сетки */
 }
 
