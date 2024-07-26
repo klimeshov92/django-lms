@@ -35,6 +35,8 @@ from reviews.filters import ObjectsReviewFilter
 from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
 from core.filters import EmployeesGroupObjectPermissionFilter, EmployeesObjectPermissionFilter
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 
 # Импортируем логи
@@ -43,7 +45,7 @@ import logging
 logger = logging.getLogger('project')
 
 # Список курсов.
-class CoursesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class CoursesView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'courses.view_course'
     # Модель.
@@ -108,7 +110,7 @@ class CoursesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект материала.
-class CourseView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, DetailView):
+class CourseView(LoginRequiredMixin, PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, DetailView):
     # Права доступа
     permission_required = 'courses.view_course'
     accept_global_perms = True
@@ -237,7 +239,7 @@ class CourseView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequi
         return context
 
 # Создание материала.
-class CourseCreateView(GPermissionRequiredMixin, CreateView):
+class CourseCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'courses.add_course'
     # Форма.
@@ -262,7 +264,7 @@ class CourseCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('courses:course', kwargs={'pk': self.object.pk})
 
 # Изменение материала.
-class CourseUpdateView(PermissionRequiredMixin, UpdateView):
+class CourseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'courses.change_course'
     accept_global_perms = True
@@ -288,7 +290,7 @@ class CourseUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('courses:course', kwargs={'pk': self.object.pk})
 
 # Удаление материала..
-class CourseDeleteView(PermissionRequiredMixin, DeleteView):
+class CourseDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа
     permission_required = 'courses.delete_course'
     accept_global_perms = True
@@ -304,7 +306,7 @@ class CourseDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 # Список файлов.
-class ScormPackagesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class ScormPackagesView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'courses.view_scormpackage'
     # Модель.
@@ -337,7 +339,7 @@ class ScormPackagesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект файла.
-class ScormPackageView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
+class ScormPackageView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     # Права доступа
     permission_required = 'courses.view_scormpackage'
     accept_global_perms = True
@@ -356,7 +358,7 @@ class ScormPackageView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailVi
         return context
 
 # Создание файла.
-class ScormPackageCreateView(GPermissionRequiredMixin, CreateView):
+class ScormPackageCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'courses.add_scormpackage'
     # Форма.
@@ -410,7 +412,7 @@ class ScormPackageCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('courses:scorm_package', kwargs={'pk': self.object.pk})
 
 # Изменение файла.
-class ScormPackageUpdateView(PermissionRequiredMixin, UpdateView):
+class ScormPackageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'courses.change_scormpackage'
     accept_global_perms = True
@@ -436,7 +438,7 @@ class ScormPackageUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('courses:scorm_package', kwargs={'pk': self.object.pk})
 
 # Удаление файла.
-class ScormPackageDeleteView(PermissionRequiredMixin, DeleteView):
+class ScormPackageDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа
     permission_required = 'courses.delete_scormpackage'
     accept_global_perms = True
@@ -452,6 +454,7 @@ class ScormPackageDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 # Плеер.
+@login_required
 def scorm_display(request, scorm_package_id):
     logger.info(f"Запрос на отображение SCORM-пакета. scorm_package_id: {scorm_package_id}")
     # Забираем пакет.

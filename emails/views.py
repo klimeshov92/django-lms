@@ -38,7 +38,8 @@ tz = timezone.get_default_timezone()
 from core.models import Employee
 # Миксины.
 from core.mixins import PreviousPageGetMixinL0, PreviousPageSetMixinL0, PreviousPageGetMixinL1, PreviousPageSetMixinL1, PreviousPageGetMixinL2, PreviousPageSetMixinL2
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 # Импортируем логи
 import logging
@@ -46,7 +47,7 @@ import logging
 logger = logging.getLogger('project')
 
 # Список вопросов.
-class EmailsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class EmailsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'emails.view_email'
     # Модель.
@@ -77,7 +78,7 @@ class EmailsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Вывод рассылки.
-class EmailView(PreviousPageGetMixinL1, PermissionRequiredMixin, ListView):
+class EmailView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, ListView):
     # Права доступа
     permission_required = 'emails.view_email'
     accept_global_perms = True
@@ -115,7 +116,7 @@ class EmailView(PreviousPageGetMixinL1, PermissionRequiredMixin, ListView):
         return context
 
 # Создание рассылки.
-class EmailCreateView(GPermissionRequiredMixin, CreateView):
+class EmailCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'emails.add_email'
     # Форма.
@@ -140,7 +141,7 @@ class EmailCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('emails:email', kwargs={'pk': self.object.pk})
 
 # Изменение файла.
-class EmailUpdateView(PermissionRequiredMixin, UpdateView):
+class EmailUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'courses.change_email'
     accept_global_perms = True
@@ -170,7 +171,7 @@ class EmailUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('emails:email', kwargs={'pk': self.object.pk})
 
 # Удаление рассылки.
-class EmailDeleteView(PermissionRequiredMixin, DeleteView):
+class EmailDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа
     permission_required = 'emails.delete_email'
     accept_global_perms = True
@@ -186,6 +187,7 @@ class EmailDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 # Отправка писем.
+@login_required
 @permission_required('emails.add_email')
 def sending(request, pk):
 

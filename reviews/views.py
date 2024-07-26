@@ -30,6 +30,8 @@ from django.http import HttpResponseForbidden
 from .filters import ObjectsReviewFilter, ReviewFilter
 # Миксины.
 from core.mixins import PreviousPageGetMixinL0, PreviousPageSetMixinL0, PreviousPageGetMixinL1, PreviousPageSetMixinL1, PreviousPageGetMixinL2, PreviousPageSetMixinL2
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 # Импортируем логи
 import logging
@@ -37,7 +39,7 @@ import logging
 logger = logging.getLogger('project')
 
 # Список отзывов.
-class ReviewsView(PermissionListMixin, ListView):
+class ReviewsView(LoginRequiredMixin, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'reviews.view_all_review'
     # Модель.
@@ -68,7 +70,7 @@ class ReviewsView(PermissionListMixin, ListView):
         return context
 
 # Список отзывов на объект.
-class ObjectsReviewsView(PreviousPageGetMixinL0, PermissionListMixin, ListView):
+class ObjectsReviewsView(LoginRequiredMixin, PreviousPageGetMixinL0, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'reviews.view_review'
     # Модель.
@@ -134,7 +136,7 @@ class ObjectsReviewsView(PreviousPageGetMixinL0, PermissionListMixin, ListView):
         return context
 
 # Создание отзыва на объект.
-class ObjectsReviewCreateView(GPermissionRequiredMixin, CreateView):
+class ObjectsReviewCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа
     permission_required = 'reviews.add_review'
     # Форма.
@@ -210,7 +212,7 @@ class ObjectsReviewCreateView(GPermissionRequiredMixin, CreateView):
 
 
 # Изменение отзыва на объект.
-class ObjectsReviewUpdateView(PermissionRequiredMixin, UpdateView):
+class ObjectsReviewUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'reviews.change_review'
     accept_global_perms = True
@@ -255,7 +257,7 @@ class ObjectsReviewUpdateView(PermissionRequiredMixin, UpdateView):
             return reverse('events:event', kwargs={'pk': self.object.event.pk})
 
 # Удаление отзыва на объект.
-class ObjectsReviewDeleteView(PermissionRequiredMixin, DeleteView):
+class ObjectsReviewDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_review'
     accept_global_perms = True

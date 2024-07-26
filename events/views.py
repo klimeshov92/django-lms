@@ -43,6 +43,8 @@ from reviews.filters import ObjectsReviewFilter
 from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
 from core.filters import EmployeesGroupObjectPermissionFilter, EmployeesObjectPermissionFilter
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 # Импортируем логи
 import logging
@@ -50,7 +52,7 @@ import logging
 logger = logging.getLogger('project')
 
 # Список вопросов.
-class EventsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class EventsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'events.view_event'
     # Модель.
@@ -90,7 +92,7 @@ class EventsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Вывод мероприятия.
-class EventView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, ListView):
+class EventView(LoginRequiredMixin, PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, ListView):
     # Права доступа
     permission_required = 'events.view_event'
     accept_global_perms = True
@@ -258,7 +260,7 @@ class EventView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequir
         return context
 
 # Создание мероприятия.
-class EventCreateView(GPermissionRequiredMixin, CreateView):
+class EventCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'events.add_event'
     # Форма.
@@ -298,7 +300,7 @@ class EventCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('events:event', kwargs={'pk': self.object.pk})
 
 # Изменение мероприятия.
-class EventUpdateView(PermissionRequiredMixin, UpdateView):
+class EventUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'events.change_event'
     accept_global_perms = True
@@ -343,7 +345,7 @@ class EventUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('events:event', kwargs={'pk': self.object.pk})
 
 # Удаление мероприятия.
-class EventDeleteView(PermissionRequiredMixin, DeleteView):
+class EventDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа
     permission_required = 'events.delete_event'
     accept_global_perms = True
@@ -359,7 +361,7 @@ class EventDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 # Создание категории.
-class ParticipantsGeneratorCreateView(GPermissionRequiredMixin, CreateView):
+class ParticipantsGeneratorCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'events.add_event'
     # Форма.
@@ -414,7 +416,7 @@ class ParticipantsGeneratorCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('events:event', kwargs={'pk': self.object.event.pk})
 
 # Изменение категории.
-class ParticipantsGeneratorUpdateView(PermissionRequiredMixin, UpdateView):
+class ParticipantsGeneratorUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'events.change_event'
     accept_global_perms = True
@@ -467,6 +469,7 @@ class ParticipantsGeneratorUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('events:event', kwargs={'pk': self.object.event.pk})
 
 # Отметка отказа.
+@login_required
 def participants_mark(request, pk, status):
 
     # Забираем резульат.
@@ -491,6 +494,7 @@ def participants_mark(request, pk, status):
     return redirect('events:event', pk=result.event.pk)
 
 # Отметка пристуствия.
+@login_required
 @permission_required('events.change_event', return_403=True)
 def responsibles_mark(request, pk, status):
 
@@ -512,6 +516,7 @@ def responsibles_mark(request, pk, status):
     return redirect('events:event', pk=result.event.pk)
 
 # Отметка статуса.
+@login_required
 @permission_required('events.change_event', return_403=True)
 def change_status(request, pk, status):
 

@@ -32,6 +32,8 @@ from reviews.models import Review
 from core.models import EmployeesGroupObjectPermission, EmployeesObjectPermission
 from reviews.filters import ObjectsReviewFilter
 from core.filters import EmployeesGroupObjectPermissionFilter, EmployeesObjectPermissionFilter
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 # Импортируем логи
 import logging
@@ -39,7 +41,7 @@ import logging
 logger = logging.getLogger('project')
 
 # Список материалов.
-class MaterialsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class MaterialsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'materials.view_material'
     # Модель.
@@ -105,7 +107,7 @@ class MaterialsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект материала.
-class MaterialView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, DetailView):
+class MaterialView(LoginRequiredMixin, PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, DetailView):
     # Права доступа/
     permission_required = 'materials.view_material'
     accept_global_perms = True
@@ -223,7 +225,7 @@ class MaterialView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionReq
         return context
 
 # Объект материала.
-class MaterialReadView(PreviousPageGetMixinL0, PermissionRequiredMixin, DetailView):
+class MaterialReadView(LoginRequiredMixin, PreviousPageGetMixinL0, PermissionRequiredMixin, DetailView):
     # Права доступа
     permission_required = 'materials.view_material'
     accept_global_perms = True
@@ -270,6 +272,7 @@ class MaterialReadView(PreviousPageGetMixinL0, PermissionRequiredMixin, DetailVi
         return context
 
 # Ознакомление.
+@login_required
 def confirm_reading(request, pk):
     # Забираем материал.
     material = Material.objects.get(pk=pk)
@@ -284,7 +287,7 @@ def confirm_reading(request, pk):
     return redirect('materials:material', pk=pk)
 
 # Создание материала.
-class MaterialCreateView(GPermissionRequiredMixin, CreateView):
+class MaterialCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'materials.add_material'
     # Форма.
@@ -309,7 +312,7 @@ class MaterialCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('materials:material', kwargs={'pk': self.object.pk})
 
 # Изменение материала.
-class MaterialUpdateView(PermissionRequiredMixin, UpdateView):
+class MaterialUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'materials.change_material'
     accept_global_perms = True
@@ -335,7 +338,7 @@ class MaterialUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('materials:material', kwargs={'pk': self.object.pk})
 
 # Удаление материала..
-class MaterialDeleteView(PermissionRequiredMixin, DeleteView):
+class MaterialDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа
     permission_required = 'materials.delete_material'
     accept_global_perms = True
@@ -351,7 +354,7 @@ class MaterialDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 # Список файлов.
-class FilesView(PreviousPageSetMixinL2, PermissionListMixin, ListView):
+class FilesView(LoginRequiredMixin, PreviousPageSetMixinL2, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'materials.view_file'
     # Модель.
@@ -386,7 +389,7 @@ class FilesView(PreviousPageSetMixinL2, PermissionListMixin, ListView):
         return context
 
 # Объект файла.
-class FileView(PreviousPageGetMixinL2, PermissionRequiredMixin, DetailView):
+class FileView(LoginRequiredMixin, PreviousPageGetMixinL2, PermissionRequiredMixin, DetailView):
     # Права доступа
     permission_required = 'materials.view_file'
     accept_global_perms = True
@@ -405,7 +408,7 @@ class FileView(PreviousPageGetMixinL2, PermissionRequiredMixin, DetailView):
         return context
 
 # Создание файла.
-class FileCreateView(GPermissionRequiredMixin, CreateView):
+class FileCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'materials.add_file'
     # Форма.
@@ -430,7 +433,7 @@ class FileCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('materials:file', kwargs={'pk': self.object.pk})
 
 # Изменение файла.
-class FileUpdateView(PermissionRequiredMixin, UpdateView):
+class FileUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'materials.change_file'
     accept_global_perms = True
@@ -456,7 +459,7 @@ class FileUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('materials:file', kwargs={'pk': self.object.pk})
 
 # Удаление файла.
-class FileDeleteView(PermissionRequiredMixin, DeleteView):
+class FileDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа
     permission_required = 'materials.delete_file'
     accept_global_perms = True

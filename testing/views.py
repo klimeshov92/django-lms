@@ -42,6 +42,10 @@ from reviews.filters import ObjectsReviewFilter
 from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
 from core.filters import EmployeesGroupObjectPermissionFilter, EmployeesObjectPermissionFilter
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+
+
 
 # Импортируем логи
 import logging
@@ -49,7 +53,7 @@ import logging
 logger = logging.getLogger('project')
 
 # Список тестов.
-class TestsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class TestsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'testing.view_test'
     # Модель.
@@ -116,7 +120,7 @@ class TestsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Вывод теста.
-class TestView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, ListView):
+class TestView(LoginRequiredMixin, PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, ListView):
     # Права доступа
     permission_required = 'testing.view_test'
     accept_global_perms = True
@@ -300,6 +304,7 @@ class TestView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequire
         return context
 
 # Сортировка вопросов теста.
+@login_required
 @permission_required('testing.change_test')
 def tests_questions_ordering(request, pk):
 
@@ -341,7 +346,7 @@ def tests_questions_ordering(request, pk):
 
 
 # Создание теста.
-class TestCreateView(GPermissionRequiredMixin, CreateView):
+class TestCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'testing.add_test'
     # Форма.
@@ -366,7 +371,7 @@ class TestCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('testing:test', kwargs={'pk': self.object.pk})
 
 # Изменение теста.
-class TestUpdateView(PermissionRequiredMixin, UpdateView):
+class TestUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'testing.change_test'
     accept_global_perms = True
@@ -392,7 +397,7 @@ class TestUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('testing:test', kwargs={'pk': self.object.pk})
 
 # Удаление теста.
-class TestDeleteView(PermissionRequiredMixin, DeleteView):
+class TestDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа
     permission_required = 'testing.delete_test'
     accept_global_perms = True
@@ -407,7 +412,7 @@ class TestDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('testing:tests')
 
 # Список вопросов.
-class QuestionsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class QuestionsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'testing.view_question'
     # Модель.
@@ -440,7 +445,7 @@ class QuestionsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Вывод вопроса.
-class QuestionView(PreviousPageGetMixinL1, PermissionRequiredMixin, ListView):
+class QuestionView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, ListView):
     # Права доступа
     permission_required = 'testing.view_question'
     accept_global_perms = True
@@ -484,7 +489,7 @@ class QuestionView(PreviousPageGetMixinL1, PermissionRequiredMixin, ListView):
         return context
 
 # Создание вопроса.
-class QuestionCreateView(GPermissionRequiredMixin, CreateView):
+class QuestionCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'testing.add_question'
     # Форма.
@@ -509,7 +514,7 @@ class QuestionCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('testing:question', kwargs={'pk': self.object.pk})
 
 # Изменение вопроса.
-class QuestionUpdateView(PermissionRequiredMixin, UpdateView):
+class QuestionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'testing.change_question'
     accept_global_perms = True
@@ -537,7 +542,7 @@ class QuestionUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('testing:question', kwargs={'pk': self.object.pk})
 
 # Удаление вопроса.
-class QuestionDeleteView(PermissionRequiredMixin, DeleteView):
+class QuestionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа
     permission_required = 'testing.delete_question'
     accept_global_perms = True
@@ -552,7 +557,7 @@ class QuestionDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('testing:questions')
 
 # Создание категории.
-class TestsQuestionsGeneratorCreateView(GPermissionRequiredMixin, CreateView):
+class TestsQuestionsGeneratorCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'testing.add_test'
     # Форма.
@@ -608,7 +613,7 @@ class TestsQuestionsGeneratorCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('testing:test', kwargs={'pk': self.object.test.pk})
 
 # Изменение категории.
-class TestsQuestionsGeneratorUpdateView(PermissionRequiredMixin, UpdateView):
+class TestsQuestionsGeneratorUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'testing.change_test'
     accept_global_perms = True
@@ -663,7 +668,7 @@ class TestsQuestionsGeneratorUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('testing:test', kwargs={'pk': self.object.test.pk})
 
 # Создание вопроса.
-class AnswerCreateView(GPermissionRequiredMixin, CreateView):
+class AnswerCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'testing.add_question'
     # Форма.
@@ -710,6 +715,7 @@ class AnswerCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('testing:question', kwargs={'pk': self.object.question.pk})
 
 # Сортировка ответов на вопрос.
+@login_required
 @permission_required('testing.change_question')
 def answers_ordering(request, pk):
 
@@ -750,7 +756,7 @@ def answers_ordering(request, pk):
     return render(request, 'answers_ordering.html', contex)
 
 # Изменение вопроса.
-class AnswerUpdateView(PermissionRequiredMixin, UpdateView):
+class AnswerUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'testing.change_question'
     accept_global_perms = True
@@ -787,7 +793,7 @@ class AnswerUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('testing:question', kwargs={'pk': self.object.question.pk})
 
 # Удаление вопроса.
-class AnswerDeleteView(PermissionRequiredMixin, DeleteView):
+class AnswerDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа
     permission_required = 'testing.change_question'
     accept_global_perms = True
@@ -807,7 +813,7 @@ class AnswerDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('testing:question', kwargs={'pk': self.object.question.pk})
 
 # Создание соотвествующего пункта.
-class RelevantPointCreateView(GPermissionRequiredMixin, CreateView):
+class RelevantPointCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'testing.add_question'
     # Форма.
@@ -840,7 +846,7 @@ class RelevantPointCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('testing:question', kwargs={'pk': self.object.answer.question.pk})
 
 # Изменение соотвествующего пункта.
-class RelevantPointUpdateView(PermissionRequiredMixin, UpdateView):
+class RelevantPointUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'testing.change_question'
     accept_global_perms = True
@@ -871,6 +877,7 @@ class RelevantPointUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('testing:question', kwargs={'pk': self.object.answer.question.pk})
 
 # Функция завершения теста.
+@login_required
 def completion_of_test(tests_result, test):
 
     # Забираем результаты
@@ -932,6 +939,7 @@ def completion_of_test(tests_result, test):
         logger.info(f'Результат теста: {tests_result.get_status_display()}\n')
 
 # Функция прохождения теста.
+@login_required
 def take_assigned_test(request, pk):
 
     # Забираем результат теста и тест.
@@ -1083,6 +1091,7 @@ def take_assigned_test(request, pk):
 
 
 # Функция прохождения теста.
+@login_required
 def view_test_results(request, pk):
 
     # Забираем результат теста и тест.
@@ -1116,6 +1125,7 @@ def view_test_results(request, pk):
     return redirect('testing:answer_to_question', pk=questions_result.id)
 
 # Функция ответа на вопрос теста.
+@login_required
 def answer_to_question(request, pk):
 
     # Забираем резульат вопроса.
@@ -1326,6 +1336,7 @@ def answer_to_question(request, pk):
     return render(request, 'answer_to_question.html', context)
 
 # Функция завершения не пройденного теста.
+@login_required
 def attempt_end_timeout(request, pk):
 
     # Забираем результат теста и тест.
@@ -1339,6 +1350,7 @@ def attempt_end_timeout(request, pk):
     return redirect('testing:test', pk=test.id)
 
 # Функция переназначения теста.
+@login_required
 def retake_the_test(request, pk):
     # забираем результат теста.
     tests_result = Result.objects.get(pk=pk)

@@ -54,6 +54,8 @@ from core.filters import EmployeesGroupObjectPermissionFilter, EmployeesObjectPe
 from datetime import timedelta
 from datetime import date
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 # Импортируем логи
 import logging
@@ -61,7 +63,7 @@ import logging
 logger = logging.getLogger('project')
 
 # Список траекторий.
-class LearningComplexsView(PreviousPageSetMixinL5, PermissionListMixin, ListView):
+class LearningComplexsView(LoginRequiredMixin, PreviousPageSetMixinL5, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'learning_path.view_learningcomplex'
     # Модель.
@@ -92,7 +94,7 @@ class LearningComplexsView(PreviousPageSetMixinL5, PermissionListMixin, ListView
         return context
 
 # Объект категории.
-class LearningComplexView(PreviousPageGetMixinL5, PreviousPageSetMixinL4, PermissionRequiredMixin, ListView):
+class LearningComplexView(LoginRequiredMixin, PreviousPageGetMixinL5, PreviousPageSetMixinL4, PermissionRequiredMixin, ListView):
     # Права доступа.
     permission_required = 'learning_path.view_learningcomplex'
     accept_global_perms = True
@@ -136,7 +138,7 @@ class LearningComplexView(PreviousPageGetMixinL5, PreviousPageSetMixinL4, Permis
 
 
 # Создание траектории.
-class LearningComplexCreateView(GPermissionRequiredMixin, CreateView):
+class LearningComplexCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'learning_path.add_larningcomplex'
     # Форма.
@@ -161,7 +163,7 @@ class LearningComplexCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('learning_path:learning_complex', kwargs={'pk': self.object.pk})
 
 # Изменение траектории.
-class LearningComplexUpdateView(PermissionRequiredMixin, UpdateView):
+class LearningComplexUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'learning_path.change_learningcomplex'
     # Форма.
@@ -187,7 +189,7 @@ class LearningComplexUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('learning_path:learning_complex', kwargs={'pk': self.object.pk})
 
 # Удаление траектории.
-class LearningComplexDeleteView(PermissionRequiredMixin, DeleteView):
+class LearningComplexDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'learning_path.delete_learningcomplex'
     # Модель.
@@ -202,7 +204,7 @@ class LearningComplexDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('learning_path:learning_complexs')
 
 # Список траекторий программы.
-class LearningComplexPathsView(PreviousPageSetMixinL3, PermissionRequiredMixin, ListView):
+class LearningComplexPathsView(LoginRequiredMixin, PreviousPageSetMixinL3, PermissionRequiredMixin, ListView):
     # Права доступа.
     permission_required = 'learning_path.view_learningcomplex'
     accept_global_perms = True
@@ -239,7 +241,7 @@ class LearningComplexPathsView(PreviousPageSetMixinL3, PermissionRequiredMixin, 
         return context
 
 # Создание траектории.
-class LearningComplexPathCreateView(GPermissionRequiredMixin, CreateView):
+class LearningComplexPathCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'learning_path.add_learningcomplex'
     # Форма.
@@ -279,6 +281,7 @@ class LearningComplexPathCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('learning_path:learning_complex', kwargs={'pk': self.object.learning_complex.pk})
 
 # Сортировка траекторий комплексной программы.
+@login_required
 @permission_required('testing.change_learningcomplex')
 def learning_paths_ordering(request, pk):
 
@@ -320,7 +323,7 @@ def learning_paths_ordering(request, pk):
 
 
 # Изменение траектории.
-class LearningComplexPathUpdateView(PermissionRequiredMixin, UpdateView):
+class LearningComplexPathUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'learning_path.change_learningcomplex'
     accept_global_perms = True
@@ -351,7 +354,7 @@ class LearningComplexPathUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('learning_path:learning_complex', kwargs={'pk': self.object.learning_complex.pk})
 
 # Удаление траектории.
-class LearningComplexPathDeleteView(PermissionRequiredMixin, DeleteView):
+class LearningComplexPathDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'learning_path.delete_learningcomplex'
     accept_global_perms = True
@@ -371,7 +374,7 @@ class LearningComplexPathDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('learning_path:learning_complex', kwargs={'pk': self.object.learning_complex.pk})
 
 # Список траекторий.
-class LearningPathsView(PreviousPageSetMixinL3, PermissionListMixin, ListView):
+class LearningPathsView(LoginRequiredMixin, PreviousPageSetMixinL3, PermissionListMixin, ListView):
     # Права доступа.
     permission_required = 'learning_path.view_learningpath'
     # Модель.
@@ -427,7 +430,7 @@ class LearningPathsView(PreviousPageSetMixinL3, PermissionListMixin, ListView):
         return context
 
 # Объект категории.
-class LearningPathView(PreviousPageGetMixinL3, PreviousPageSetMixinL2, PreviousPageSetMixinL0, PermissionRequiredMixin, ListView):
+class LearningPathView(LoginRequiredMixin, PreviousPageGetMixinL3, PreviousPageSetMixinL2, PreviousPageSetMixinL0, PermissionRequiredMixin, ListView):
     # Права доступа.
     permission_required = 'learning_path.view_learningpath'
     accept_global_perms = True
@@ -559,7 +562,7 @@ class LearningPathView(PreviousPageGetMixinL3, PreviousPageSetMixinL2, PreviousP
         return context
 
 # Создание траектории.
-class LearningPathCreateView(GPermissionRequiredMixin, CreateView):
+class LearningPathCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'learning_path.add_learningpath'
     # Форма.
@@ -584,7 +587,7 @@ class LearningPathCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('learning_path:learning_path', kwargs={'pk': self.object.pk})
 
 # Изменение траектории.
-class LearningPathUpdateView(PermissionRequiredMixin, UpdateView):
+class LearningPathUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'learning_path.change_learningpath'
     accept_global_perms = True
@@ -610,7 +613,7 @@ class LearningPathUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('learning_path:learning_path', kwargs={'pk': self.object.pk})
 
 # Удаление траектории.
-class LearningPathDeleteView(PermissionRequiredMixin, DeleteView):
+class LearningPathDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'learning_path.delete_learningpath'
     accept_global_perms = True
@@ -625,7 +628,7 @@ class LearningPathDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('learning_path:learning_paths')
 
 # Список задач.
-class LearningPathTasksView(PreviousPageSetMixinL1, PermissionRequiredMixin, ListView):
+class LearningPathTasksView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionRequiredMixin, ListView):
     # Права доступа
     permission_required = 'learning_path.view_learningpath'
     # Модель.
@@ -736,7 +739,7 @@ class LearningPathTasksView(PreviousPageSetMixinL1, PermissionRequiredMixin, Lis
         return context
 
 # Создание задачи.
-class LearningTaskCreateView(GPermissionRequiredMixin, CreateView):
+class LearningTaskCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'learning_path.add_learningpath'
     # Форма.
@@ -776,6 +779,7 @@ class LearningTaskCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('learning_path:learning_path', kwargs={'pk': self.object.learning_path.pk})
 
 # Сортировка задач траектории.
+@login_required
 @permission_required('testing.change_learningpath')
 def learning_tasks_ordering(request, pk):
 
@@ -816,7 +820,7 @@ def learning_tasks_ordering(request, pk):
     return render(request, 'learning_tasks_ordering.html', contex)
 
 # Изменение задачи.
-class LearningTaskUpdateView(PermissionRequiredMixin, UpdateView):
+class LearningTaskUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'learning_path.change_learningpath'
     # Форма.
@@ -847,7 +851,7 @@ class LearningTaskUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('learning_path:learning_path', kwargs={'pk': self.object.learning_path.pk})
 
 # Удаление задач.
-class LearningTaskDeleteView(PermissionRequiredMixin, DeleteView):
+class LearningTaskDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'learning_path.delete_learningpath'
     accept_global_perms = True
@@ -867,7 +871,7 @@ class LearningTaskDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('learning_path:learning_path', kwargs={'pk': self.object.learning_path.pk})
 
 # Список назначений.
-class AssignmentsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class AssignmentsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'learning_path.view_assignment'
     # Модель.
@@ -898,7 +902,7 @@ class AssignmentsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект назначения.
-class AssignmentView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
+class AssignmentView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     # Права доступа.
     permission_required = 'learning_path.view_assignment'
     accept_global_perms = True
@@ -932,7 +936,7 @@ class AssignmentView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView
         return context
 
 # Создание задачи.
-class AssignmentCreateView(GPermissionRequiredMixin, CreateView):
+class AssignmentCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'learning_path.add_assignment'
     # Форма.
@@ -957,7 +961,7 @@ class AssignmentCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('learning_path:assignment', kwargs={'pk': self.object.pk})
 
 # Изменение задачи.
-class AssignmentUpdateView(GPermissionRequiredMixin, UpdateView):
+class AssignmentUpdateView(LoginRequiredMixin, GPermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'learning_path.add_assignment'
     accept_global_perms = True
@@ -984,7 +988,7 @@ class AssignmentUpdateView(GPermissionRequiredMixin, UpdateView):
         return reverse('learning_path:assignment', kwargs={'pk': self.object.pk})
 
 # Удаление назначения.
-class AssignmentDeleteView(PermissionRequiredMixin, DeleteView):
+class AssignmentDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'learning_path.delete_assignment'
     accept_global_perms = True
@@ -999,7 +1003,7 @@ class AssignmentDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('learning_path:assignments')
 
 # Создание задачи.
-class AssignmentRepeatCreateView(GPermissionRequiredMixin, CreateView):
+class AssignmentRepeatCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'learning_path.add_assignment'
     # Форма.
@@ -1032,7 +1036,7 @@ class AssignmentRepeatCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('learning_path:assignment', kwargs={'pk': self.object.assignment.pk})
 
 # Изменение задачи.
-class AssignmentRepeatUpdateView(GPermissionRequiredMixin, UpdateView):
+class AssignmentRepeatUpdateView(LoginRequiredMixin, GPermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'learning_path.add_assignment'
     accept_global_perms = True
@@ -1066,7 +1070,7 @@ class AssignmentRepeatUpdateView(GPermissionRequiredMixin, UpdateView):
         return reverse('learning_path:assignment', kwargs={'pk': self.object.assignment.pk})
 
 # Удаление назначения.
-class AssignmentRepeatDeleteView(PermissionRequiredMixin, DeleteView):
+class AssignmentRepeatDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'learning_path.delete_assignment'
     accept_global_perms = True
@@ -1329,7 +1333,7 @@ def self_appointment(request, pk, type):
 
 
 # Список траекторий.
-class ResultsView(PreviousPageSetMixinL1, ListView):
+class ResultsView(LoginRequiredMixin, PreviousPageSetMixinL1, ListView):
     # Модель.
     model = Result
     # Поле сортировки.

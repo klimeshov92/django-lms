@@ -33,6 +33,9 @@ from django.db.models.functions import Cast, Coalesce
 from django.core.paginator import Paginator
 # Миксины.
 from core.mixins import PreviousPageGetMixinL0, PreviousPageSetMixinL0, PreviousPageGetMixinL1, PreviousPageSetMixinL1, PreviousPageGetMixinL2, PreviousPageSetMixinL2
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+
 
 # Импортируем логи
 import logging
@@ -40,7 +43,7 @@ import logging
 logger = logging.getLogger('project')
 
 # Список сотрудников.
-class LeadersView(PermissionListMixin, ListView):
+class LeadersView(LoginRequiredMixin, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'leaders.view_transaction'
     # Модель.

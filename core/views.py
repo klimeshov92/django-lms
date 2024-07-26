@@ -80,6 +80,8 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMessage
 from .forms import SignUpForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 # Импортируем логи
 import logging
@@ -317,7 +319,7 @@ class PlacementViewSet(viewsets.ModelViewSet):
         instance.delete()
 
 # Список сотрудников.
-class EmployeesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class EmployeesView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'core.view_employee'
     # Модель.
@@ -354,7 +356,7 @@ class EmployeesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект сотрудника.
-class EmployeeView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
+class EmployeeView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     # Права доступа.
     permission_required = 'core.view_employee'
     accept_global_perms = True
@@ -422,6 +424,7 @@ class EmployeeView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
         return context
 
 # Копируем адреса.
+@login_required
 @permission_required('core.view_employee')
 def copy_emails(request, pk):
     # Забираем группу.
@@ -437,7 +440,7 @@ def copy_emails(request, pk):
     return HttpResponse(f"Адреса: {employees_emails_str}. {back_button}")
 
 # Создание сотрудника.
-class EmployeeCreateView(GPermissionRequiredMixin, CreateView):
+class EmployeeCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_employee'
     # Форма.
@@ -462,6 +465,7 @@ class EmployeeCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:employee', kwargs={'pk': self.object.pk})
 
 # Копируем пароль пользователя.
+@login_required
 @permission_required('core.change_employee')
 def update_password(request, pk):
     # Получаем пользователя.
@@ -476,7 +480,7 @@ def update_password(request, pk):
     return HttpResponse(f"Обновленные данные: {user.username} - {random_password}. {back_button}")
 
 # Изменение сотрудника.
-class EmployeeUpdateView(PermissionRequiredMixin, UpdateView):
+class EmployeeUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'core.change_employee'
     accept_global_perms = True
@@ -505,7 +509,7 @@ class EmployeeUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('core:employee', kwargs={'pk': self.object.pk})
 
 # Удаление сотрудника.
-class EmployeeDeleteView(PermissionRequiredMixin, DeleteView):
+class EmployeeDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_employee'
     accept_global_perms = True
@@ -520,7 +524,7 @@ class EmployeeDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('core:employees')
 
 # Список организаций.
-class OrganizationsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class OrganizationsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'core.view_organization'
     # Модель.
@@ -551,7 +555,7 @@ class OrganizationsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект организации.
-class OrganizationView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
+class OrganizationView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     # Права доступа.
     permission_required = 'core.view_organization'
     accept_global_perms = True
@@ -561,7 +565,7 @@ class OrganizationView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailVi
     template_name = 'organization.html'
 
 # Создание организации.
-class OrganizationCreateView(GPermissionRequiredMixin, CreateView):
+class OrganizationCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_organization'
     # Форма.
@@ -586,7 +590,7 @@ class OrganizationCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:organization', kwargs={'pk': self.object.pk})
 
 # Изменение организации.
-class OrganizationUpdateView(PermissionRequiredMixin, UpdateView):
+class OrganizationUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'core.change_organization'
     accept_global_perms = True
@@ -612,7 +616,7 @@ class OrganizationUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('core:organization', kwargs={'pk': self.object.pk})
 
 # Удаление организации.
-class OrganizationDeleteView(PermissionRequiredMixin, DeleteView):
+class OrganizationDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_organization'
     accept_global_perms = True
@@ -627,7 +631,7 @@ class OrganizationDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('core:organizations')
 
 # Список подразделений.
-class SubdivisionsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class SubdivisionsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'core.view_subdivision'
     # Модель.
@@ -660,7 +664,7 @@ class SubdivisionsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект подразделения.
-class SubdivisionView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
+class SubdivisionView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     # Права доступа.
     permission_required = 'core.view_subdivision'
     accept_global_perms = True
@@ -670,7 +674,7 @@ class SubdivisionView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailVie
     template_name = 'subdivision.html'
 
 # Создание подразделения.
-class SubdivisionCreateView(GPermissionRequiredMixin, CreateView):
+class SubdivisionCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_subdivision'
     # Форма.
@@ -695,7 +699,7 @@ class SubdivisionCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:subdivision', kwargs={'pk': self.object.pk})
 
 # Изменение подразделения.
-class SubdivisionUpdateView(PermissionRequiredMixin, UpdateView):
+class SubdivisionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'core.change_subdivision'
     accept_global_perms = True
@@ -721,7 +725,7 @@ class SubdivisionUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('core:subdivision', kwargs={'pk': self.object.pk})
 
 # Удаление подразделения.
-class SubdivisionDeleteView(PermissionRequiredMixin, DeleteView):
+class SubdivisionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_subdivision'
     accept_global_perms = True
@@ -736,7 +740,7 @@ class SubdivisionDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('core:subdivisions')
 
 # Список подразделений.
-class PositionsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class PositionsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'core.view_position'
     # Модель.
@@ -767,7 +771,7 @@ class PositionsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект подразделения.
-class PositionView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
+class PositionView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     # Права доступа.
     permission_required = 'core.view_position'
     accept_global_perms = True
@@ -777,7 +781,7 @@ class PositionView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     template_name = 'position.html'
 
 # Создание подразделения.
-class PositionCreateView(GPermissionRequiredMixin, CreateView):
+class PositionCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_position'
     # Форма.
@@ -802,7 +806,7 @@ class PositionCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:position', kwargs={'pk': self.object.pk})
 
 # Изменение подразделения.
-class PositionUpdateView(PermissionRequiredMixin, UpdateView):
+class PositionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'core.change_position'
     accept_global_perms = True
@@ -828,7 +832,7 @@ class PositionUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('core:position', kwargs={'pk': self.object.pk})
 
 # Удаление подразделения.
-class PositionDeleteView(PermissionRequiredMixin, DeleteView):
+class PositionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_position'
     accept_global_perms = True
@@ -843,7 +847,7 @@ class PositionDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('core:positions')
 
 # Создание категории.
-class PlacementCreateView(GPermissionRequiredMixin, CreateView):
+class PlacementCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_placement'
     # Форма.
@@ -871,7 +875,7 @@ class PlacementCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:employee', kwargs={'pk': self.object.employee.pk})
 
 # Изменение категории.
-class PlacementUpdateView(PermissionRequiredMixin, UpdateView):
+class PlacementUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'core.change_placement'
     accept_global_perms = True
@@ -904,7 +908,7 @@ class PlacementUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('core:employee', kwargs={'pk': self.object.employee.pk})
 
 # Удаление категории.
-class PlacementDeleteView(PermissionRequiredMixin, DeleteView):
+class PlacementDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_placement'
     accept_global_perms = True
@@ -919,7 +923,7 @@ class PlacementDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('core:employee', kwargs={'pk': self.object.employee.pk})
 
 # Список импортов.
-class EmployeeExcelImportsView(PreviousPageSetMixinL1, PermissionRequiredMixin, ListView):
+class EmployeeExcelImportsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionRequiredMixin, ListView):
     # Права доступа
     permission_required = 'core.view_employeeexcelimport'
     accept_global_perms = True
@@ -953,7 +957,7 @@ class EmployeeExcelImportsView(PreviousPageSetMixinL1, PermissionRequiredMixin, 
         return context
 
 # Вью импорта.
-class EmployeeExcelImportView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
+class EmployeeExcelImportView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     # Права доступа.
     permission_required = 'core.view_employeeexcelimport'
     accept_global_perms = True
@@ -963,7 +967,7 @@ class EmployeeExcelImportView(PreviousPageGetMixinL1, PermissionRequiredMixin, D
     template_name = 'employee_excel_import.html'
 
 # Вью добавления импорта
-class EmployeeExcelImportCreateView(GPermissionRequiredMixin, CreateView):
+class EmployeeExcelImportCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_employeeexcelimport'
     # Форма.
@@ -988,7 +992,7 @@ class EmployeeExcelImportCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:employee_excel_import', kwargs={'pk': self.object.pk})
 
 # Вью обновления импорта.
-class EmployeeExcelImportUpdateView(PermissionRequiredMixin, UpdateView):
+class EmployeeExcelImportUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'core.change_employeeexcelimport'
     accept_global_perms = True
@@ -1014,7 +1018,7 @@ class EmployeeExcelImportUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('core:employee_excel_import', kwargs={'pk': self.object.pk})
 
 # Удаление категории.
-class EmployeeExcelImportDeleteView(PermissionRequiredMixin, DeleteView):
+class EmployeeExcelImportDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_employeeexcelimport'
     accept_global_perms = True
@@ -1029,6 +1033,7 @@ class EmployeeExcelImportDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('core:employee_excel_imports')
 
 # Импорт по MDM ID.
+@login_required
 @permission_required('core.add_employeeexcelimport')
 def start_employee_excel_import_mdm_view(request, pk):
     # Генерируем URL на основе имени маршрута 'employee_excel_import' и передавая значение pk
@@ -1302,6 +1307,7 @@ def start_employee_excel_import_mdm_view(request, pk):
     return HttpResponse(f"Импорт завершен успешно. {back_button}")
 
 # Импорт по именам объектов.
+@login_required
 @permission_required('core.add_employeeexcelimport')
 def start_employee_excel_import_name_view(request, pk):
     # Генерируем URL на основе имени маршрута 'employee_excel_import' и передавая значение pk
@@ -1553,7 +1559,7 @@ def start_employee_excel_import_name_view(request, pk):
     return HttpResponse(f"Импорт завершен успешно. {back_button}")
 
 # Список категорий.
-class CategoriesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class CategoriesView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'core.view_category'
     # Модель.
@@ -1584,7 +1590,7 @@ class CategoriesView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект категории.
-class CategoryView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
+class CategoryView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     # Права доступа.
     permission_required = 'core.view_category'
     accept_global_perms = True
@@ -1594,7 +1600,7 @@ class CategoryView(PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
     template_name = 'category.html'
 
 # Создание категории.
-class CategoryCreateView(GPermissionRequiredMixin, CreateView):
+class CategoryCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_category'
     # Форма.
@@ -1619,7 +1625,7 @@ class CategoryCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:category', kwargs={'pk': self.object.pk})
 
 # Изменение категории.
-class CategoryUpdateView(PermissionRequiredMixin, UpdateView):
+class CategoryUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'core.change_category'
     accept_global_perms = True
@@ -1645,7 +1651,7 @@ class CategoryUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('core:category', kwargs={'pk': self.object.pk})
 
 # Удаление категории.
-class CategoryDeleteView(PermissionRequiredMixin, DeleteView):
+class CategoryDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_category'
     # Модель.
@@ -1659,7 +1665,7 @@ class CategoryDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('core:categories')
 
 # Список прав на объекты.
-class GroupsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
+class GroupsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
     # Права доступа
     permission_required = 'core.view_employeesgroup'
     # Модель.
@@ -1692,7 +1698,7 @@ class GroupsView(PreviousPageSetMixinL1, PermissionListMixin, ListView):
         return context
 
 # Объект категории.
-class GroupView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, ListView):
+class GroupView(LoginRequiredMixin, PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequiredMixin, ListView):
     # Права доступа
     permission_required = 'core.view_employeesgroup'
     accept_global_perms = True
@@ -1767,7 +1773,7 @@ class GroupView(PreviousPageGetMixinL1, PreviousPageSetMixinL0, PermissionRequir
         return context
 
 # Создание категории.
-class GroupCreateView(GPermissionRequiredMixin, CreateView):
+class GroupCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа
     permission_required = 'core.add_employeesgroup'
     # Форма.
@@ -1794,7 +1800,7 @@ class GroupCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:group', kwargs={'pk': self.object.pk})
 
 # Изменение категории.
-class GroupUpdateView(PermissionRequiredMixin, UpdateView):
+class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'core.change_employeesgroup'
     accept_global_perms = True
@@ -1822,7 +1828,7 @@ class GroupUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('core:group', kwargs={'pk': self.object.pk})
 
 # Удаление категории.
-class GroupDeleteView(PermissionRequiredMixin, DeleteView):
+class GroupDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_employeesgroup'
     accept_global_perms = True
@@ -1837,7 +1843,7 @@ class GroupDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse('core:groups')
 
 # Создание категории.
-class GroupsGeneratorCreateView(GPermissionRequiredMixin, CreateView):
+class GroupsGeneratorCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_employeesgroup'
     # Форма.
@@ -1911,7 +1917,7 @@ class GroupsGeneratorCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:group', kwargs={'pk': self.object.group.pk})
 
 # Изменение категории.
-class GroupsGeneratorUpdateView(PermissionRequiredMixin, UpdateView):
+class GroupsGeneratorUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа.
     permission_required = 'core.change_employeesgroup'
     accept_global_perms = True
@@ -1966,7 +1972,7 @@ class GroupsGeneratorUpdateView(PermissionRequiredMixin, UpdateView):
         return reverse('core:group', kwargs={'pk': self.object.group.pk})
 
 # Создание права на объект.
-class EmployeesGroupObjectPermissionCreateView(GPermissionRequiredMixin, CreateView):
+class EmployeesGroupObjectPermissionCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа
     permission_required = 'core.add_employeesgroupobjectpermission'
     # Форма.
@@ -2020,7 +2026,7 @@ class EmployeesGroupObjectPermissionCreateView(GPermissionRequiredMixin, CreateV
 
 
 # Удаление права на объект.
-class EmployeesGroupObjectPermissionDeleteView(PermissionRequiredMixin, DeleteView):
+class EmployeesGroupObjectPermissionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_employeesgroupobjectpermission'
     accept_global_perms = True
@@ -2048,7 +2054,7 @@ class EmployeesGroupObjectPermissionDeleteView(PermissionRequiredMixin, DeleteVi
             return reverse('core:group', kwargs={'pk': self.kwargs.get('pk')})
 
 # Создание права на объект.
-class EmployeesObjectPermissionCreateView(GPermissionRequiredMixin, CreateView):
+class EmployeesObjectPermissionCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа
     permission_required = 'core.add_employeesobjectpermission'
     # Форма.
@@ -2102,7 +2108,7 @@ class EmployeesObjectPermissionCreateView(GPermissionRequiredMixin, CreateView):
 
 
 # Удаление права на объект.
-class EmployeesObjectPermissionDeleteView(PermissionRequiredMixin, DeleteView):
+class EmployeesObjectPermissionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     # Права доступа.
     permission_required = 'core.delete_employeesobjectpermission'
     accept_global_perms = True
@@ -2398,7 +2404,7 @@ class ContactsView(PreviousPageSetMixinL1, DetailView):
         return Contacts.objects.first()
 
 # Создание контактов.
-class ContactsCreateView(GPermissionRequiredMixin, CreateView):
+class ContactsCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_contacts'
     # Форма.
@@ -2423,7 +2429,7 @@ class ContactsCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:contacts')
 
 # Изменение контактов.
-class ContactsUpdateView(PermissionRequiredMixin, UpdateView):
+class ContactsUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'core.change_contacts'
     accept_global_perms = True
@@ -2466,7 +2472,7 @@ class PrivacyPolicyView(PreviousPageSetMixinL1, DetailView):
         return PrivacyPolicy.objects.first()
 
 # Создание политики конфиденциальности.
-class PrivacyPolicyCreateView(GPermissionRequiredMixin, CreateView):
+class PrivacyPolicyCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_privacypolicy'
     # Форма.
@@ -2491,7 +2497,7 @@ class PrivacyPolicyCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:privacy_policy')
 
 # Изменение политики конфиденциальности.
-class PrivacyPolicyUpdateView(PermissionRequiredMixin, UpdateView):
+class PrivacyPolicyUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'core.change_privacypolicy'
     accept_global_perms = True
@@ -2534,7 +2540,7 @@ class DataProcessingView(PreviousPageSetMixinL1, DetailView):
         return DataProcessing.objects.first()
 
 # Создание политики конфиденциальности.
-class DataProcessingCreateView(GPermissionRequiredMixin, CreateView):
+class DataProcessingCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Права доступа.
     permission_required = 'core.add_dataprocessing'
     # Форма.
@@ -2559,7 +2565,7 @@ class DataProcessingCreateView(GPermissionRequiredMixin, CreateView):
         return reverse('core:data_processing')
 
 # Изменение политики конфиденциальности.
-class DataProcessingUpdateView(PermissionRequiredMixin, UpdateView):
+class DataProcessingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     # Права доступа
     permission_required = 'core.change_dataprocessing'
     accept_global_perms = True
