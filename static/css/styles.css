@@ -1318,7 +1318,8 @@ a.status-button-failed:hover {
 .material-content-table-responsive table {
     /*max-width: 100%; /* Убедитесь, что таблица не выходит за пределы контейнера */
     border-collapse: collapse; /* Убираем двойные границы между ячейками */
-    border: 2px solid var(--color-divider-rgb); /* Дополнительные стили для таблицы */
+    /* border: 2px solid var(--color-divider-rgb); /* Дополнительные стили для таблицы */
+    border: solid var(--color-divider-rgb); /* Дополнительные стили для таблицы */
     /* Добавьте дополнительные стили для таблицы здесь, например, для границ, шрифта и т.д. */
 }
 
