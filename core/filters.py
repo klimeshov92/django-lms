@@ -7,6 +7,7 @@ from django_select2.forms import Select2MultipleWidget, Select2Widget
 # Импорт моделей.
 from .models import EmployeeExcelImport, Category, EmployeesGroup, Employee, Organization, Subdivision, Position
 from django.db.models import Count
+from django.contrib.contenttypes.models import ContentType
 
 # Фильтрация импортов.
 class EmployeeExcelImportFilter(FilterSet):
@@ -155,7 +156,7 @@ class PositionFilter(FilterSet):
     )
 
 # Фильтрация прав.
-class EmployeesGroupObjectPermissionFilter(FilterSet):
+class EmployeesGroupObjectPermissionGroupsFilter(FilterSet):
     # Фильтрация по группе.
     group = ModelMultipleChoiceFilter(
         label='Группа',
@@ -165,11 +166,31 @@ class EmployeesGroupObjectPermissionFilter(FilterSet):
     )
 
 # Фильтрация прав.
-class EmployeesObjectPermissionFilter(FilterSet):
+class EmployeesGroupObjectPermissionObjectsFilter(FilterSet):
+    # Фильтрация по типу.
+    content_type__model = ModelMultipleChoiceFilter(
+        label='Тип контента',
+        field_name='content_type__model',
+        queryset=ContentType.objects.filter(model__in=['learningpath', 'material', 'course', 'test', 'event']),
+        widget=Select2MultipleWidget()
+    )
+
+# Фильтрация прав.
+class EmployeesObjectPermissionEmployeesFilter(FilterSet):
     # Фильтрация по группе.
     user = ModelMultipleChoiceFilter(
         label='Сотрудник',
         field_name='user',
         queryset=Employee.objects.all(),
+        widget=Select2MultipleWidget()
+    )
+
+# Фильтрация прав.
+class EmployeesObjectPermissionObjectsFilter(FilterSet):
+    # Фильтрация по типу.
+    content_type__model = ModelMultipleChoiceFilter(
+        label='Тип контента',
+        field_name='content_type__model',
+        queryset=ContentType.objects.filter(model__in=['learningpath', 'material', 'course', 'test', 'event']),
         widget=Select2MultipleWidget()
     )

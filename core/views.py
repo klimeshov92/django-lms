@@ -13,7 +13,8 @@ from .models import Organization, Subdivision, Position, Employee, Placement, \
     EmployeesObjectPermission, PrivacyPolicy, DataProcessing, Contacts
 # Импорт модели фильтров.
 from .filters import CategoryFilter, EmployeeExcelImportFilter, \
-    OrganizationFilter, SubdivisionFilter, PositionFilter, GroupFilter, EmployeeFilter, GroupsEmployeeFilter, EmployeesObjectPermissionFilter
+    OrganizationFilter, SubdivisionFilter, PositionFilter, GroupFilter, EmployeeFilter, GroupsEmployeeFilter, \
+    EmployeesObjectPermissionEmployeesFilter, EmployeesGroupObjectPermissionObjectsFilter, EmployeesObjectPermissionObjectsFilter
 # Импорт форм.
 from .forms import CategoryForm, EmployeeExcelImportForm, GroupForm, GroupsGeneratorForm, \
     EmployeesGroupObjectPermissionForm, EmployeeForm, PlacementForm, \
@@ -65,7 +66,7 @@ from core.models import EmployeesGroupObjectPermission
 from reviews.filters import ObjectsReviewFilter
 from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
-from core.filters import EmployeesGroupObjectPermissionFilter
+from core.filters import EmployeesGroupObjectPermissionGroupsFilter
 from django.db.models import OuterRef, Subquery
 from django.core.paginator import Paginator
 from django.contrib.auth.models import Permission
@@ -413,11 +414,14 @@ class EmployeeView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequire
         else:
             object_permissions_queryset = EmployeesObjectPermission.objects.none()
         context['object_permissions_qs_count'] = len(object_permissions_queryset)
+        object_permissions_filter = EmployeesGroupObjectPermissionObjectsFilter(self.request.GET, queryset=object_permissions_queryset, request=self.request)
+        object_permissions = object_permissions_filter.qs
         # Добавляем пагинатор.
-        object_permissions_paginator = Paginator(object_permissions_queryset, 6)
+        object_permissions_paginator = Paginator(object_permissions, 6)
         object_permissions_page_number = self.request.GET.get('object_permissions_page')
         object_permissions_page_obj = object_permissions_paginator.get_page(object_permissions_page_number)
         # Добавляем во вью.
+        context['object_permissions_filter'] = object_permissions_filter
         context['object_permissions_page_obj'] = object_permissions_page_obj
 
         # Возвращаем новый набор переменных в контролер.
@@ -1746,7 +1750,7 @@ class GroupView(LoginRequiredMixin, PreviousPageGetMixinL1, PreviousPageSetMixin
         else:
             group_object_permissions_queryset = EmployeesGroupObjectPermission.objects.none()
         context['group_object_permissions_qs_count'] = len(group_object_permissions_queryset)
-        group_object_permissions_filter = EmployeesGroupObjectPermissionFilter(self.request.GET, queryset=group_object_permissions_queryset, request=self.request)
+        group_object_permissions_filter = EmployeesGroupObjectPermissionObjectsFilter(self.request.GET, queryset=group_object_permissions_queryset, request=self.request)
         group_object_permissions = group_object_permissions_filter.qs
         # Добавляем пагинатор.
         group_object_permissions_paginator = Paginator(group_object_permissions, 6)

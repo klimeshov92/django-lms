@@ -248,6 +248,21 @@
 
         {% if user|perms:"core.view_employeesobjectpermission" %}
             <div id="tab3" class="tab-content">
+                {# Фильтр элементов #}
+                <div class="filters-header">
+                    <a href="" class="filters-button">Фильтры</a>
+                </div>
+                <div class="filters-area">
+                    <form action="" method="get" class="form filter-form">
+                        {{ object_permissions_filter.form.media.css }}
+                        {{ object_permissions_filter.form.as_p }}
+                        {{ object_permissions_filter.form.media.js }}
+                    <nav class="form-menu ">
+                        <input type="submit" value="Найти" class="button"/>
+                    </nav>
+                    </form>
+                </div>
+                {# Вывод элементов #}
                 {# Вывод элементов #}
                 {% if object_permissions_page_obj %}
                     <div class="list-table-responsive">

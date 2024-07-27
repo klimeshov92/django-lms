@@ -50,7 +50,7 @@ from core.models import EmployeesGroupObjectPermission, EmployeesObjectPermissio
 from reviews.filters import ObjectsReviewFilter
 from django.core.paginator import Paginator
 from django.contrib.contenttypes.models import ContentType
-from core.filters import EmployeesGroupObjectPermissionFilter, EmployeesObjectPermissionFilter
+from core.filters import EmployeesGroupObjectPermissionGroupsFilter, EmployeesObjectPermissionEmployeesFilter
 from datetime import timedelta
 from datetime import date
 from django.contrib.auth.decorators import login_required
@@ -529,7 +529,7 @@ class LearningPathView(LoginRequiredMixin, PreviousPageGetMixinL3, PreviousPageS
         else:
             group_object_permissions_queryset = EmployeesGroupObjectPermission.objects.none()
         context['group_object_permissions_qs_count'] = len(group_object_permissions_queryset)
-        group_object_permissions_filter = EmployeesGroupObjectPermissionFilter(self.request.GET, queryset=group_object_permissions_queryset, request=self.request)
+        group_object_permissions_filter = EmployeesGroupObjectPermissionGroupsFilter(self.request.GET, queryset=group_object_permissions_queryset, request=self.request)
         group_object_permissions = group_object_permissions_filter.qs
         # Добавляем пагинатор.
         group_object_permissions_paginator = Paginator(group_object_permissions, 6)
@@ -548,7 +548,7 @@ class LearningPathView(LoginRequiredMixin, PreviousPageGetMixinL3, PreviousPageS
         else:
             object_permissions_queryset = EmployeesObjectPermission.objects.none()
         context['object_permissions_qs_count'] = len(object_permissions_queryset)
-        object_permissions_filter = EmployeesObjectPermissionFilter(self.request.GET, queryset=object_permissions_queryset, request=self.request)
+        object_permissions_filter = EmployeesObjectPermissionEmployeesFilter(self.request.GET, queryset=object_permissions_queryset, request=self.request)
         object_permissions = object_permissions_filter.qs
         # Добавляем пагинатор.
         object_permissions_paginator = Paginator(object_permissions, 6)
