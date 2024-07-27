@@ -83,6 +83,7 @@ from django.core.mail import EmailMessage
 from .forms import SignUpForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.utils.http import url_has_allowed_host_and_scheme
 
 # Импортируем логи
 import logging
@@ -2319,6 +2320,7 @@ def home (request):
 
 # Регистрация.
 def signup_view(request):
+
     # Проверяем, был ли запрос POST (форма отправлена).
     if request.method == 'POST':
         # Создаем экземпляр формы с данными из запроса.
@@ -2343,6 +2345,8 @@ def signup_view(request):
             current_site = get_current_site(request)
             # Тема письма.
             mail_subject = 'Активируйте ваш аккаунт.'
+            # Некст параметр.
+            next_url = request.POST.get('next', '')
             # Генерируем текст письма на основе шаблона.
             message = render_to_string('registration/account_activation_email.html', {
                 'user': user,
@@ -2350,6 +2354,7 @@ def signup_view(request):
                 'protocol': 'https' if request.is_secure() else 'http',  # Определяем протокол.
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),  # Кодируем UID пользователя.
                 'token': default_token_generator.make_token(user),  # Создаем токен для активации.
+                'next': next_url,  # Добавляем next в контекст.
             })
             # Получаем email пользователя из формы.
             to_email = form.cleaned_data.get('email')
@@ -2365,6 +2370,7 @@ def signup_view(request):
     else:
         # Если запрос не POST, создаем пустую форму.
         form = SignUpForm()
+
     # Рендерим страницу регистрации с формой.
     return render(request, 'registration/signup.html', {'form': form})
 
@@ -2389,8 +2395,11 @@ def activate(request, uidb64, token):
         backend = 'django.contrib.auth.backends.ModelBackend'
         # Авторизуем пользователя.
         login(request, user, backend=backend)
-        # Перенаправляем на главную страницу.
-        return redirect('home')
+        # Перенаправляем.
+        next_url = request.GET.get('next', '')
+        if not next_url or not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+            next_url = 'home'
+        return redirect(next_url)
     else:
         # рендерим страницу, уведомляющую о недействительной ссылке активации
         return render(request, 'registration/activation_invalid.html')

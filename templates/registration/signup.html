@@ -16,6 +16,7 @@
         <form method="post" class="form">
             {% csrf_token %}
             {{ form.as_p }}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
             <nav class="form-menu form-menu-center">
                 <input type="submit" value="Зарегистрироваться" class="button"/>
             </nav>

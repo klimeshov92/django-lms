@@ -4,7 +4,7 @@
 
 Пожалуйста, перейдите по следующей ссылке для подтверждения вашего аккаунта:
 
-{{ protocol }}://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+{{ protocol }}://{{ domain }}{% url 'activate' uidb64=uid token=token %}{% if '?' in request.get_full_path %}&next={{ next|urlencode }}{% else %}?next={{ next|urlencode }}{% endif %}
 
 С наилучшими пожеланиями,
 Команда поддержки Лайт ЛМС
