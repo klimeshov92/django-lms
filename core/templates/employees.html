@@ -53,10 +53,10 @@
                     <div class="list-grid-item-header">
                         <h3>{{obj.username}}</h3>
                     </div>
-                    {% if obj.first_name and obj.last_name %}
+                    {% if obj.first_name or obj.last_name or obj.fathers_name %}
                         <div class="list-grid-item-header">
                             <h3>
-                                {{obj.last_name}} {{obj.first_name}} {{obj.fathers_name}}
+                                {% if obj.last_name %}{{obj.last_name}}{% endif %} {% if obj.first_name %}{{obj.first_name}}{% endif %} {% if obj.fathers_name %}{{obj.fathers_name}}{% endif %}
                             </h3>
                         </div>
                     {% endif %}
