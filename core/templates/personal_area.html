@@ -36,9 +36,9 @@
                     <h1>
                         {{object.username}}
                     </h1>
-                    {% if object.last_name and object.first_name %}
+                    {% if object.last_name or object.first_name or object.fathers_name %}
                         <h1>
-                            {{object.last_name}} {{object.first_name}}
+                            {% if object.last_name %}{{object.last_name}}{% endif %} {% if object.first_name %}{{object.first_name}}{% endif %} {% if object.fathers_name %}{{object.fathers_name}}{% endif %}
                         </h1>
                     {% endif %}
                     {% if object.mdm_id %}
