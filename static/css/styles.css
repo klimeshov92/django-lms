@@ -1672,7 +1672,7 @@ label[for$="clear_id"] {
 .test-container-header {
     padding: 0px 25px; /* Отступы внутри */
     margin: 0 auto; /* Отступы внешние */
-    max-width: 800px; /* Установка максимальной ширины */
+    max-width: 1100px; /* Установка максимальной ширины */
     box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
 }
 
@@ -1680,7 +1680,7 @@ label[for$="clear_id"] {
 .test-container {
     padding: 0px 25px; /* Отступы внутри */
     margin: 0 auto; /* Отступы внешние */
-    max-width: 800px; /* Установка максимальной ширины */
+    max-width: 1100px; /* Установка максимальной ширины */
     box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
 }
 
@@ -1688,7 +1688,7 @@ label[for$="clear_id"] {
 .test-container-footer {
     padding: 0px 25px 25px 25px; /* Отступы внутри */
     margin: 0 auto; /* Отступы внешние */
-    max-width: 800px; /* Установка максимальной ширины */
+    max-width: 1100px; /* Установка максимальной ширины */
     box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
 }
 

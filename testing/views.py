@@ -878,7 +878,7 @@ class RelevantPointUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Updat
 
 # Функция завершения теста.
 @login_required
-def completion_of_test(tests_result, test):
+def completion_of_test(request, tests_result, test):
 
     # Забираем результаты
     if settings.DEBUG:
@@ -1079,7 +1079,7 @@ def take_assigned_test(request, pk):
         else:
 
             # Вызываем завершение теста.
-            completion_of_test(test=test, tests_result=tests_result)
+            completion_of_test(request=request, test=test, tests_result=tests_result)
 
             # Переходим.
             return redirect('testing:test', pk=test.id)
@@ -1344,7 +1344,7 @@ def attempt_end_timeout(request, pk):
     test=tests_result.test
 
     # Вызываем завершение теста.
-    completion_of_test(test=test, tests_result=tests_result)
+    completion_of_test(request=request, test=test, tests_result=tests_result)
 
     # Переходим.
     return redirect('testing:test', pk=test.id)
