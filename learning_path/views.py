@@ -1119,13 +1119,17 @@ def self_appointment(request, pk, type):
         # Если результата нет.
         if appoint == True:
 
+            # Переменные.
+            duration = learning_path.duration
+            planned_end_date = datetime.now() + timedelta(days=duration)
             logger.info(f"Назначение учебной траектории {learning_path} для {request.user}.")
 
             # Создание объекта результата для учебной траектории.
             learning_path_result = Result.objects.create(
                 learning_path=learning_path,
                 employee=request.user,
-                type='learning_path'
+                type='learning_path',
+                planned_end_date = planned_end_date
             )
             logger.info(f"Создан {learning_path_result}")
 
