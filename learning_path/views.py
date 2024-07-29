@@ -1119,17 +1119,12 @@ def self_appointment(request, pk, type):
         # Если результата нет.
         if appoint == True:
 
-            # Переменные.
-            duration = learning_path.duration
-            planned_end_date = datetime.now() + timedelta(days=duration)
-            logger.info(f"Назначение учебной траектории {learning_path} для {request.user}.")
-
             # Создание объекта результата для учебной траектории.
             learning_path_result = Result.objects.create(
                 learning_path=learning_path,
                 employee=request.user,
                 type='learning_path',
-                planned_end_date = planned_end_date
+                self_appointment = True
             )
             logger.info(f"Создан {learning_path_result}")
 
@@ -1149,7 +1144,8 @@ def self_appointment(request, pk, type):
                         employee=request.user,
                         material=material,
                         learning_task=learning_task,
-                        type='material'
+                        type='material',
+                        self_appointment=True
                     )
                     logger.info(f"Создан {learning_task_result}")
 
@@ -1165,7 +1161,8 @@ def self_appointment(request, pk, type):
                         employee=request.user,
                         test=test,
                         learning_task=learning_task,
-                        type='test'
+                        type='test',
+                        self_appointment=True
                     )
                     logger.info(f"Создан {learning_task_result}")
 
@@ -1182,7 +1179,8 @@ def self_appointment(request, pk, type):
                         course=course,
                         scorm_package=course.scorm_package,
                         learning_task=learning_task,
-                        type='course'
+                        type='course',
+                        self_appointment=True
                     )
                     logger.info(f"Создан {learning_task_result}")
 

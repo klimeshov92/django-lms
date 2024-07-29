@@ -179,9 +179,9 @@ class TestView(LoginRequiredMixin, PreviousPageGetMixinL1, PreviousPageSetMixinL
             context['result'] = result
             context['blocked'] = blocked
             # Добавляем все для просрочки.
-            if not result.learning_path_result or result.assignment.deadlines == False or (result.learning_path_result.planned_end_date >= datetime.now().date() and result.assignment.deadlines == True):
+            if result.self_appointment or not result.learning_path_result or result.assignment.deadlines == False or (result.learning_path_result.planned_end_date >= datetime.now().date() and result.assignment.deadlines == True):
                 context['overdue'] = False
-                if result.learning_path_result is None:
+                if result.self_appointment or result.learning_path_result is None:
                     if settings.DEBUG:
                         logger.info(f'Тест активен')
                 else:
@@ -964,7 +964,7 @@ def take_assigned_test(request, pk):
             return HttpResponseForbidden('Тест заблокирован!')
 
     # Если дата уже наступила.
-    if tests_result.learning_path_result and tests_result.learning_path_result.planned_end_date <= datetime.now().date():
+    if not tests_result.self_appointment and tests_result.learning_path_result and tests_result.learning_path_result.planned_end_date <= datetime.now().date():
         return HttpResponseForbidden('Тест просрочен!')
 
     # Если нет вопросов.
@@ -1158,7 +1158,7 @@ def answer_to_question(request, pk):
         return HttpResponseForbidden('Тест назначен не вам!')
 
     # Если дата уже наступила.
-    if tests_result.learning_path_result and tests_result.learning_path_result.planned_end_date <= datetime.now().date():
+    if not tests_result.self_appointment and tests_result.learning_path_result and tests_result.learning_path_result.planned_end_date <= datetime.now().date():
         return HttpResponseForbidden('Тест просрочен!')
 
     # Если тест заблокирован.
@@ -1363,7 +1363,7 @@ def retake_the_test(request, pk):
     if tests_result.attempts_used >= tests_result.test.amount_of_try:
         return HttpResponseForbidden('Уже использованы все попытки!')
     # Если дата уже наступила.
-    if tests_result.learning_path_result and tests_result.learning_path_result.planned_end_date <= datetime.now().date():
+    if not tests_result.self_appointment and tests_result.learning_path_result and tests_result.learning_path_result.planned_end_date <= datetime.now().date():
         return HttpResponseForbidden('Тест просрочен!')
     if settings.DEBUG:
         logger.info(f'Результат теста: {tests_result.get_status_display()}\n')
