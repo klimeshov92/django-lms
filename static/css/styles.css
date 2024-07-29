@@ -1836,9 +1836,15 @@ label[for$="clear_id"] {
     .tab-list-grid {
         grid-template-columns: repeat(auto-fit, 500px); /* Ширина грида */
     }
-    .content-grid,
-    .test-grid {
+    .content-grid {
         grid-template-columns: 400px 300px; /* Левый элемент занимает две трети, правый - одну треть */
+    }
+}
+
+/* Медиа-запросы для десктопных экранов */
+@media screen and (min-width: 1100px) {
+    .test-grid {
+        grid-template-columns: 600px 400px; /* Левый элемент занимает две трети, правый - одну треть */
     }
 }
 
@@ -1856,8 +1862,7 @@ label[for$="clear_id"] {
         /*grid-template-columns: minmax(0, 300px); /* Ширина грида */
         grid-template-columns: 100%; /* Ширина грида */
     }
-    .content-grid,
-    .test-grid {
+    .content-grid{
         /*grid-template-columns: minmax(0, 400px); /* Ширина грида */
         grid-template-columns: 100%; /* Ширина грида */
         grid-gap: 0px;
@@ -1884,13 +1889,6 @@ label[for$="clear_id"] {
     .material-container {
         padding: 0; /* Отступы внутри */
     }
-    .test-container {
-        padding: 0; /* Отступы внутри */
-    }
-    /* Тест */
-    .test-nav {
-        margin: 25px 0; /* Отступ внутренний */
-    }
     /* Стили для пагинации */
     .pagination-content {
         margin: 25px 0; /* Отступ внутренний */
@@ -1912,5 +1910,21 @@ label[for$="clear_id"] {
     }
     .long-list-grid-item-content-with-image-text-container {
         width: 100%; /* Вложенные элементы занимают всю ширину */
+    }
+}
+
+/* Медиа-запросы для мобильных устройств */
+@media screen and (max-width: 1099px) {
+    .test-grid {
+        /*grid-template-columns: minmax(0, 400px); /* Ширина грида */
+        grid-template-columns: 100%; /* Ширина грида */
+        grid-gap: 0px;
+    }
+    .test-container {
+        padding: 0; /* Отступы внутри */
+    }
+    /* Тест */
+    .test-nav {
+        margin: 25px 0; /* Отступ внутренний */
     }
 }
