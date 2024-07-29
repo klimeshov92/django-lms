@@ -1332,7 +1332,7 @@ a.status-button-failed:hover {
 /* Код */
 pre code.hljs {
     border-radius: 5px; /* Скругление углов */
-    white-space: pre-wrap; /* Позволяет тексту переноситься */
+    /* white-space: pre-wrap; /* Позволяет тексту переноситься */
 }
 
 /* Стили для контейнера iframe */
