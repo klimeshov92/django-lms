@@ -78,7 +78,7 @@
                                     {% if obj.type != 'event' %}
                                         {% if obj.status == 'appointed' or obj.status == 'in_progress' %}
                                                 {{obj.get_status_display}}
-                                                {% if obj.type == 'learning_path' and obj.learning_path_result.planned_end_date %}
+                                                {% if obj.type == 'learning_path' and obj.planned_end_date %}
                                                     до {{obj.planned_end_date}}
                                                 {% elif obj.learning_path_result.planned_end_date %}
                                                     до {{obj.learning_path_result.planned_end_date}}
