@@ -26,7 +26,12 @@ class EmailForm(forms.ModelForm):
             'type': forms.Select(attrs={'class': 'type-select-1'}),
             'creator': forms.HiddenInput(),
             'categories': Select2MultipleWidget(),
-            'group': Select2Widget(),
+            'group': Select2Widget(
+                attrs={
+                    'class': 'group-select toggle-field',
+                    'data-show-if-type-1': '["password"]'
+                }
+            ),
             'assignment': Select2Widget(
                 attrs={
                     'class': 'assignment-select toggle-field',
@@ -35,7 +40,7 @@ class EmailForm(forms.ModelForm):
             ),
             'event': Select2Widget(
                 attrs={
-                    'class': 'in-person-select toggle-field',
+                    'class': 'event-select toggle-field',
                     'data-show-if-type-1': '["event"]'
                 }
             ),

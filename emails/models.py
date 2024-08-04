@@ -120,7 +120,7 @@ class EmailsResult(models.Model):
         related_query_name='emails_results'
     )
     # Адресат.
-    employee = models.OneToOneField(
+    employee = models.ForeignKey(
         Employee,
         verbose_name='Адресат',
         null=True,
@@ -128,14 +128,6 @@ class EmailsResult(models.Model):
         on_delete=models.CASCADE,
         related_name='emails_employee',
         related_query_name='emails_employee'
-    )
-    # Адресаты.
-    recipients = models.ManyToManyField(
-        Employee,
-        verbose_name='Получатели',
-        blank=True,
-        related_name='emails_recipients',
-        related_query_name='emails_recipients'
     )
     # Дата и время создания и изменения.
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания', db_index=True)

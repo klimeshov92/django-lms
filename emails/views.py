@@ -185,169 +185,119 @@ class EmailDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         # Направляем по адресу объектов.
         return reverse('emails:emails')
 
-
-# Отправка писем.
-@login_required
-@permission_required('emails.add_email')
-def sending(request, pk):
+# Функция рассылки сообщений.
+def sending_start(email, sending_type):
 
     # Получаем переменные.
-    email = get_object_or_404(Email, id=pk)
     group = email.group
+    assignment = email.assignment
+    event = email.event
+    base_href = settings.BASE_URL
 
-    # Если форма отправлена.
-    if request.method == 'POST':
+    # Получение пользователей.
+    if email.type == 'password':
+        employees = group.user_set.filter(email__isnull=False)
+    elif email.type == 'assignment':
+        if assignment.participants == 'group':
+            employees = assignment.participants_group.user_set.filter(email__isnull=False)
+        if assignment.participants == 'employee':
+            employees = [assignment.employee]
+    elif email.type == 'event':
+        employees = event.participants_group.user_set.filter(email__isnull=False)
 
-        # Форма с данными.
-        form = EmailSendingForm(request.POST)
+    # Если рассылка только для новых адресатов.
+    if sending_type == 'new':
 
-        # Если данные валидны.
-        if form.is_valid():
+        # Если уже есть отправленные письма.
+        if EmailsResult.objects.filter(email=email, status='sent').exists():
+            # Создаем список старых получателей.
+            old_employees_list = Employee.objects.filter(
+                emails_employee__email=email, emails_employee__status='sent'
+            ).distinct()
+            # Получаем ключи.
+            old_employees_pks = list(old_employees_list.values_list('pk', flat=True))
 
-            # Получите выбранный тип рассылки.
-            sending_type = form.cleaned_data['sending_type']
+            # Фильтруем набор.
+            employees = employees.exclude(pk__in=old_employees_pks)
 
-            # Если это письмо с паролем.
+    # Если получатели есть:
+    if employees.exists():
+
+        # Проходим по сотрудникам.
+        for employee in employees:
+
+            # Подготовка письма с паролем.
             if email.type == 'password':
+                # Генерируем новый случайный пароль.
+                new_password = get_random_string(length=8)
+                employee.set_password(new_password)
+                employee.save()
 
-                # Тема письма.
+                # Письмо.
                 subject = 'Пароль для входа'
+                message = (
+                    f'Добрый день, {employee.username}!\n\n'
+                    f'Ваш пароль для входа: {new_password}\n\n'
+                    f'Ссылка на портал: {base_href}\n\n'
+                )
 
-                # Отправляем индивидуальные письма каждому пользователю в группе
-                employees = group.user_set.filter(email__isnull=False)
+            # Подготовка письма с назначением.
+            elif email.type == 'assignment':
 
-                # Если рассылка только для новых адресатов.
-                if sending_type == 'new':
+                # Получаем ссылку для письма.
+                sub_href = reverse('core:personal_area') + '#tab2'
+                href = f'{base_href}{sub_href}'
 
-                    # Если уже есть отправленные письма.
-                    if EmailsResult.objects.filter(email=email, status='sent').exists():
+                # Письмо.
 
-                        # Создаем список старых получателей.
-                        old_employees_list = Employee.objects.filter(
-                            emails_employee__email=email, emails_employee__status='sent'
-                        ).distinct()
-                        # Получаем ключи.
-                        old_employees_pks = list(old_employees_list.values_list('pk', flat=True))
-
-                        # Фильтруем набор.
-                        employees = employees.exclude(pk__in=old_employees_pks)
-
-                # Если получатели есть:
-                if employees.exists():
-
-                    # Проходим по сотрудникам.
-                    for employee in employees:
-
-                        # Генерируем новый случайный пароль
-                        new_password = get_random_string(length=8)
-                        employee.set_password(new_password)
-                        employee.save()
-
-                        # Формируем текст письма с учетом данных пользователя
-                        message = (
-                            f'Добрый день, {employee.first_name}!\n\n' \
-                            f'Ваше имя пользователя: {employee.username}, а пароль для входа: {new_password}'
-                        )
-                        # Отправляем письмо пользователю
-                        send_mail(subject, message, EMAIL_HOST_USER, [employee.email], html_message=message)
-
-                        # Сохраняем резульат.
-                        emails_result = EmailsResult.objects.create(email=email, employee=employee, sending_type=sending_type, status='sent')
-
-                # Если получателей нет.
-                else:
-                    emails_result = EmailsResult.objects.create(email=email, sending_type=sending_type, status='not_sent')
-                    if settings.DEBUG:
-                        logger.info(f'Результат отправки сообщения: {emails_result}')
-
-            # Если это письмо с назначением.
-            if email.type == 'assignment':
-
-                # Проверка объекта.
-                if email.assignment:
-                    assignment = email.assignment
-                    base_href = settings.BASE_URL
-                    sub_href = reverse('core:personal_area') + '#tab2'
-                    href = f'{base_href}{sub_href}'
-                else:
-                    return HttpResponse(f"Назначение не найдено.")
-
-                # Тема и текст письма.
                 subject = 'Назначение обучения'
-                if assignment.participants == 'group':
 
-                    if assignment.type == 'learning_complex':
+                if assignment.type == 'learning_complex':
 
-                        message = (
-                            f'Добрый день, коллеги!\n\n'
-                            f'Группе {assignment.group} были назначены траектории обучения:'
-                        )
+                    learning_paths = [
+                        learning_complex_path.learning_path for learning_complex_path in
+                        assignment.learning_complex.learning_complex_paths.all().order_by(
+                            'learning_complex', 'position')
+                    ]
 
-                        learning_paths = [
-                            learning_complex_path.learning_path for learning_complex_path in
-                            assignment.learning_complex.learning_complex_paths.all().order_by('learning_complex', 'position')
-                        ]
+                    message = (
+                        f'Добрый день, коллеги!\n\n'
+                        f'Вам назначены траектории обучения:\n'
+                    )
+                    for learning_path in learning_paths:
+                        message += f'- {learning_path}\n'
+                    message += f'Просмотрите назначенное обучение: {href}\n\n'
 
-                        for learning_path in learning_paths:
-                            message += f'-{learning_path}\n'\
+                elif assignment.type == 'learning_path':
+                    message = (
+                        f'Добрый день, {employee.username}!\n\n'
+                        f'Вам назначена траектория обучения: {assignment.learning_path}\n\n'
+                        f'Просмотрите назначенное обучение: {href}\n\n'
+                    )
 
-                        message += f'Просмотрите <a href="{href}">назначенное обучение</a>'
+                elif assignment.type == 'material':
+                    message = (
+                        f'Добрый день, {employee.username}!\n\n'
+                        f'Вам назначен материал: {assignment.material}\n\n'
+                        f'Просмотрите назначенное обучение: {href}\n\n'
+                    )
 
-                    if assignment.type == 'learning_path':
+                elif assignment.type == 'course':
+                    message = (
+                        f'Добрый день, {employee.username}!\n\n'
+                        f'Вам назначен курс: {assignment.course}\n\n'
+                        f'Просмотрите назначенное обучение: {href}\n\n'
+                    )
 
-                        message = (
-                            f'Добрый день, коллеги!\n\n'\
-                            f'Группе {assignment.group} была назначена траектория обучения: {assignment.learning_path}\n'\
-                            f'Просмотрите <a href="{href}">назначенное обучение</a>'
-                        )
+                elif assignment.type == 'test':
+                    message = (
+                        f'Добрый день, {employee.username}!\n\n'
+                        f'Вам назначен тест: {assignment.test}\n\n'
+                        f'Просмотрите назначенное обучение: {href}\n\n'
+                    )
 
-                    # Забираем адресатов.
-                    recipients = group.user_set.filter(email__isnull=False)
-
-                # Если рассылка только для новых адресатов.
-                if sending_type == 'new':
-
-                    # Если уже есть отправленные письма.
-                    if EmailsResult.objects.filter(email=email, status='sent').exists():
-
-                        # Создаем список старых получателей.
-                        old_recipients_list = Employee.objects.filter(
-                            emails_recipients__email=email, emails_recipients__status='sent'
-                        ).distinct()
-                        # Получаем ключи.
-                        old_recipients_pks = list(old_recipients_list.values_list('pk', flat=True))
-
-                        # Фильтруем набор.
-                        recipients = recipients.exclude(pk__in=old_recipients_pks)
-
-
-                # Если получатели есть:
-                if recipients.exists():
-
-                    # Добавляем список мэйлов.
-                    if settings.DEBUG:
-                        logger.info(f'Получатели с адресатом: {recipients}')
-                    email_list = recipients.values_list('email', flat=True)
-                    if settings.DEBUG:
-                        logger.info(f'Адреса получателей: {email_list}')
-
-                    # Отправляем письмо на список адресов электронной почты.
-                    send_mail(subject, message, EMAIL_HOST_USER, email_list, fail_silently=False, html_message=message)
-
-                    # После успешной отправки письма записываем статус отправки в модель EmailsResult.
-                    emails_result = EmailsResult.objects.create(email=email, sending_type=sending_type, status='sent')
-                    emails_result.recipients.set(recipients)
-                    if settings.DEBUG:
-                        logger.info(f'Результат отправки сообщения: {emails_result}')
-
-                # Если получателей нет.
-                else:
-                    emails_result = EmailsResult.objects.create(email=email, sending_type=sending_type, status='not_sent')
-                    if settings.DEBUG:
-                        logger.info(f'Результат отправки сообщения: {emails_result}')
-
-            # Если это письмо с назначением.
-            if email.type == 'event':
+            # Подготовка письма с мероприятием.
+            elif email.type == 'event':
 
                 # Проверка объекта.
                 if email.event:
@@ -358,7 +308,8 @@ def sending(request, pk):
                 else:
                     return HttpResponse(f"Мероприятие не найдено.")
 
-                # Тема и текст письма.
+                # Письмо.
+
                 subject = 'Приглашение на мероприятие'
 
                 # Создаем HTML-сообщение с вложенным iCalendar-файлом
@@ -371,52 +322,57 @@ def sending(request, pk):
                 icalendar_content = icalendar.serialize()
 
                 message = (
-                    f'Добрый день, коллеги!\n\n'\
-                    f'{event.planned_start_date.strftime("%d.%m.%Y %H:%M")} состоится мероприятие: {event}\n'\
-                    f'<a href="{href}">Ссылка</a>\n'\
+                    f'Добрый день, {employee.username}!\n\n'
+                    f'{event.planned_start_date.strftime("%d.%m.%Y %H:%M")} состоится мероприятие: {event}\n'
+                    f'Ссылка: {href}\n'
                     f'<pre>{icalendar_content}</pre>'
                 )
 
-                # Забираем адресатов.
-                recipients = group.user_set.filter(email__isnull=False)
+            # Отправка письма.
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    EMAIL_HOST_USER,
+                    [employee.email],
+                    fail_silently=False,
+                    html_message=message
+                )
+                status = 'sent'
+            except Exception as e:
+                status = 'not_sent'
+                logger.info(f'Ошибка отправки сообщения: {e}')
 
-                # Если рассылка только для новых адресатов.
-                if sending_type == 'new':
+            # Сохраняем результат в базе данных.
+            EmailsResult.objects.create(
+                email=email,
+                employee=employee,
+                sending_type=sending_type,
+                status=status
+            )
 
-                    # Если уже есть отправленные письма.
-                    if EmailsResult.objects.filter(email=email, status='sent').exists():
-                        # Создаем список старых получателей.
-                        old_recipients_list = Employee.objects.filter(
-                            emails_recipients__email=email, emails_recipients__status='sent'
-                        ).distinct()
-                        # Получаем ключи.
-                        old_recipients_pks = list(old_recipients_list.values_list('pk', flat=True))
+# Отправка писем.
+@login_required
+@permission_required('emails.add_email')
+def sending(request, pk):
 
-                        # Фильтруем набор.
-                        recipients = recipients.exclude(pk__in=old_recipients_pks)
+    # Получаем объект.
+    email = get_object_or_404(Email, id=pk)
 
-                # Если получатели есть:
-                if recipients.exists():
-                    # Добавляем список мэйлов.
-                    if settings.DEBUG:
-                        logger.info(f'Получатели с адресатом: {recipients}')
-                    email_list = recipients.values_list('email', flat=True)
-                    if settings.DEBUG:
-                        logger.info(f'Адреса получателей: {email_list}')
+    # Если форма отправлена.
+    if request.method == 'POST':
 
-                    send_mail(subject, message, EMAIL_HOST_USER, email_list, fail_silently=False, html_message=message)
+        # Форма с данными.
+        form = EmailSendingForm(request.POST)
 
-                    # После успешной отправки письма записываем статус отправки в модель EmailsResult.
-                    emails_result = EmailsResult.objects.create(email=email, sending_type=sending_type, status='sent')
-                    emails_result.recipients.set(recipients)
-                    if settings.DEBUG:
-                        logger.info(f'Результат отправки сообщения: {emails_result}')
+        # Если данные валидны.
+        if form.is_valid():
 
-                # Если получателей нет.
-                else:
-                    emails_result = EmailsResult.objects.create(email=email, sending_type=sending_type, status='not_sent')
-                    if settings.DEBUG:
-                        logger.info(f'Результат отправки сообщения: {emails_result}')
+            # Выбранный тип рассылки.
+            sending_type = form.cleaned_data['sending_type']
+
+            # Выполнение рассылки.
+            sending_start(email=email, sending_type=sending_type)
 
         # Переходим.
         return redirect('emails:email', pk=pk)
