@@ -432,6 +432,35 @@ class ScormPackageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Update
         # Возвращаем значения в форму.
         return initial
 
+    # Валидация формы.
+    def form_valid(self, form):
+        try:
+            scorm_package = form.save()
+
+            # Создаем директорию для распаковки, если ее нет
+            extract_path = os.path.join(settings.MEDIA_ROOT, 'scorm_packages', str(scorm_package.id))
+            os.makedirs(extract_path, exist_ok=True)
+
+            # Логирование: начало распаковки
+            logger.info(f"Начало распаковки SCORM-пакета {scorm_package.id}")
+
+            # Распаковываем SCORM-пакет
+            with zipfile.ZipFile(scorm_package.zip_file.path, 'r') as zip_ref:
+                zip_ref.extractall(extract_path)
+
+            # Логирование: успешная распаковка
+            logger.info(f"Успешная распаковка SCORM-пакета {scorm_package.id} в {extract_path}")
+
+            return super().form_valid(form)
+
+        except Exception as e:
+            logger.error(f"Ошибка при распаковке SCORM-пакета {scorm_package.id}: {str(e)}")
+
+            if settings.DEBUG:
+                raise e
+            else:
+                return HttpResponseServerError("Ошибка сервера, обратитесь к администратору")
+
     # Перенаправление после валидации формы.
     def get_success_url(self):
         # Направляем по адресу объекта.

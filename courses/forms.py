@@ -47,11 +47,3 @@ class ScormPackageForm(forms.ModelForm):
             'creator': forms.HiddenInput(),
             'categories': Select2MultipleWidget(),
         }
-
-    # Особенность формы для апдейта.
-    def __init__(self, *args, **kwargs):
-        super(ScormPackageForm, self).__init__(*args, **kwargs)
-
-        # Если форма связана с существующим экземпляром модели, скрываем поле 'type'.
-        if self.instance and self.instance.pk:
-            self.fields['zip_file'].widget = forms.HiddenInput(attrs={'disabled': 'disabled'})
