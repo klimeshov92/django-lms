@@ -703,7 +703,7 @@ def scorm_set_value(request):
         if check_status:
 
             # Если курс еще не пройден или не провален.
-            if result.status not in ['completed', 'failed']:
+            if result.status != 'completed':
 
                 # Преобразуем текущий прогресс в словарь.
                 progress_data = json.loads(result.progress)
