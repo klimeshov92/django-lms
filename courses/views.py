@@ -37,6 +37,7 @@ from django.contrib.contenttypes.models import ContentType
 from core.filters import EmployeesGroupObjectPermissionGroupsFilter, EmployeesObjectPermissionEmployeesFilter
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+import shutil
 
 
 # Импортируем логи
@@ -382,18 +383,20 @@ class ScormPackageCreateView(LoginRequiredMixin, GPermissionRequiredMixin, Creat
         try:
             scorm_package = form.save()
 
-            # Создаем директорию для распаковки, если ее нет
+            # Путь распаковки.
             extract_path = os.path.join(settings.MEDIA_ROOT, 'scorm_packages', str(scorm_package.id))
+
+            # Создаем директорию.
             os.makedirs(extract_path, exist_ok=True)
 
-            # Логирование: начало распаковки
+            # Логирование: начало распаковки.
             logger.info(f"Начало распаковки SCORM-пакета {scorm_package.id}")
 
-            # Распаковываем SCORM-пакет
+            # Распаковываем SCORM-пакет.
             with zipfile.ZipFile(scorm_package.zip_file.path, 'r') as zip_ref:
                 zip_ref.extractall(extract_path)
 
-            # Логирование: успешная распаковка
+            # Логирование: успешная распаковка.
             logger.info(f"Успешная распаковка SCORM-пакета {scorm_package.id} в {extract_path}")
 
             return super().form_valid(form)
@@ -437,18 +440,24 @@ class ScormPackageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Update
         try:
             scorm_package = form.save()
 
-            # Создаем директорию для распаковки, если ее нет
+            # Путь распаковки.
             extract_path = os.path.join(settings.MEDIA_ROOT, 'scorm_packages', str(scorm_package.id))
+
+            # Удаляем старое содержимое, если оно существует.
+            if os.path.exists(extract_path):
+                shutil.rmtree(extract_path)
+
+            # Создаем директорию.
             os.makedirs(extract_path, exist_ok=True)
 
-            # Логирование: начало распаковки
+            # Логирование: начало распаковки.
             logger.info(f"Начало распаковки SCORM-пакета {scorm_package.id}")
 
-            # Распаковываем SCORM-пакет
+            # Распаковываем SCORM-пакет.
             with zipfile.ZipFile(scorm_package.zip_file.path, 'r') as zip_ref:
                 zip_ref.extractall(extract_path)
 
-            # Логирование: успешная распаковка
+            # Логирование: успешная распаковка.
             logger.info(f"Успешная распаковка SCORM-пакета {scorm_package.id} в {extract_path}")
 
             return super().form_valid(form)
@@ -658,7 +667,6 @@ def scorm_get_value(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
-
 # Установка значения в базе.
 @csrf_exempt
 def scorm_set_value(request):
@@ -751,6 +759,7 @@ def scorm_set_value(request):
                     result.end_date = timezone.now()
                 elif completion_status == 'completed' and success_status == 'unknown':
                     result.status = 'completed'
+                    result.score_scaled = 100
                     result.end_date = timezone.now()
                 elif success_status == 'failed':
                     result.status = 'failed'

@@ -83,7 +83,7 @@
                 <nav class="submenu">
                     {% if object.scorm_package %}
                         {% if result %}
-                            {% if result.status != 'failed' and result.status != 'completed' %}
+                            {% if result.status != 'completed' %}
                                 {% if blocked == False %}
                                     <a href="{% url 'courses:scorm_display' scorm_package_id=object.scorm_package.id %}">Пройти</a>
                                 {% endif %}
