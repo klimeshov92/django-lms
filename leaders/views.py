@@ -67,12 +67,6 @@ class LeadersView(LoginRequiredMixin, PermissionListMixin, ListView):
             total_bonus=Coalesce(Sum('transactions__bonus', filter=Q(transactions__in=queryset)), 0)
         ).order_by('-total_bonus')
 
-        # Добавляем ранг.
-        rank = 1
-        for leader in self.absolute_leaders:
-            leader.total_rank = rank
-            rank += 1
-
         # Добавляем модель фильтрации в выборку вью.
         self.filterset = LeadersFilter(self.request.GET, queryset, request=self.request)
 
@@ -96,7 +90,9 @@ class LeadersView(LoginRequiredMixin, PermissionListMixin, ListView):
         # Присваиваем ранг каждому лидеру для filter_bonus.
         rank = 1
         previous_filter_bonus = None
-        for leader in leaders:
+        # Преобразуем в список, чтобы сохранить в память.
+        filter_leaders = list(leaders.order_by('-filter_bonus'))
+        for leader in filter_leaders:
             if previous_filter_bonus is not None and leader.filter_bonus == previous_filter_bonus:
                 leader.filter_rank = previous_filter_rank
             else:
@@ -109,7 +105,10 @@ class LeadersView(LoginRequiredMixin, PermissionListMixin, ListView):
         # Присваиваем ранг каждому лидеру для total_bonus.
         rank = 1
         previous_total_bonus = None
-        for leader in leaders:
+        # Сортируем список.
+        total_leaders = sorted(filter_leaders, key=lambda x: x.total_bonus, reverse=True)
+
+        for leader in total_leaders:
             if previous_total_bonus is not None and leader.total_bonus == previous_total_bonus:
                 leader.total_rank = previous_total_rank
             else:
@@ -119,10 +118,8 @@ class LeadersView(LoginRequiredMixin, PermissionListMixin, ListView):
             previous_total_bonus = leader.total_bonus
             previous_total_rank = leader.total_rank
 
-        context['leaders'] = leaders
-
         # Добавляем пагинатор
-        paginator = Paginator(leaders, 10)
+        paginator = Paginator(total_leaders, 10)
         page_number = self.request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         context['page_obj'] = page_obj

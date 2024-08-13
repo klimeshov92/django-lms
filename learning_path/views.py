@@ -1325,6 +1325,7 @@ def self_appointment(request, pk, type):
                 employee=request.user,
                 type='event',
                 event=event,
+                status='registered',
                 planned_end_date=event.date,
                 self_appointment=True
             )
