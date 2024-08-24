@@ -21,6 +21,8 @@ class TestForm(forms.ModelForm):
             'bonus',
             'desc',
             'amount_of_try',
+            'sample_of_questions',
+            'number_of_questions',
             'passing_score',
             'random_questions',
             'random_answers',
@@ -34,6 +36,10 @@ class TestForm(forms.ModelForm):
             'creator': forms.HiddenInput(),
             'categories': Select2MultipleWidget(),
             'questions': Select2MultipleWidget(),
+            'sample_of_questions': forms.Select(attrs={'class': 'type-select-1'}),
+            'number_of_questions': forms.NumberInput(
+                attrs={'class': 'number-of-questions-select toggle-field', 'data-show-if-type-1': '["random"]'}
+            ),
         }
 
 # Форма создания вопроса.

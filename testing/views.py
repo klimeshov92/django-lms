@@ -898,7 +898,13 @@ def completion_of_test(request, tests_result, test):
     maximum_test_score = 0
 
     # Забираем сумму баллов за вопросы.
-    questions = Question.objects.filter(tests_questions__test=test).order_by('tests_questions__position')
+    questions_ids = [
+        questions_result.question.id
+        for questions_result in tests_result.questions_results.all()
+    ]
+    questions = Question.objects.filter(id__in=questions_ids)
+    if settings.DEBUG:
+        logger.info(f'Выборка вопросов: {questions}\n')
     questions_scores_sum = questions.aggregate(sum=Sum('score'))['sum']
     maximum_test_score += questions_scores_sum
     if settings.DEBUG:
@@ -979,6 +985,12 @@ def take_assigned_test(request, pk):
             filter(tests_questions__test=test).order_by('tests_questions__position')
         if settings.DEBUG:
             logger.info(f'Вопросы теста: {questions}\n')
+
+        # Если выборка не полная обрезаем.
+        if test.sample_of_questions == 'random':
+            questions = questions.order_by('?')[:test.number_of_questions]
+            if settings.DEBUG:
+                logger.info(f'Выборка {test.number_of_questions} случайных вопросов теста: {questions}\n')
 
         # Создаем результаты вопросов теста.
         for question in questions:

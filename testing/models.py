@@ -41,6 +41,14 @@ class Test(models.Model):
     desc = models.TextField(verbose_name='Описание', null=True, blank=True)
     # Количество попыток.
     amount_of_try = models.IntegerField(verbose_name='Количество попыток', default=1, validators=[MinValueValidator(1)])
+    # Выборка вопросов.
+    SAMPLE_OF_QUESTIONS = [
+        ('all', 'Все'),
+        ('random', 'Несколько случайных'),
+    ]
+    sample_of_questions = models.CharField(max_length=255, choices=SAMPLE_OF_QUESTIONS, default='all', verbose_name='Выборка вопросов')
+    # Количество вопросов.
+    number_of_questions = models.IntegerField(verbose_name='Количество вопросов в выборке', default=1, validators=[MinValueValidator(1)])
     # Проходной балл.
     passing_score = models.IntegerField(verbose_name='Проходной балл', default=20, validators=[MinValueValidator(1)])
     # Случайный порядок вопросов.
