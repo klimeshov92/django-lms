@@ -396,6 +396,13 @@
                         </p>
                     {% endif %}
                 {% endif %}
+                <p><span class="description-item">Выборка вопросов:</span>
+                    {% if object.sample_of_questions == 'all' %}
+                        {{object.get_sample_of_questions_display}}
+                    {% elif object.sample_of_questions == 'random' %}
+                        {{object.number_of_questions}}
+                    {% endif %}
+                </p>
                 {% if maximum_test_score %}
                     <p><span class="description-item">Максимальный балл:</span> {{maximum_test_score}}</p>
                 {% endif %}
