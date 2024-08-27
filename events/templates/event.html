@@ -105,7 +105,7 @@
                                 {% endif %}
                             {% else %}
                                 {% if object.self_appointment == True %}
-                                    <a href="{% url 'learning_path:self_appointment' pk=object.id type='event' %}">Самоназначение</a>
+                                    <a href="{% url 'learning_path:self_appointment' pk=object.id type='event' %}">Регистрация</a>
                                 {% endif %}
                             {% endif %}
                             {% if user|perms:"events.change_event" %}

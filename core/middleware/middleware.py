@@ -4,8 +4,6 @@ from django.http import HttpResponse
 from django.db.models.deletion import ProtectedError
 from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
-from django.contrib.auth import get_user_model
-from guardian.utils import get_anonymous_user
 
 # Отработка защиты от удаления.
 class ProtectedErrorMiddleware:
@@ -29,8 +27,3 @@ class ProtectedErrorMiddleware:
 
         # Если это не исключение ProtectedError, передаем его дальше
         return None
-
-class CustomAnonymousUserMiddleware(MiddlewareMixin):
-    def process_request(self, request):
-        if request.user.is_anonymous:
-            request.user = get_anonymous_user()
