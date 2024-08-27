@@ -128,8 +128,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # Захват анонимного пользователя.
-    #'core.middleware.middleware.CustomAnonymousUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # Фреймы.
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
