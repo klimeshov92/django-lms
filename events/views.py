@@ -2,40 +2,25 @@ from django.shortcuts import render
 
 # Create your views here.
 
-# Импорт настроек.
 from django.conf import settings
-# Импорт моделей вью.
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-# Импорт моделей ядра.
 from .models import Event, ParticipantsGenerator
 from learning_path.models import Result
-# Импорт модели фильтров.
 from .filters import EventFilter, ParticipantsFilter
-# Импорт форм.
 from .forms import EventForm, ParticipantsGeneratorForm
-# Импорт рендера, перенаправления, генерации адреса и других урл функций.
 from django.shortcuts import redirect, reverse, get_object_or_404
-# Проверка прав доступа для классов.
 from guardian.mixins import PermissionListMixin
 from guardian.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin as GPermissionRequiredMixin
-# Импорт декораторов проверки прав.
 from guardian.decorators import permission_required
-# Сабквери.
 from django.db.models import OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.db.models import Case, When, Value
-# Импорт Q.
 from django.db.models import Q
-# Импорт выброса ошибок и джисон ответа.
 from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse
-# Импорт времени с учетом таймзоны.
 from django.utils import timezone
-# Импорт пагинатора
 from django.core.paginator import Paginator
-# Импорт суммирования значений.
 from django.db.models import Sum
-# Миксины.
 from core.mixins import PreviousPageGetMixinL0, PreviousPageSetMixinL0, PreviousPageGetMixinL1, PreviousPageSetMixinL1, PreviousPageGetMixinL2, PreviousPageSetMixinL2
 from reviews.models import Review
 from core.models import EmployeesGroupObjectPermission, EmployeesObjectPermission
@@ -45,6 +30,8 @@ from django.contrib.contenttypes.models import ContentType
 from core.filters import EmployeesGroupObjectPermissionGroupsFilter, EmployeesObjectPermissionEmployeesFilter
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from guardian.utils import get_anonymous_user
+
 
 # Импортируем логи
 import logging
@@ -64,8 +51,19 @@ class EventsView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin
     # Количество объектов на странице
     paginate_by = 6
 
+    # Моделируем логику перенаправления.
+    def dispatch(self, request, *args, **kwargs):
+
+        # Проверка на анонимного пользователя.
+        if request.user.is_anonymous:
+            # Используем анонимного пользователя.
+            request.user = get_anonymous_user()
+
+        return super().dispatch(request, *args, **kwargs)
+
     # Переопределяем выборку вью.
     def get_queryset(self):
+
         # Забираем изначальную выборку вью.
         queryset = super().get_queryset().prefetch_related(
             'categories',
@@ -103,6 +101,16 @@ class EventView(LoginRequiredMixin, PreviousPageGetMixinL1, PreviousPageSetMixin
     # Количество объектов на странице
     paginate_by = 6
 
+    # Моделируем логику перенаправления.
+    def dispatch(self, request, *args, **kwargs):
+        # Проверка на анонимного пользователя.
+        if request.user.is_anonymous:
+            # Используем анонимного пользователя.
+            request.user = get_anonymous_user()
+            print(f"User: {request.user}, is_authenticated: {request.user.is_authenticated}")  #
+
+        return super().dispatch(request, *args, **kwargs)
+
     # Определяем объект проверки.
     def get_permission_object(self):
         event = Event.objects.get(pk=self.kwargs.get('pk'))
@@ -110,12 +118,15 @@ class EventView(LoginRequiredMixin, PreviousPageGetMixinL1, PreviousPageSetMixin
 
     # Переопределяем выборку вью.
     def get_queryset(self):
+
         # Переопределяем изначальную выборку.
         event = self.get_permission_object()
         queryset = super().get_queryset().filter(event=event).order_by('employee')
         self.qs_count = queryset.count
+
         # Добавляем модель фильтрации в выборку вью.
         self.filterset = ParticipantsFilter(self.request.GET, queryset, request=self.request, event=event)
+
         # Возвращаем вью новую выборку.
         return self.filterset.qs
 

@@ -128,6 +128,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # Захват анонимного пользователя.
+    #'core.middleware.middleware.CustomAnonymousUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # Фреймы.
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -266,6 +268,7 @@ AUTH_GROUP_MODEL = 'core.EmployeesGroup'
 GUARDIAN_GROUP_OBJ_PERMS_MODEL = 'core.EmployeesGroupObjectPermission'
 GUARDIAN_USER_OBJ_PERMS_MODEL = 'core.EmployeesObjectPermission'
 ANONYMOUS_USER_ID = -1
+
 
 LOGGING = {
     # Версия конфигурации логирования. 1 — это единственное допустимое значение.

@@ -92,40 +92,42 @@
             {# Управление #}
             <div class="submenu-container">
                 <nav class="submenu">
-                    {% if object.status != 'completed' and object.status != 'canceled' %}
-                        {% if result %}
-                            {% if result.status != 'present' and result.status != 'absent' %}
-                                {% if result.status != 'refused' and object.mandatory == False %}
-                                    <a href="{% url 'events:participants_mark' pk=result.id status='refused' %}">Отказаться от участия</a>
+                    {#{% if not request.user.username == 'AnonymousUser' %}#}
+                        {% if object.status != 'completed' and object.status != 'canceled' %}
+                            {% if result %}
+                                {% if result.status != 'present' and result.status != 'absent' %}
+                                    {% if result.status != 'refused' and object.mandatory == False %}
+                                        <a href="{% url 'events:participants_mark' pk=result.id status='refused' %}">Отказаться от участия</a>
+                                    {% endif %}
+                                    {% if result.status != 'registered' and result.status != 'absent' %}
+                                        <a href="{% url 'events:participants_mark' pk=result.id status='registered' %}">Вернуться к участию</a>
+                                    {% endif %}
                                 {% endif %}
-                                {% if result.status != 'registered' and result.status != 'absent' %}
-                                    <a href="{% url 'events:participants_mark' pk=result.id status='registered' %}">Вернуться к участию</a>
+                            {% else %}
+                                {% if object.self_appointment == True %}
+                                    <a href="{% url 'learning_path:self_appointment' pk=object.id type='event' %}">Самоназначение</a>
                                 {% endif %}
                             {% endif %}
-                        {% else %}
-                            {% if object.self_appointment == True %}
-                                <a href="{% url 'learning_path:self_appointment' pk=object.id type='event' %}">Самоназначение</a>
+                            {% if user|perms:"events.change_event" %}
+                                {% if object.status == 'planned' %}
+                                    <a href="{% url 'events:change_status' pk=object.id status='in_progress' %}">Начать</a>
+                                {% endif %}
+                                {% if object.status == 'in_progress' %}
+                                    <a href="{% url 'events:change_status' pk=object.id status='canceled' %}">Отменить</a>
+                                    <a href="{% url 'events:change_status' pk=object.id status='completed' %}">Завершить</a>
+                                {% endif %}
+                                <a href="{% url 'events:event_update' pk=object.id %}">Изменить</a>
+                            {% endif %}
+                            {% if user|perms:"events.delete_event" %}
+                                <a href="{% url 'events:event_delete' pk=object.id %}">Удалить</a>
                             {% endif %}
                         {% endif %}
                         {% if user|perms:"events.change_event" %}
-                            {% if object.status == 'planned' %}
-                                <a href="{% url 'events:change_status' pk=object.id status='in_progress' %}">Начать</a>
+                            {% if object.status == 'canceled' or object.status == 'completed' %}
+                                <a href="{% url 'events:change_status' pk=object.id status='planned' %}">Вернуть к планированию</a>
                             {% endif %}
-                            {% if object.status == 'in_progress' %}
-                                <a href="{% url 'events:change_status' pk=object.id status='canceled' %}">Отменить</a>
-                                <a href="{% url 'events:change_status' pk=object.id status='completed' %}">Завершить</a>
-                            {% endif %}
-                            <a href="{% url 'events:event_update' pk=object.id %}">Изменить</a>
                         {% endif %}
-                        {% if user|perms:"events.delete_event" %}
-                            <a href="{% url 'events:event_delete' pk=object.id %}">Удалить</a>
-                        {% endif %}
-                    {% endif %}
-                    {% if user|perms:"events.change_event" %}
-                        {% if object.status == 'canceled' or object.status == 'completed' %}
-                            <a href="{% url 'events:change_status' pk=object.id status='planned' %}">Вернуть к планированию</a>
-                        {% endif %}
-                    {% endif %}
+                    {#{% endif %}#}
                     <a href="{{ BASE_URL }}{% url 'events:event' pk=object.id %}" class="copy_link">Скопировать ссылку</a>
                     <a href="{{ previous_page_l1 }}">Назад</a>
                 </nav>

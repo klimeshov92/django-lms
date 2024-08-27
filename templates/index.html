@@ -33,7 +33,7 @@
             <button class="hamburger-menu">☰</button>
         </div>
         <div class="header-username">
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and user.username != 'AnonymousUser' %}
                 {% if is_area %}
                     {{request.user.username}}
                 {% else %}
@@ -55,8 +55,7 @@
         {% endif %}
 
         {% if user|perms:"events.view_event" %}
-            <a href="{% url 'events:events' %}">Мероприятия ({{active_events_count}})</a>
-
+            <a href="{% url 'events:events' %}">Мероприятия {% if user.is_authenticated and user.username != 'AnonymousUser' %}({{active_events_count}}){% endif %}</a>
         {% endif %}
 
         {% if user|perms:"learning_path.view_learningpath" %}

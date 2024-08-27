@@ -12,8 +12,6 @@ from django.contrib.auth.models import Group
 from django.utils import timezone
 # Импорт поля контента с возможностью загрузки файлов.
 from ckeditor.fields import RichTextField
-# Импорт поля контента с возможностью загрузки файлов.
-from ckeditor.fields import RichTextField
 
 # Класс сотрудника на основе пользователя.
 class Employee(AbstractUser):
