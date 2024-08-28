@@ -281,6 +281,16 @@ class EventCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
     # Шаблон.
     template_name = 'event_edit.html'
 
+    # Моделируем логику перенаправления.
+    def dispatch(self, request, *args, **kwargs):
+        # Проверка на анонимного пользователя.
+        if request.user.is_anonymous:
+            # Используем анонимного пользователя.
+            request.user = get_anonymous_user()
+            print(f"User: {request.user}, is_authenticated: {request.user.is_authenticated}")  #
+
+        return super().dispatch(request, *args, **kwargs)
+
     # Заполнение полей данными.
     def get_initial(self):
         # Забираем изначальный набор.
@@ -321,6 +331,16 @@ class EventUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Event
     # Шаблон.
     template_name = 'event_edit.html'
+
+    # Моделируем логику перенаправления.
+    def dispatch(self, request, *args, **kwargs):
+        # Проверка на анонимного пользователя.
+        if request.user.is_anonymous:
+            # Используем анонимного пользователя.
+            request.user = get_anonymous_user()
+            print(f"User: {request.user}, is_authenticated: {request.user.is_authenticated}")  #
+
+        return super().dispatch(request, *args, **kwargs)
 
     # Заполнение полей данными.
     def get_initial(self):
@@ -364,6 +384,16 @@ class EventDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Event
     # Шаблон.
     template_name = 'event_delete.html'
+
+    # Моделируем логику перенаправления.
+    def dispatch(self, request, *args, **kwargs):
+        # Проверка на анонимного пользователя.
+        if request.user.is_anonymous:
+            # Используем анонимного пользователя.
+            request.user = get_anonymous_user()
+            print(f"User: {request.user}, is_authenticated: {request.user.is_authenticated}")  #
+
+        return super().dispatch(request, *args, **kwargs)
 
     # Перенаправление после валидации формы.
     def get_success_url(self):
