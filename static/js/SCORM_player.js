@@ -1,14 +1,14 @@
 // Функция для загрузки SCORM контента.
-function loadScormContent(scorm_package_id) {
-    console.log("Загрузка SCORM контента для пакета:", scorm_package_id);
+function loadScormContent(course_id) {
+    console.log("Загрузка SCORM контента для пакета:", course_id);
 
     var contentUrl;
     if (type === 'ispring') {
-        contentUrl = `/media/scorm_packages/${scorm_package_id}/res/index.html`;
+        contentUrl = `/media/scorm_packages/${course_id}/res/index.html`;
     } else if (type === 'articulate') {
-        contentUrl = `/media/scorm_packages/${scorm_package_id}/index_lms.html`;
+        contentUrl = `/media/scorm_packages/${course_id}/index_lms.html`;
     } else if (type === 'scroll') {
-        contentUrl = `/media/scorm_packages/${scorm_package_id}/index.html`;
+        contentUrl = `/media/scorm_packages/${course_id}/index.html`;
     } else {
         console.error("Неизвестный тип SCORM пакета:", type);
         return;
@@ -66,7 +66,7 @@ function requestFullscreen(element) {
 // Загрузка SCORM контента при открытии окна.
 window.addEventListener('load', function() {
     console.log("Окно загружено, начинаем загрузку SCORM контента");
-    loadScormContent(scorm_package_id);
+    loadScormContent(course_id);
     console.log("SCORM контент загружен");
 });
 

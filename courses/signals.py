@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from django.conf import settings
 from django.db import models
 from django.http import HttpResponseServerError
-from .models import ScormPackage
+from .models import Course
 
 # Импортируем логи.
 import logging
@@ -14,7 +14,7 @@ import logging
 logger = logging.getLogger('project')
 
 # Функция-обработчик сигнала post_delete
-@receiver(post_delete, sender=ScormPackage)
+@receiver(post_delete, sender=Course)
 def delete_scorm_package_directory(sender, instance, **kwargs):
     try:
         # Получаем путь к директории для удаления

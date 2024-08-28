@@ -81,21 +81,19 @@
             </div>
             <div class="submenu-container">
                 <nav class="submenu">
-                    {% if object.scorm_package %}
-                        {% if result %}
-                            {% if result.status != 'completed' %}
-                                {% if blocked == False %}
-                                    <a href="{% url 'courses:scorm_display' scorm_package_id=object.scorm_package.id %}">Пройти</a>
-                                {% endif %}
-                            {% else %}
-                                {% if object.self_appointment == True %}
-                                    <a href="{% url 'learning_path:self_appointment' pk=object.id type='course' %}">Самоназначение</a>
-                                {% endif %}
+                    {% if result %}
+                        {% if result.status != 'completed' %}
+                            {% if blocked == False %}
+                                <a href="{% url 'courses:scorm_display' course_id=object.id %}">Пройти</a>
                             {% endif %}
                         {% else %}
                             {% if object.self_appointment == True %}
                                 <a href="{% url 'learning_path:self_appointment' pk=object.id type='course' %}">Самоназначение</a>
                             {% endif %}
+                        {% endif %}
+                    {% else %}
+                        {% if object.self_appointment == True %}
+                            <a href="{% url 'learning_path:self_appointment' pk=object.id type='course' %}">Самоназначение</a>
                         {% endif %}
                     {% endif %}
                     {% if user|perms:"courses.change_course" %}
@@ -104,6 +102,7 @@
                     {% if user|perms:"courses.delete_course" %}
                         <a href="{% url 'courses:course_delete' pk=object.id %}">Удалить</a>
                     {% endif %}
+                    <a href="{{ object.zip_file.url }}" download>Скачать файл</a>
                     <a href="{{ previous_page_l1 }}">Назад</a>
                 </nav>
             </div>

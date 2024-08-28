@@ -4,7 +4,7 @@ from django_filters import FilterSet, ModelMultipleChoiceFilter, ChoiceFilter, D
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 # Импорт моделей.
 from core.models import Category
-from .models import Course, ScormPackage
+from .models import Course
 # Импорт форм.
 from django import forms
 # Импорт каунта.
@@ -49,21 +49,4 @@ class CourseFilter(FilterSet):
         ],
         widget=Select2Widget,
         label='Статус'
-    )
-
-# Фильтрация файлов.
-class ScormPackageFilter(FilterSet):
-    # Фильтрация по категории.
-    сategory = ModelMultipleChoiceFilter(
-        field_name='categories',
-        queryset=Category.objects.annotate(num_scorm_packages=Count('scorm_packages'))
-        .filter(num_scorm_packages__gt=0).order_by('name'),
-        widget=Select2MultipleWidget()
-    )
-    # Фильтрация по имени.
-    course = ModelMultipleChoiceFilter(
-        queryset=ScormPackage.objects.all(),
-        to_field_name='course',
-        lookup_expr='icontains',
-        widget=Select2MultipleWidget()
     )

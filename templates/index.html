@@ -130,10 +130,6 @@
         <a href="{% url 'materials:files' %}">Файлы</a>
         {% endif %}
 
-        {% if user|perms:"courses.view_scormpackage" %}
-        <a href="{% url 'courses:scorm_packages' %}">SCORM-пакеты</a>
-        {% endif %}
-
     </nav>
 
     {# Подключение контента #}

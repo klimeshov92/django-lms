@@ -22,10 +22,10 @@
     {# Передача переменных в глобальный контекст #}
     <script>
         // Получение и передача параметров из контекста шаблона Django.
-        var scorm_package_id = "{{ scorm_package_id }}";
+        var course_id = "{{ course_id }}";
         var user_id = "{{ user_id }}";
         var type = "{{ type }}";
-        console.log("Переданный scorm_package_id:", scorm_package_id);
+        console.log("Переданный course_id:", course_id);
         console.log("Переданный user_id:", user_id);
     </script>
 

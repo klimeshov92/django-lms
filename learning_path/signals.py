@@ -201,7 +201,6 @@ def create_learning_results(sender, instance, created, **kwargs):
                         learning_path_result=learning_path_result,
                         employee=employee,
                         course=course,
-                        scorm_package=course.scorm_package,
                         learning_task=learning_task,
                         assignment=assignment,
                         type='course'
@@ -349,7 +348,6 @@ def create_learning_results(sender, instance, created, **kwargs):
                     learning_path_result=learning_path_result,
                     employee=employee,
                     course=course,
-                    scorm_package=course.scorm_package,
                     learning_task=learning_task,
                     assignment=assignment,
                     type='course'
@@ -938,7 +936,6 @@ def create_learning_results(sender, instance, created, **kwargs):
                             course_result = Result.objects.create(
                                 employee=employee,
                                 course=course,
-                                scorm_package=course.scorm_package,
                                 assignment=assignment,
                                 planned_end_date=planned_end_date,
                                 type='course'
@@ -972,7 +969,6 @@ def create_learning_results(sender, instance, created, **kwargs):
                     course_result = Result.objects.create(
                         employee=employee,
                         course=course,
-                        scorm_package=course.scorm_package,
                         assignment=assignment,
                         planned_end_date=planned_end_date,
                         type='material'

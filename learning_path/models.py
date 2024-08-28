@@ -8,7 +8,7 @@ from django.utils import timezone
 from core.models import Employee, EmployeesGroup, Category
 from materials.models import Material
 from testing.models import Test, Question, Answer, RelevantPoint
-from courses.models import ScormPackage, Course
+from courses.models import Course
 from events.models import Event
 from asgiref.sync import sync_to_async
 from django.core.validators import MinValueValidator
@@ -657,17 +657,6 @@ class Result(models.Model):
     course = models.ForeignKey(
         Course,
         verbose_name='Курс',
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name='results',
-        related_query_name='results',
-        db_index=True
-    )
-    # Пакет.
-    scorm_package = models.ForeignKey(
-        ScormPackage,
-        verbose_name='SCORM-пакет',
         null=True,
         blank=True,
         on_delete=models.CASCADE,

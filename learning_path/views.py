@@ -1177,7 +1177,6 @@ def self_appointment(request, pk, type):
                         learning_path_result=learning_path_result,
                         employee=request.user,
                         course=course,
-                        scorm_package=course.scorm_package,
                         learning_task=learning_task,
                         type='course',
                         self_appointment=True
@@ -1252,7 +1251,6 @@ def self_appointment(request, pk, type):
                 employee=request.user,
                 type='course',
                 course=course,
-                scorm_package=course.scorm_package,
                 self_appointment=True
             )
             logger.info(f"Создан результат: {result}")

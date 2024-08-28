@@ -4,9 +4,9 @@ from django.shortcuts import render
 
 from django.conf import settings
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Course, ScormPackage
-from .filters import CourseFilter, ScormPackageFilter
-from .forms import CourseForm, ScormPackageForm
+from .models import Course
+from .filters import CourseFilter
+from .forms import CourseForm
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from guardian.mixins import PermissionListMixin
 from guardian.mixins import PermissionRequiredMixin
@@ -259,6 +259,37 @@ class CourseCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView)
         # Возвращаем значения в форму.
         return initial
 
+    # Валидация формы.
+    def form_valid(self, form):
+        try:
+            course = form.save()
+
+            # Путь распаковки.
+            extract_path = os.path.join(settings.MEDIA_ROOT, 'scorm_packages', str(course.id))
+
+            # Создаем директорию.
+            os.makedirs(extract_path, exist_ok=True)
+
+            # Логирование: начало распаковки.
+            logger.info(f"Начало распаковки SCORM-пакета {course.id}")
+
+            # Распаковываем SCORM-пакет.
+            with zipfile.ZipFile(course.zip_file.path, 'r') as zip_ref:
+                zip_ref.extractall(extract_path)
+
+            # Логирование: успешная распаковка.
+            logger.info(f"Успешная распаковка SCORM-пакета {course.id} в {extract_path}")
+
+            return super().form_valid(form)
+
+        except Exception as e:
+            logger.error(f"Ошибка при распаковке SCORM-пакета {course.id}: {str(e)}")
+
+            if settings.DEBUG:
+                raise e
+            else:
+                return HttpResponseServerError("Ошибка сервера, обратитесь к администратору")
+
     # Перенаправление после валидации формы.
     def get_success_url(self):
         # Направляем по адресу объекта.
@@ -285,6 +316,41 @@ class CourseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         # Возвращаем значения в форму.
         return initial
 
+    # Валидация формы.
+    def form_valid(self, form):
+        try:
+            course = form.save()
+
+            # Путь распаковки.
+            extract_path = os.path.join(settings.MEDIA_ROOT, 'scorm_packages', str(course.id))
+
+            # Удаляем старое содержимое, если оно существует.
+            if os.path.exists(extract_path):
+                shutil.rmtree(extract_path)
+
+            # Создаем директорию.
+            os.makedirs(extract_path, exist_ok=True)
+
+            # Логирование: начало распаковки.
+            logger.info(f"Начало распаковки SCORM-пакета {course.id}")
+
+            # Распаковываем SCORM-пакет.
+            with zipfile.ZipFile(course.zip_file.path, 'r') as zip_ref:
+                zip_ref.extractall(extract_path)
+
+            # Логирование: успешная распаковка.
+            logger.info(f"Успешная распаковка SCORM-пакета {course.id} в {extract_path}")
+
+            return super().form_valid(form)
+
+        except Exception as e:
+            logger.error(f"Ошибка при распаковке SCORM-пакета {course.id}: {str(e)}")
+
+            if settings.DEBUG:
+                raise e
+            else:
+                return HttpResponseServerError("Ошибка сервера, обратитесь к администратору")
+
     # Перенаправление после валидации формы.
     def get_success_url(self):
         # Направляем по адресу объекта.
@@ -305,201 +371,14 @@ class CourseDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
         # Направляем по адресу объектов.
         return reverse('courses:courses')
 
-
-# Список файлов.
-class ScormPackagesView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionListMixin, ListView):
-    # Права доступа
-    permission_required = 'courses.view_scormpackage'
-    # Модель.
-    model = ScormPackage
-    # Поле сортировки.
-    ordering = 'course__name'
-    # Шаблон.
-    template_name = 'scorm_packages.html'
-    # Количество объектов на странице
-    paginate_by = 6
-
-    # Переопределяем выборку вью.
-    def get_queryset(self):
-        # Забираем изначальную выборку вью.
-        queryset = super().get_queryset().prefetch_related(
-            'categories',
-        )
-        # Добавляем модель фильтрации в выборку вью.
-        self.filterset = ScormPackageFilter(self.request.GET, queryset)
-        # Возвращаем вью новую выборку.
-        return self.filterset.qs
-
-    # Добавляем во вью переменные.
-    def get_context_data(self, **kwargs):
-        # Забираем изначальный набор переменных.
-        context = super().get_context_data(**kwargs)
-        # Добавляем фильтрсет.
-        context['filterset'] = self.filterset
-        # Возвращаем новый набор переменных.
-        return context
-
-# Объект файла.
-class ScormPackageView(LoginRequiredMixin, PreviousPageGetMixinL1, PermissionRequiredMixin, DetailView):
-    # Права доступа
-    permission_required = 'courses.view_scormpackage'
-    accept_global_perms = True
-    # Модель.
-    model = ScormPackage
-    # Шаблон.
-    template_name = 'scorm_package.html'
-
-    # Добавляем во вью переменные.
-    def get_context_data(self, **kwargs):
-        # Забираем изначальный набор переменных.
-        context = super().get_context_data(**kwargs)
-        # Добавляем базовый адрес.
-        context['BASE_URL'] = settings.BASE_URL
-        # Возвращаем новый набор переменных.
-        return context
-
-# Создание файла.
-class ScormPackageCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
-    # Права доступа.
-    permission_required = 'courses.add_scormpackage'
-    # Форма.
-    form_class = ScormPackageForm
-    # Модель.
-    model = ScormPackage
-    # Шаблон.
-    template_name = 'scorm_package_edit.html'
-
-    # Заполнение полей данными.
-    def get_initial(self):
-        # Забираем изначальный набор.
-        initial = super().get_initial()
-        # Добавляем создателя: юзера отправившего запрос.
-        initial["creator"] = self.request.user
-        # Возвращаем значения в форму.
-        return initial
-
-    # Валидация формы.
-    def form_valid(self, form):
-        try:
-            scorm_package = form.save()
-
-            # Путь распаковки.
-            extract_path = os.path.join(settings.MEDIA_ROOT, 'scorm_packages', str(scorm_package.id))
-
-            # Создаем директорию.
-            os.makedirs(extract_path, exist_ok=True)
-
-            # Логирование: начало распаковки.
-            logger.info(f"Начало распаковки SCORM-пакета {scorm_package.id}")
-
-            # Распаковываем SCORM-пакет.
-            with zipfile.ZipFile(scorm_package.zip_file.path, 'r') as zip_ref:
-                zip_ref.extractall(extract_path)
-
-            # Логирование: успешная распаковка.
-            logger.info(f"Успешная распаковка SCORM-пакета {scorm_package.id} в {extract_path}")
-
-            return super().form_valid(form)
-
-        except Exception as e:
-            logger.error(f"Ошибка при распаковке SCORM-пакета {scorm_package.id}: {str(e)}")
-
-            if settings.DEBUG:
-                raise e
-            else:
-                return HttpResponseServerError("Ошибка сервера, обратитесь к администратору")
-
-    # Перенаправление после валидации формы.
-    def get_success_url(self):
-        # Направляем по адресу объекта.
-        return reverse('courses:scorm_package', kwargs={'pk': self.object.pk})
-
-# Изменение файла.
-class ScormPackageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    # Права доступа
-    permission_required = 'courses.change_scormpackage'
-    accept_global_perms = True
-    # Форма.
-    form_class = ScormPackageForm
-    # Модель.
-    model = ScormPackage
-    # Шаблон.
-    template_name = 'scorm_package_edit.html'
-
-    # Заполнение полей данными.
-    def get_initial(self):
-        # Забираем изначальный набор.
-        initial = super().get_initial()
-        # Добавляем создателя: юзера отправившего запрос.
-        initial["creator"] = self.request.user
-        # Возвращаем значения в форму.
-        return initial
-
-    # Валидация формы.
-    def form_valid(self, form):
-        try:
-            scorm_package = form.save()
-
-            # Путь распаковки.
-            extract_path = os.path.join(settings.MEDIA_ROOT, 'scorm_packages', str(scorm_package.id))
-
-            # Удаляем старое содержимое, если оно существует.
-            if os.path.exists(extract_path):
-                shutil.rmtree(extract_path)
-
-            # Создаем директорию.
-            os.makedirs(extract_path, exist_ok=True)
-
-            # Логирование: начало распаковки.
-            logger.info(f"Начало распаковки SCORM-пакета {scorm_package.id}")
-
-            # Распаковываем SCORM-пакет.
-            with zipfile.ZipFile(scorm_package.zip_file.path, 'r') as zip_ref:
-                zip_ref.extractall(extract_path)
-
-            # Логирование: успешная распаковка.
-            logger.info(f"Успешная распаковка SCORM-пакета {scorm_package.id} в {extract_path}")
-
-            return super().form_valid(form)
-
-        except Exception as e:
-            logger.error(f"Ошибка при распаковке SCORM-пакета {scorm_package.id}: {str(e)}")
-
-            if settings.DEBUG:
-                raise e
-            else:
-                return HttpResponseServerError("Ошибка сервера, обратитесь к администратору")
-
-    # Перенаправление после валидации формы.
-    def get_success_url(self):
-        # Направляем по адресу объекта.
-        return reverse('courses:scorm_package', kwargs={'pk': self.object.pk})
-
-# Удаление файла.
-class ScormPackageDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    # Права доступа
-    permission_required = 'courses.delete_scormpackage'
-    accept_global_perms = True
-    # Модель.
-    model = ScormPackage
-    # Шаблон.
-    template_name = 'scorm_package_delete.html'
-
-    # Перенаправление после валидации формы.
-    def get_success_url(self):
-        # Направляем по адресу объектов.
-        return reverse('courses:scorm_packages')
-
-
 # Плеер.
 @login_required
-def scorm_display(request, scorm_package_id):
-    logger.info(f"Запрос на отображение SCORM-пакета. scorm_package_id: {scorm_package_id}")
+def scorm_display(request, course_id):
+    logger.info(f"Запрос на отображение SCORM-пакета: {course_id}")
     # Забираем пакет.
-    scorm_package = get_object_or_404(ScormPackage, pk=scorm_package_id)
-    course = scorm_package.course
+    course = get_object_or_404(Course, pk=course_id)
     # Проверки.
-    result = scorm_package.course.results.filter(employee=request.user).latest('id')
+    result = course.results.filter(employee=request.user).latest('id')
     if result.status != 'appointed' and result.status != 'in_progress':
         return HttpResponseForbidden('Вам не назначен этот курс!')
     if result.learning_task and result.learning_task.blocking_tasks:
@@ -510,18 +389,18 @@ def scorm_display(request, scorm_package_id):
         ]
         if any(blocking_task_results.status != 'completed' for blocking_task_results in blocking_tasks_results):
             return HttpResponseForbidden('Курс заблокирован!')
-    if scorm_package.type == 'ispring':
+    if course.type == 'ispring':
         type = 'ispring'
-    if scorm_package.type == 'articulate':
+    if course.type == 'articulate':
         type = 'articulate'
-    if scorm_package.type == 'scroll':
+    if course.type == 'scroll':
         type = 'scroll'
     # Получаем идентификатор текущего пользователя.
     user_id = request.user.id
     # Получаем контекст.
     context = {
         'user_id': user_id,
-        'scorm_package_id': scorm_package_id,
+        'course_id': course_id,
         'course': course,
         'type': type,
     }
@@ -544,20 +423,20 @@ def scorm_initialize(request):
         # Парсим JSON из тела запроса.
         data = json.loads(request.body)
 
-        # Получаем user_id и scorm_package_id из данных запроса.
+        # Получаем user_id и course_id из данных запроса.
         user_id = data.get('user_id')
-        scorm_package_id = data.get('scorm_package_id')
+        course_id = data.get('course_id')
 
         # Проверяем.
         user = get_object_or_404(Employee, id=user_id)
-        scorm_package = get_object_or_404(ScormPackage, id=scorm_package_id)
+        course = get_object_or_404(Course, id=course_id)
 
-        # Сохраняем user_id и scorm_package_id в сессии.
+        # Сохраняем user_id и course_id в сессии.
         request.session['user_id'] = user_id
-        request.session['scorm_package_id'] = scorm_package_id
+        request.session['course_id'] = course_id
 
         # Получаем объект Result для отслеживания прогресса пользователя.
-        result = Result.objects.filter(employee_id=user_id, scorm_package_id=scorm_package_id).latest('id')
+        result = Result.objects.filter(employee_id=user_id, course_id=course_id).latest('id')
 
         # Если курс назначен - ставим отметку начала.
         if result.status == 'appointed':
@@ -593,7 +472,7 @@ def scorm_get_value(request):
 
         # Получаем значения из сессии.
         user_id = request.session.get('user_id')
-        scorm_package_id = request.session.get('scorm_package_id')
+        course_id = request.session.get('course_id')
         element = request.GET.get('element')
 
         # Выводим информацию о полученном элементе.
@@ -621,7 +500,7 @@ def scorm_get_value(request):
             return JsonResponse({'cmi.learner_name': request.user.username})
 
         # Получаем последний объект Result из базы данных.
-        result = Result.objects.filter(employee_id=user_id, scorm_package_id=scorm_package_id).latest('id')
+        result = Result.objects.filter(employee_id=user_id, course_id=course_id).latest('id')
 
         # Преобразование строки JSON в словарь Python.
         progress_data = json.loads(result.progress)
@@ -685,10 +564,10 @@ def scorm_set_value(request):
 
         # Извлечение идентификатора пользователя и пакета SCORM из сессии.
         user_id = request.session.get('user_id')
-        scorm_package_id = request.session.get('scorm_package_id')
+        course_id = request.session.get('course_id')
 
         # Получение данных о прогрессе пользователя.
-        result = Result.objects.filter(employee_id=user_id, scorm_package_id=scorm_package_id).latest('id')
+        result = Result.objects.filter(employee_id=user_id, course_id=course_id).latest('id')
         progress_data = json.loads(result.progress)
 
         # Инициализация, если отсутствует.
@@ -812,10 +691,10 @@ def scorm_commit(request):
 
         # Забираем пользователя и пакет.
         user_id = request.session.get('user_id')
-        scorm_package_id = request.session.get('scorm_package_id')
+        course_id = request.session.get('course_id')
 
         # Получение данных о прогрессе пользователя.
-        result = Result.objects.filter(employee_id=user_id, scorm_package_id=scorm_package_id).latest('id')
+        result = Result.objects.filter(employee_id=user_id, course_id=course_id).latest('id')
 
         # Преобразуем текущий прогресс в словарь.
         progress_data = json.loads(result.progress)
@@ -862,10 +741,10 @@ def scorm_finish(request):
         # Загружаем запрос.
         data = json.loads(request.body)
         user_id = request.session.get('user_id')
-        scorm_package_id = request.session.get('scorm_package_id')
+        course_id = request.session.get('course_id')
 
         # Получение данных о прогрессе пользователя.
-        result = Result.objects.filter(employee_id=user_id, scorm_package_id=scorm_package_id).latest('id')
+        result = Result.objects.filter(employee_id=user_id, course_id=course_id).latest('id')
 
         # Устанавливаем время завершения.
         result.end_date = timezone.now()
@@ -895,10 +774,10 @@ def scorm_finish(request):
 
 def scorm_get_last_error(request):
     user_id = request.session.get('user_id')
-    scorm_package_id = request.session.get('scorm_package_id')
+    course_id = request.session.get('course_id')
     try:
         # Получение данных о прогрессе пользователя.
-        result = Result.objects.filter(employee_id=user_id, scorm_package_id=scorm_package_id).latest('id')
+        result = Result.objects.filter(employee_id=user_id, course_id=course_id).latest('id')
 
         # Преобразование строки JSON в словарь Python.
         progress_data = json.loads(result.progress)

@@ -1,12 +1,12 @@
 function SCORM_API() {
-    var scorm_package_id = window.scorm_package_id;
+    var course_id = window.course_id;
     var user_id = window.user_id;
 
     this.Initialize = function() {
-        console.log("Initialize вызван для пользователя:", user_id, "и пакета:", scorm_package_id);
+        console.log("Initialize вызван для пользователя:", user_id, "и пакета:", course_id);
         const data = {
             user_id: user_id,
-            scorm_package_id: scorm_package_id
+            course_id: course_id
         };
 
         const xhr = new XMLHttpRequest();

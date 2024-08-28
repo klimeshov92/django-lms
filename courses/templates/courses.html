@@ -80,7 +80,7 @@
                             {% if obj.scorm_package %}
                                 {% if obj.latest_result_status == 'appointed' or obj.latest_result_status == 'in_progress' or obj.latest_result_status == 'failed' %}
                                     {% if not obj.now_blocking_tasks %}
-                                        <a href="{% url 'courses:scorm_display' scorm_package_id=obj.scorm_package.id %}">Пройти</a>
+                                        <a href="{% url 'courses:scorm_display' scorm_package_id=obj.id %}">Пройти</a>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
