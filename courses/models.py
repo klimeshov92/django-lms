@@ -21,7 +21,7 @@ class Course(models.Model):
     ]
     type = models.CharField(max_length=255, choices=TYPES, default='', verbose_name='Тип')
     # Файл.
-    zip_file = models.FileField(verbose_name='Zip-файл', null=True, blank=True, upload_to='scorm_packages/')
+    zip_file = models.FileField(verbose_name='Zip-файл', upload_to='scorm_packages/')
     # Создатель.
     creator = models.ForeignKey(
         Employee,
