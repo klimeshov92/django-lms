@@ -318,28 +318,34 @@ class CourseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 
     # Валидация формы.
     def form_valid(self, form):
+
         try:
+
+            # Сохраняем форму (обновляем курс).
             course = form.save()
 
-            # Путь распаковки.
-            extract_path = os.path.join(settings.MEDIA_ROOT, 'scorm_packages', str(course.id))
+            # Проверяем, был ли загружен новый файл.
+            if 'zip_file' in form.changed_data:
 
-            # Удаляем старое содержимое, если оно существует.
-            if os.path.exists(extract_path):
-                shutil.rmtree(extract_path)
+                # Путь распаковки.
+                extract_path = os.path.join(settings.MEDIA_ROOT, 'scorm_packages', str(course.id))
 
-            # Создаем директорию.
-            os.makedirs(extract_path, exist_ok=True)
+                # Удаляем старое содержимое, если оно существует.
+                if os.path.exists(extract_path):
+                    shutil.rmtree(extract_path)
 
-            # Логирование: начало распаковки.
-            logger.info(f"Начало распаковки SCORM-пакета {course.id}")
+                # Создаем директорию.
+                os.makedirs(extract_path, exist_ok=True)
 
-            # Распаковываем SCORM-пакет.
-            with zipfile.ZipFile(course.zip_file.path, 'r') as zip_ref:
-                zip_ref.extractall(extract_path)
+                # Логирование: начало распаковки.
+                logger.info(f"Начало распаковки SCORM-пакета {course.id}")
 
-            # Логирование: успешная распаковка.
-            logger.info(f"Успешная распаковка SCORM-пакета {course.id} в {extract_path}")
+                # Распаковываем SCORM-пакет.
+                with zipfile.ZipFile(course.zip_file.path, 'r') as zip_ref:
+                    zip_ref.extractall(extract_path)
+
+                # Логирование: успешная распаковка.
+                logger.info(f"Успешная распаковка SCORM-пакета {course.id} в {extract_path}")
 
             return super().form_valid(form)
 
