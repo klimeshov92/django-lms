@@ -98,11 +98,11 @@
                     {% endif %}
                     {% if user|perms:"courses.change_course" %}
                         <a href="{% url 'courses:course_update' pk=object.id %}">Изменить</a>
+                        <a href="{{ object.zip_file.url }}" download>Скачать файл</a>
                     {% endif %}
                     {% if user|perms:"courses.delete_course" %}
                         <a href="{% url 'courses:course_delete' pk=object.id %}">Удалить</a>
                     {% endif %}
-                    <a href="{{ object.zip_file.url }}" download>Скачать файл</a>
                     <a href="{{ previous_page_l1 }}">Назад</a>
                 </nav>
             </div>
