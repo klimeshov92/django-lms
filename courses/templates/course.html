@@ -82,14 +82,11 @@
             <div class="submenu-container">
                 <nav class="submenu">
                     {% if result %}
-                        {% if result.status != 'failed' and result.status != 'completed' %}
-                            {% if blocked == False %}
-                                <a href="{% url 'courses:scorm_display' course_id=object.id %}">Пройти</a>
-                            {% endif %}
-                        {% else %}
-                            {% if object.self_appointment == True %}
-                                <a href="{% url 'learning_path:self_appointment' pk=object.id type='course' %}">Самоназначение</a>
-                            {% endif %}
+                        {% if blocked == False %}
+                            <a href="{% url 'courses:scorm_display' course_id=object.id %}">Пройти</a>
+                        {% endif %}
+                        {% if object.self_appointment == True %}
+                            <a href="{% url 'learning_path:self_appointment' pk=object.id type='course' %}">Самоназначение</a>
                         {% endif %}
                     {% else %}
                         {% if object.self_appointment == True %}

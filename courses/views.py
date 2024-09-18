@@ -646,7 +646,7 @@ def scorm_set_value(request):
                     result.status = 'completed'
                     result.score_scaled = 100
                     result.end_date = timezone.now()
-                elif success_status == 'failed':
+                elif completion_status == 'completed' and success_status == 'failed':
                     result.status = 'failed'
                     result.end_date = timezone.now()
                 if settings.DEBUG:
