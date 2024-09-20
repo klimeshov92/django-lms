@@ -385,7 +385,7 @@ def scorm_display(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
     # Проверки.
     result = course.results.filter(employee=request.user).latest('id')
-    if result.status != 'appointed' and result.status != 'in_progress':
+    if not result:
         return HttpResponseForbidden('Вам не назначен этот курс!')
     if result.learning_task and result.learning_task.blocking_tasks:
         blocking_tasks = result.learning_task.blocking_tasks.all()
