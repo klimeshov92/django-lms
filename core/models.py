@@ -22,6 +22,7 @@ class Employee(AbstractUser):
     # first_name;
     # last_name;
     # is_active;
+    # 'user_permissions';
     # is_staff;
     # is_superuser;
     # last_login;
