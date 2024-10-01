@@ -31,6 +31,12 @@ function loadScormContent(course_id) {
     };
 }
 
+// Функция для скрытия меню.
+function hideMenu() {
+    const submenu = document.querySelector('.submenu');
+    submenu.classList.add('hidden');
+}
+
 // Запрос на полноэкранный режим.
 function requestFullscreen(element) {
     console.log("Запрос на полноэкранный режим для элемента:", element);
@@ -43,6 +49,7 @@ function requestFullscreen(element) {
             console.log("Полноэкранный режим активирован для iOS.");
         } else {
             console.error("Полноэкранный режим не поддерживается на этом устройстве.");
+            hideMenu(); // Скрываем меню, если активация не удалась.
         }
         return; // Прерываем выполнение, так как iOS специфичная логика уже обработана.
     }
@@ -53,27 +60,32 @@ function requestFullscreen(element) {
             console.log("Полноэкранный режим активирован");
         }).catch((err) => {
             console.error("Ошибка при активации полноэкранного режима:", err);
+            hideMenu(); // Скрываем меню, если активация не удалась.
         });
     } else if (element.mozRequestFullScreen) { // Firefox
         element.mozRequestFullScreen().then(() => {
             console.log("Полноэкранный режим активирован (Firefox)");
         }).catch((err) => {
             console.error("Ошибка при активации полноэкранного режима (Firefox):", err);
+            hideMenu(); // Скрываем меню, если активация не удалась.
         });
     } else if (element.webkitRequestFullscreen) { // Chrome, Safari, Opera
         element.webkitRequestFullscreen().then(() => {
             console.log("Полноэкранный режим активирован (Webkit)");
         }).catch((err) => {
             console.error("Ошибка при активации полноэкранного режима (Webkit):", err);
+            hideMenu(); // Скрываем меню, если активация не удалась.
         });
     } else if (element.msRequestFullscreen) { // IE/Edge
         element.msRequestFullscreen().then(() => {
             console.log("Полноэкранный режим активирован (IE/Edge)");
         }).catch((err) => {
             console.error("Ошибка при активации полноэкранного режима (IE/Edge):", err);
+            hideMenu(); // Скрываем меню, если активация не удалась.
         });
     } else {
         console.error("Полноэкранный режим не поддерживается этим браузером");
+        hideMenu(); // Скрываем меню, если активация не удалась.
     }
 }
 
@@ -97,9 +109,9 @@ document.addEventListener('fullscreenchange', function() {
     const submenu = document.querySelector('.submenu');
     if (fullscreenElement) {
         console.log("Полноэкранный режим активирован");
-        submenu.classList.add('hidden'); // Скрываем меню.
+        hideMenu(); // Скрываем меню при активации полноэкранного режима.
     } else {
         console.log("Полноэкранный режим не активен");
-        submenu.classList.remove('hidden'); // Показываем меню.
+        submenu.classList.remove('hidden'); // Показываем меню, если полноэкранный режим отключен.
     }
 });
