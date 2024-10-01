@@ -54,9 +54,7 @@ function SCORM_API() {
             exitFullscreen();
         } else {
             const submenu = document.querySelector('.submenu');
-            const fullscreenBtn = document.getElementById('fullscreen-btn');
             if (submenu && submenu.classList.contains('hidden')) {
-                fullscreenBtn.classList.add('hidden');
                 submenu.classList.remove('hidden');
             }
         }
