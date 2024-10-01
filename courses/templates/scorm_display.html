@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Отображение курса SCORM</title>
     {% load static %}
+    {# Подключение стилей #}
     <link rel="stylesheet" type="text/css" href="{% static 'css/SCORM_player.css' %}">
 </head>
 <body>
@@ -12,7 +13,7 @@
     <div id="scorm-player" class="scorm-player">
         <iframe id="scorm-player-iframe" class="scorm-player-iframe" src="your_content_url" allowfullscreen webkitallowfullscreen></iframe>
         <nav class="submenu">
-            <button id="fullscreen-btn">Развернуть на весь экран</button>
+            <a href="#" id="fullscreen-btn">Развернуть на весь экран</a>
             <a href="{% url 'courses:course' pk=course.id %}">Назад</a>
         </nav>
         {# Контент #}
