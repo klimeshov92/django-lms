@@ -52,6 +52,11 @@ function SCORM_API() {
 
         if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
             exitFullscreen();
+        } else {
+            const submenu = document.querySelector('.submenu');
+            if (submenu && submenu.classList.contains('hidden')) {
+                submenu.classList.remove('hidden');
+            }
         }
 
         if (xhr.status === 200) {
