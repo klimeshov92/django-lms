@@ -34,6 +34,20 @@ function loadScormContent(course_id) {
 // Запрос на полноэкранный режим.
 function requestFullscreen(element) {
     console.log("Запрос на полноэкранный режим для элемента:", element);
+
+    // Проверка для устройств на iOS.
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+        // Для iOS Safari включаем полноэкранный режим с webkit методом.
+        if (element.webkitEnterFullscreen) {
+            element.webkitEnterFullscreen(); // iOS специфичный вызов для видео или iframe.
+            console.log("Полноэкранный режим активирован для iOS.");
+        } else {
+            console.error("Полноэкранный режим не поддерживается на этом устройстве.");
+        }
+        return; // Прерываем выполнение, так как iOS специфичная логика уже обработана.
+    }
+
+    // Стандартные методы для других браузеров.
     if (element.requestFullscreen) {
         element.requestFullscreen().then(() => {
             console.log("Полноэкранный режим активирован");
@@ -46,7 +60,7 @@ function requestFullscreen(element) {
         }).catch((err) => {
             console.error("Ошибка при активации полноэкранного режима (Firefox):", err);
         });
-    } else if (element.webkitRequestFullscreen) { // Chrome, Safari and Opera
+    } else if (element.webkitRequestFullscreen) { // Chrome, Safari, Opera
         element.webkitRequestFullscreen().then(() => {
             console.log("Полноэкранный режим активирован (Webkit)");
         }).catch((err) => {
@@ -63,6 +77,13 @@ function requestFullscreen(element) {
     }
 }
 
+// Обработчик нажатия кнопки полноэкранного режима.
+document.getElementById('fullscreen-btn').addEventListener('click', function(event) {
+    event.preventDefault();
+    var iframe = document.getElementById('scorm-player-iframe');
+    requestFullscreen(iframe);
+});
+
 // Загрузка SCORM контента при открытии окна.
 window.addEventListener('load', function() {
     console.log("Окно загружено, начинаем загрузку SCORM контента");
@@ -70,29 +91,15 @@ window.addEventListener('load', function() {
     console.log("SCORM контент загружен");
 });
 
-// Переход в полноэкранный режим при нажатии кнопки.
-document.getElementById('fullscreen-btn').addEventListener('click', function(event) {
-    event.preventDefault();
-    console.log("Попытка перехода в полноэкранный режим по нажатию кнопки");
-    requestFullscreen(document.documentElement);
-    console.log("Скрытие/показ меню выполнено");
-});
-
 // Обработчик события изменения состояния полноэкранного режима.
-document.addEventListener('fullscreenchange', function(event) {
-    // Проверяем, активен ли в данный момент полноэкранный режим.
+document.addEventListener('fullscreenchange', function() {
     var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    const submenu = document.querySelector('.submenu');
     if (fullscreenElement) {
         console.log("Полноэкранный режим активирован");
-        // Изменяем видимость меню.
-        const submenu = document.querySelector('.submenu');
         submenu.classList.add('hidden'); // Скрываем меню.
     } else {
         console.log("Полноэкранный режим не активен");
-        // Изменяем видимость меню.
-        const submenu = document.querySelector('.submenu');
         submenu.classList.remove('hidden'); // Показываем меню.
     }
 });
-
-
