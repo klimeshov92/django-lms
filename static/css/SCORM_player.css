@@ -119,32 +119,6 @@ html, body {
     background-color: var(--color-accent-rgb-dark); /* Фон при активации */
 }
 
-/* Стили для кнопок, аналогичные ссылкам в нижнем меню */
-.submenu button {
-    color: var(--color-accent-rgb); /* Цвет текста */
-    text-decoration: none; /* Без подчеркивания */
-    padding: 10px 15px; /* Отступы */
-    display: inline-block; /* Блочно-строчное отображение */
-    transition: background-color 0.3s, color 0.3s, transform 0.2s, border 0.3s, border-radius 0.3s, box-shadow 0.3s, opacity 0.3s; /* Анимация изменений */
-    word-wrap: break-word; /* Перенос */
-    font-weight: 500; /* Жирность шрифта */
-    border: none; /* Убираем рамку */
-    background: transparent; /* Прозрачный фон */
-    cursor: pointer; /* Курсор в виде указателя */
-}
-
-/* Стили для кнопок при наведении, фокусе или активации */
-.submenu button.active, .submenu button:hover {
-    background-color: var(--color-accent-rgb); /* Фон при активации */
-    color: white; /* Цвет текста */
-}
-
-/* Стили для кнопок при нажатии */
-.submenu button:active {
-    background-color: var(--color-accent-rgb-dark); /* Фон при активации */
-}
-
-
 /* Медиа-запросы для мобильных устройств с принудительной альбомной ориентацией */
 @media screen and (max-width: 767px) {
     /* Дополнительные стили для мобильных устройств */
