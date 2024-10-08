@@ -245,7 +245,7 @@ footer {
     justify-content: start; /* Выравниваем по горизонтали */
     text-align: left; /* Текст по центру */
     width: 100% !important; /* Ширина */
-    padding: 10px 20px; /* Отступы */
+    padding: 10px 0px; /* Отступы */
 }
 
 /* Стили для подвала */
