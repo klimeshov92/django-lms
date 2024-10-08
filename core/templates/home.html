@@ -13,140 +13,188 @@
 {# Подключение контента #}
 {% block content %}
 
-<div class="detail-container">
+{# Вывод элемента #}
 
-    <div class="home-container">
+{% if user.is_authenticated %}
 
-        {# Главная страница #}
-        {% if user.is_authenticated %}
+    {# Вывод элемента #}
+    <div class="detail-container">
+
+        <div class="home-container">
+
+            {# Главная страница #}
+
+                <div class="h1-center">
+                    <h1>Добро пожаловать, {{user.username}}!</h1>
+                </div>
+                <div class="auth-text">
+                    <div>
+                        <p>Вы авторизованы, можете открыть <a href="javascript:void(0);" onclick="document.querySelector('.hamburger-menu').click();">меню</a> для начала обучения!</p>
+                        <p>Или перейдите в <a href="{% url 'core:personal_area' %}">личный кабинет</a> для просмотра результатов.</p>
+                    </div>
+                    <div class="informers-grid">
+                        {% if appointed_paths_count != 0 %}
+                            <a href="{% url 'learning_path:learning_paths' %}?latest_result_status=appointed" class="informers-grid-item informers-grid-item-button">
+                                <div>
+                                    <div>
+                                        Назначено траекторий
+                                    </div>
+                                    <div>
+                                        <span class="informer-int">{{appointed_paths_count}}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        {% else %}
+                            <div class="informers-grid-item informers-grid-item-container">
+                                <div>
+                                    <div>
+                                        Назначено траекторий
+                                    </div>
+                                    <div>
+                                        <span class="informer-int">{{appointed_paths_count}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if paths_in_progress_count != 0 %}
+                            <a href="{% url 'learning_path:learning_paths' %}?latest_result_status=in_progress" class="informers-grid-item informers-grid-item-button">
+                                <div>
+                                    <div>
+                                        Траектории в процессе
+                                    </div>
+                                    <div>
+                                        <span class="informer-int">{{paths_in_progress_count}}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        {% else %}
+                            <div class="informers-grid-item informers-grid-item-container">
+                                <div>
+                                    <div>
+                                        Траектории в процессе
+                                    </div>
+                                    <div>
+                                        <span class="informer-int">{{paths_in_progress_count}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if completed_paths_count != 0 %}
+                            <a href="{% url 'learning_path:learning_paths' %}?latest_result_status=completed" class="informers-grid-item informers-grid-item-button informers-grid-item-button-completed">
+                                <div>
+                                    <div>
+                                        Пройдено траекторий
+                                    </div>
+                                    <div>
+                                        <span class="informer-int">{{completed_paths_count}}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        {% else %}
+                            <div class="informers-grid-item informers-grid-item-container informers-grid-item-container-completed">
+                                <div>
+                                    <div>
+                                        Пройдено траекторий
+                                    </div>
+                                    <div>
+                                        <span class="informer-int">{{completed_paths_count}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if failed_paths_count != 0 %}
+                            <a href="{% url 'learning_path:learning_paths' %}?latest_result_status=failed" class="informers-grid-item informers-grid-item-button informers-grid-item-button-failed">
+                                <div>
+                                    <div>
+                                        Провалено траекторий
+                                    </div>
+                                    <div>
+                                        <span class="informer-int">{{failed_paths_count}}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        {% else %}
+                            <div class="informers-grid-item informers-grid-item-container informers-grid-item-container-failed">
+                                <div>
+                                    <div>
+                                        Провалено траекторий
+                                    </div>
+                                    <div>
+                                        <span class="informer-int">{{failed_paths_count}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="submenu-container">
+                    <nav class="submenu">
+                        <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                            {% csrf_token %}
+                        </form>
+                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выход</a>
+                        <a href="{% url 'password_change' %}">Изменить пароль</a>
+                        {% if object %}
+                            {% if user|perms:"core.add_home" %}
+                                <a href="{% url 'home_update' %}">Изменить главную</a>
+                            {% endif %}
+                        {% else %}
+                            {% if user|perms:"core.add_home" %}
+                                <a href="{% url 'home_create' %}">Создать главную</a>
+                            {% endif %}
+                        {% endif %}
+                    </nav>
+                </div>
+
+        </div>
+
+    </div>
+
+{% else %}
+
+    {# Вывод элемента #}
+    <div class="material-container-header">
+
+        {% if object %}
+
             <div class="h1-center">
-                <h1>Добро пожаловать, {{user.username}}!</h1>
-            </div>
-            <div class="auth-text">
-                <div>
-                    <p>Вы авторизованы, можете открыть <a href="javascript:void(0);" onclick="document.querySelector('.hamburger-menu').click();">меню</a> для начала обучения!</p>
-                    <p>Или перейдите в <a href="{% url 'core:personal_area' %}">личный кабинет</a> для просмотра результатов.</p>
-                </div>
-                <div class="informers-grid">
-                    {% if appointed_paths_count != 0 %}
-                        <a href="{% url 'learning_path:learning_paths' %}?latest_result_status=appointed" class="informers-grid-item informers-grid-item-button">
-                            <div>
-                                <div>
-                                    Назначено траекторий
-                                </div>
-                                <div>
-                                    <span class="informer-int">{{appointed_paths_count}}</span>
-                                </div>
-                            </div>
-                        </a>
-                    {% else %}
-                        <div class="informers-grid-item informers-grid-item-container">
-                            <div>
-                                <div>
-                                    Назначено траекторий
-                                </div>
-                                <div>
-                                    <span class="informer-int">{{appointed_paths_count}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if paths_in_progress_count != 0 %}
-                        <a href="{% url 'learning_path:learning_paths' %}?latest_result_status=in_progress" class="informers-grid-item informers-grid-item-button">
-                            <div>
-                                <div>
-                                    Траектории в процессе
-                                </div>
-                                <div>
-                                    <span class="informer-int">{{paths_in_progress_count}}</span>
-                                </div>
-                            </div>
-                        </a>
-                    {% else %}
-                        <div class="informers-grid-item informers-grid-item-container">
-                            <div>
-                                <div>
-                                    Траектории в процессе
-                                </div>
-                                <div>
-                                    <span class="informer-int">{{paths_in_progress_count}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if completed_paths_count != 0 %}
-                        <a href="{% url 'learning_path:learning_paths' %}?latest_result_status=completed" class="informers-grid-item informers-grid-item-button informers-grid-item-button-completed">
-                            <div>
-                                <div>
-                                    Пройдено траекторий
-                                </div>
-                                <div>
-                                    <span class="informer-int">{{completed_paths_count}}</span>
-                                </div>
-                            </div>
-                        </a>
-                    {% else %}
-                        <div class="informers-grid-item informers-grid-item-container informers-grid-item-container-completed">
-                            <div>
-                                <div>
-                                    Пройдено траекторий
-                                </div>
-                                <div>
-                                    <span class="informer-int">{{completed_paths_count}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% if failed_paths_count != 0 %}
-                        <a href="{% url 'learning_path:learning_paths' %}?latest_result_status=failed" class="informers-grid-item informers-grid-item-button informers-grid-item-button-failed">
-                            <div>
-                                <div>
-                                    Провалено траекторий
-                                </div>
-                                <div>
-                                    <span class="informer-int">{{failed_paths_count}}</span>
-                                </div>
-                            </div>
-                        </a>
-                    {% else %}
-                        <div class="informers-grid-item informers-grid-item-container informers-grid-item-container-failed">
-                            <div>
-                                <div>
-                                    Провалено траекторий
-                                </div>
-                                <div>
-                                    <span class="informer-int">{{failed_paths_count}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="submenu-container">
-                <nav class="submenu">
-                    <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
-                        {% csrf_token %}
-                    </form>
-                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выход</a>
-                    <a href="{% url 'password_change' %}">Изменить пароль</a>
-                </nav>
+                <h1>{{object.name}}</h1>
             </div>
 
-            {% else %}
-            <div class="h1-center">
-                <h1>Здравствуйте!</h1>
-            </div>
-            <div class="auth-text">
-                <div>
-                    <p>Это демо-стенд "Лайт ЛМС".</p>
-                    <p>Если вы уже зарегистрированы, <a href="{% url 'login' %}?next={{ request.GET.next }}">войдите</a> в систему!</p>
-                    <p>Иначе пройдите <a href="{% url 'signup' %}?next={{ request.GET.next }}">регистрацию</a> на портале.</p>
-                    <p>Для получения обезличенной тестовой учетной записи и с другими дополнительными вопросами обращайтесь к <a href="https://t.me/Sergey_Klimeshov">администратору</a> демо-портала.</p>
+    </div>
+
+    <div class="material-container">
+
+            <div class="material">
+                <div class="material-content">
+                    <p>{{object.content|safe}}</p>
                 </div>
             </div>
+
+        {% else %}
+
+            {# Вывод сообщения, если элемента нет #}
+            <div class="not-found">
+                <p>Главная не найдена!</p>
+            </div>
+
         {% endif %}
 
     </div>
 
-</div>
+    <div class="material-container-footer">
+
+        {# Управление #}
+        <div class="submenu-container">
+            <nav class="submenu">
+                <a href="{% url 'login' %}?next={{ request.GET.next }}">Вход</a>
+                <a href="{% url 'signup' %}?next={{ request.GET.next }}">Регистрация</a>
+            </nav>
+        </div>
+
+    </div>
+
+{% endif %}
+
+
 {% endblock content %}

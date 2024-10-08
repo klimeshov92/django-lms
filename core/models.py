@@ -662,3 +662,34 @@ class DataProcessing(models.Model):
         if not self.pk and DataProcessing.objects.exists():
             raise ValueError("Может быть только одна запись в модели DataProcessing")
         return super().save(*args, **kwargs)
+
+# Класс домашней страницы.
+class Home(models.Model):
+    # Создатель.
+    creator = models.ForeignKey(
+        Employee,
+        verbose_name='Создатель',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='home_creator',
+        related_query_name='home_creator'
+    )
+    # Название.
+    name = models.CharField(verbose_name='Название', max_length=255, db_index=True)
+    # Контент
+    content = RichTextField(verbose_name='Содержание', null=True, blank=True)
+    # Дата и время создания и изменения.
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания', db_index=True)
+    changed = models.DateTimeField(auto_now=True, verbose_name='Дата и время изменения', db_index=True)
+
+    class Meta:
+        # Изменение имени модели.
+        verbose_name = 'Главная страница'
+        verbose_name_plural = 'Главная страница'
+
+    # Ограничение одной записью.
+    def save(self, *args, **kwargs):
+        if not self.pk and Home.objects.exists():
+            raise ValueError("Может быть только одна запись в модели Home")
+        return super().save(*args, **kwargs)

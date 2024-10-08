@@ -23,7 +23,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordChangeDoneView, LogoutView, \
     PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from core.views import home, signup_view, activate
+from core.views import HomeView, signup_view, activate, HomeCreateView, HomeUpdateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,7 +34,9 @@ urlpatterns = [
     path('activate/<uidb64>/<token>/', activate, name='activate'),
     # Маршруты авторизации.
     path('login/', LoginView.as_view(), name='login'),
-    path('', home, name='home'),
+    path('', HomeView.as_view(), name='home'),
+    path('home_create/', HomeCreateView.as_view(), name='home_create'),
+    path('home_update/', HomeUpdateView.as_view(), name='home_update'),
     path('logout/', LogoutView.as_view(), name='logout'),
     # Маршруты изменения пароля
     path('password_change/', PasswordChangeView.as_view(), name='password_change'),

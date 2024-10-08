@@ -6,7 +6,7 @@ from django.contrib.auth.models import Permission
 from django_select2.forms import Select2Widget, Select2MultipleWidget
 from .models import EmployeeExcelImport, Category, EmployeesGroup, Employee, \
     GroupsGenerator, EmployeesGroupObjectPermission, Placement, Organization, Subdivision, Position, EmployeesObjectPermission, \
-    PrivacyPolicy, DataProcessing, Contacts
+    PrivacyPolicy, DataProcessing, Contacts, Home
 from django.contrib.contenttypes.models import ContentType
 from materials.models import Material, File
 from courses.models import Course
@@ -473,6 +473,23 @@ class DataProcessingForm(forms.ModelForm):
     class Meta:
         # Модель.
         model = DataProcessing
+        # Поля.
+        fields = [
+            'creator',
+            'name',
+            'content'
+        ]
+        # Классы виджетов.
+        widgets = {
+            'creator': forms.HiddenInput()
+        }
+
+# Форма домашней страницы.
+class HomeForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorWidget(), label='Содержание')
+    class Meta:
+        # Модель.
+        model = Home
         # Поля.
         fields = [
             'creator',

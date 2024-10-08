@@ -10,7 +10,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 # Импорт моделей ядра.
 from .models import Organization, Subdivision, Position, Employee, Placement, \
     EmployeeExcelImport, Category, EmployeesGroup, EmployeesGroupObjectPermission, GroupsGenerator, \
-    EmployeesObjectPermission, PrivacyPolicy, DataProcessing, Contacts
+    EmployeesObjectPermission, PrivacyPolicy, DataProcessing, Contacts, Home
 # Импорт модели фильтров.
 from .filters import CategoryFilter, EmployeeExcelImportFilter, \
     OrganizationFilter, SubdivisionFilter, PositionFilter, GroupFilter, EmployeeFilter, GroupsEmployeeFilter, \
@@ -19,7 +19,7 @@ from .filters import CategoryFilter, EmployeeExcelImportFilter, \
 from .forms import CategoryForm, EmployeeExcelImportForm, GroupForm, GroupsGeneratorForm, \
     EmployeesGroupObjectPermissionForm, EmployeeForm, PlacementForm, \
     OrganizationForm, SubdivisionForm, PositionForm, EmployeesObjectPermissionForm, PersonalInfoForm, \
-    PrivacyPolicyForm, DataProcessingForm, ContactsForm
+    PrivacyPolicyForm, DataProcessingForm, ContactsForm, HomeForm
 # Импорт пандас.
 import pandas as pd
 # Импорт рендера, перенаправления, генерации адреса и других урл функций.
@@ -2264,60 +2264,6 @@ class PersonalInfoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Update
         # Направляем по адресу объекта.
         return reverse('core:personal_area')
 
-# Домашняя.
-def home (request):
-    # Сохраняем полный URL предыдущей страницы в сессии при каждом запросе.
-    previous_page = request.get_full_path()
-    request.session['previous_page_l1'] = previous_page
-    print("Previous page l1 set to:", previous_page)
-    # Забираем юзера и его результаты.
-    employee = request.user
-    if employee.is_authenticated:
-
-        # Подзапрос информеров.
-        latest_paths_results = employee.results.filter(
-            learning_path=OuterRef('learning_path'),
-            type='learning_path',
-            employee=request.user
-        ).order_by('-id').values('id')[:1]
-
-        # Основной запрос информеров.
-        employees_paths_results = employee.results.filter(
-            id__in=Subquery(latest_paths_results)
-        ).prefetch_related('learning_path')
-
-        # Забираем траектории юзера.
-        appointed_paths_count = employees_paths_results.filter(
-            status='appointed',
-        ).count()
-        paths_in_progress_count = employees_paths_results.filter(
-            status='in_progress',
-        ).count()
-        completed_paths_count = employees_paths_results.filter(
-            status='completed',
-        ).count()
-        failed_paths_count = employees_paths_results.filter(
-            status='failed',
-        ).count()
-
-        # Отдаем контекст.
-        context = {
-            'employee': employee,
-            'appointed_paths_count': appointed_paths_count,
-            'paths_in_progress_count': paths_in_progress_count,
-            'completed_paths_count': completed_paths_count,
-            'failed_paths_count': failed_paths_count,
-        }
-
-    else:
-
-        # Отдаем контекст.
-        context = {
-            'employee': employee
-        }
-
-    return render(request, 'home.html', context)
-
 # Регистрация.
 def signup_view(request):
 
@@ -2607,3 +2553,123 @@ class DataProcessingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Upda
     def get_success_url(self):
         # Направляем по адресу объекта.
         return reverse('core:data_processing')
+
+# Объект политики конфиденциальности.
+class HomeView(PreviousPageSetMixinL1, DetailView):
+    # Модель.
+    model = Home
+    # Шаблон.
+    template_name = 'home.html'
+
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return Home.objects.first()
+
+    # Переопределеяем переменные вью.
+    def get_context_data(self, **kwargs):
+
+        # Забираем изначальный набор переменных
+        context = super().get_context_data(**kwargs)
+
+        # Забираем юзера и его результаты.
+        employee = self.request.user
+        if employee.is_authenticated:
+
+            # Подзапрос информеров.
+            latest_paths_results = employee.results.filter(
+                learning_path=OuterRef('learning_path'),
+                type='learning_path',
+                employee=employee
+            ).order_by('-id').values('id')[:1]
+
+            # Основной запрос информеров.
+            employees_paths_results = employee.results.filter(
+                id__in=Subquery(latest_paths_results)
+            ).prefetch_related('learning_path')
+
+            # Забираем траектории юзера.
+            appointed_paths_count = employees_paths_results.filter(
+                status='appointed',
+            ).count()
+            paths_in_progress_count = employees_paths_results.filter(
+                status='in_progress',
+            ).count()
+            completed_paths_count = employees_paths_results.filter(
+                status='completed',
+            ).count()
+            failed_paths_count = employees_paths_results.filter(
+                status='failed',
+            ).count()
+
+            # Отдаем контекст.
+            context['employee'] = employee
+            context['appointed_paths_count'] = appointed_paths_count
+            context['paths_in_progress_count'] = paths_in_progress_count
+            context['completed_paths_count'] = completed_paths_count
+            context['failed_paths_count'] = failed_paths_count
+
+
+        else:
+
+            # Отдаем контекст.
+            context['employee'] = employee
+
+        # Возвращаем новый набор переменных в контролер.
+        return context
+
+# Создание политики конфиденциальности.
+class HomeCreateView(LoginRequiredMixin, GPermissionRequiredMixin, CreateView):
+    # Права доступа.
+    permission_required = 'core.add_home'
+    # Форма.
+    form_class = HomeForm
+    # Модель.
+    model = Home
+    # Шаблон.
+    template_name = 'home_edit.html'
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        return reverse('home')
+
+# Изменение политики конфиденциальности.
+class HomeUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    # Права доступа
+    permission_required = 'core.change_home'
+    accept_global_perms = True
+    # Форма.
+    form_class = HomeForm
+    # Модель.
+    model = Home
+    # Шаблон.
+    template_name = 'home_edit.html'
+
+    # Получаем объект.
+    def get_object(self):
+        # Возвращаем единственный экземпляр политики конфиденциальности
+        return Home.objects.first()
+
+    # Заполнение полей данными.
+    def get_initial(self):
+        # Забираем изначальный набор.
+        initial = super().get_initial()
+        # Добавляем создателя: юзера отправившего запрос.
+        initial["creator"] = self.request.user
+        # Возвращаем значения в форму.
+        return initial
+
+    # Перенаправление после валидации формы.
+    def get_success_url(self):
+        # Направляем по адресу объекта.
+        return reverse('home')
