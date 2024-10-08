@@ -43,23 +43,26 @@
 
 </div>
 
-<div class="material-container-footer">
+{% if user|perms:"core.add_dataprocessing" or user|perms:"core.change_dataprocessing" %}
+    <div class="material-container-footer">
 
-    {# Управление #}
-    <div class="submenu-container">
-        <nav class="submenu">
-            {% if object %}
-                {% if user|perms:"core.add_dataprocessing" %}
-                    <a href="{% url 'core:data_processing_update' %}">Изменить</a>
+        {# Управление #}
+        <div class="submenu-container">
+            <nav class="submenu">
+                {% if object %}
+                    {% if user|perms:"core.add_dataprocessing" %}
+                        <a href="{% url 'core:data_processing_update' %}">Изменить</a>
+                    {% endif %}
+                {% else %}
+                    {% if user|perms:"core.change_dataprocessing" %}
+                        <a href="{% url 'core:data_processing_create' %}">Создать</a>
+                    {% endif %}
                 {% endif %}
-            {% else %}
-                {% if user|perms:"core.add_dataprocessing" %}
-                    <a href="{% url 'core:data_processing_create' %}">Создать</a>
-                {% endif %}
-            {% endif %}
-        </nav>
+            </nav>
+        </div>
+
+
     </div>
-
-</div>
+{% endif %}
 
 {% endblock content %}
