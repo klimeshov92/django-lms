@@ -480,8 +480,8 @@ SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 
 # Вход
-LOGIN_URL = 'home'
-LOGOUT_URL = 'home'
+LOGIN_URL = 'login'
+LOGOUT_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
