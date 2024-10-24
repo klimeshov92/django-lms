@@ -21,7 +21,7 @@
     --color-content-label-rgb: rgb(126, 87, 194);
 
     /* Более бледный фиолетовый var(--color-content-label-light-rgb)*/
-    --color-content-label-light-rgb: rgb(203, 187, 225);
+    --color-content-label-light-rgb: rgb(229, 218, 241);
 
     /* Оранжевый для статуса "В процессе" rgb(255, 165, 0) var(--color-in-progress-rgb)*/
     --color-in-progress-rgb: rgb(255, 165, 0);
