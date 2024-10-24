@@ -20,6 +20,9 @@
     /* Фиолетовый для подписи типа контента rgb(126, 87, 194) var(--color-content-label-rgb)*/
     --color-content-label-rgb: rgb(126, 87, 194);
 
+    /* Более бледный фиолетовый var(--color-content-label-light-rgb)*/
+    --color-content-label-light-rgb: rgb(203, 187, 225);
+
     /* Оранжевый для статуса "В процессе" rgb(255, 165, 0) var(--color-in-progress-rgb)*/
     --color-in-progress-rgb: rgb(255, 165, 0);
 
@@ -580,21 +583,24 @@ a.button-mini:not(:first-of-type):disabled,
     font-size: 1.25rem; /* Размер шрифта */
     background-color: white; /* Фон */
     color: var(--color-in-progress-rgb); /* Цвет текста */
+    background-color: var(--color-in-progress-light-rgb); /* Цвет фона */
     border-radius: 15px; /* Радиус углов рамки */
     padding: 15px 25px; /* Вертикальный и горизонтальный отступы кнопки */
-    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+    /* border: 2px solid var(--color-in-progress-rgb); /* Граница */
 }
 
 /* Информеры */
 .informers-grid-item-container-completed{
     color: var(--color-completed-rgb); /* Цвет текста */
-    border: 2px solid var(--color-completed-rgb); /* Граница */
+    /* border: 2px solid var(--color-completed-rgb); /* Граница */
+    background-color: var(--color-completed-light-rgb); /* Цвет фона */
 }
 
 /* Информеры */
 .informers-grid-item-container-failed {
     color: var(--color-attention-rgb); /* Цвет текста */
-    border: 2px solid var(--color-attention-rgb); /* Граница */
+    /* border: 2px solid var(--color-attention-rgb); /* Граница */
+    background-color: var(--color-attention-light-rgb); /* Цвет фона */
 }
 
 /* Информеры */
@@ -1054,9 +1060,10 @@ a.informers-grid-item-button-failed:focus {
 .content-type-basic {
     display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
     color: var(--color-content-label-rgb); /* Цвет текста */
+    background-color: var(--color-content-label-light-rgb); /* Цвет фона */
     border-radius: 15px; /* Радиус углов рамки */
     padding: 10px 15px; /* Внутренний отступ */
-    border: 2px solid var(--color-content-label-rgb); /* Граница */
+    /*border: 2px solid var(--color-content-label-rgb); /* Граница */
     font-size: 1.1rem; /* Размер шрифта */
 }
 
@@ -1064,9 +1071,10 @@ a.informers-grid-item-button-failed:focus {
 .content-type-sub {
     display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
     color: var(--color-content-label-rgb); /* Цвет текста */
+    background-color: var(--color-content-label-light-rgb); /* Цвет фона */
     border-radius: 10px; /* Радиус углов рамки */
     padding: 5px 10px; /* Внутренний отступ */
-    border: 2px solid var(--color-content-label-rgb); /* Граница */
+    /* border: 2px solid var(--color-content-label-rgb); /* Граница */
 }
 
 /* Отзыв */
@@ -1120,11 +1128,11 @@ a.informers-grid-item-button-failed:focus {
 /* Статус */
 .status {
     font-weight: normal; /* Обычный (нормальный) шрифт */
-
     color: var(--color-in-progress-rgb); /* Цвет текста */
+    background-color: var(--color-in-progress-light-rgb); /* Цвет фона */
     border-radius: 10px; /* Радиус углов рамки */
     padding: 5px 10px; /* Внутренний отступ */
-    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+    /*border: 2px solid var(--color-in-progress-rgb); /* Граница */
     text-align: center;
     display: block; /* Блочное отображение */
 }
@@ -1133,9 +1141,10 @@ a.informers-grid-item-button-failed:focus {
 .status-big {
     font-weight: normal; /* Обычный (нормальный) шрифт */
     color: var(--color-in-progress-rgb); /* Цвет текста */
+    background-color: var(--color-in-progress-light-rgb); /* Цвет фона */
     border-radius: 15px; /* Радиус углов рамки */
     padding: 10px 15px; /* Внутренний отступ */
-    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+    /*border: 2px solid var(--color-in-progress-rgb); /* Граница */
     text-align: center;
     display: block; /* Блочное отображение */
     font-size: 1.1rem; /* Размер шрифта */
@@ -1144,13 +1153,15 @@ a.informers-grid-item-button-failed:focus {
 /* Статус */
 .status-completed {
     color: var(--color-completed-rgb); /* Цвет текста */
-    border: 2px solid var(--color-completed-rgb); /* Граница */
+    /* border: 2px solid var(--color-completed-rgb); /* Граница */
+    background-color: var(--color-completed-light-rgb); /* Цвет фона */
 }
 
 /* Статус */
 .status-failed {
     color: var(--color-attention-rgb); /* Цвет текста */
-    border: 2px solid var(--color-attention-rgb); /* Граница */
+    /* border: 2px solid var(--color-attention-rgb); /* Граница */
+    background-color: var(--color-attention-light-rgb); /* Цвет фона */
 }
 
 /* Статус */
