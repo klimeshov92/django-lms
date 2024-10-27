@@ -676,7 +676,7 @@ a.informers-grid-item-button-failed:focus {
 
 /* Авторизация */
 .auth-text {
-    text-align: left; /* Текст по центру */
+    text-align: center; /* Текст по центру */
     word-wrap: break-word; /* Перенос слов */
 }
 
