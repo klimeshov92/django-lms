@@ -1062,7 +1062,7 @@ a.informers-grid-item-button-failed:focus {
     color: var(--color-content-label-rgb); /* Цвет текста */
     background-color: var(--color-content-label-light-rgb); /* Цвет фона */
     border-radius: 15px; /* Радиус углов рамки */
-    padding: 10px 15px; /* Внутренний отступ */
+    padding: 5px 10px; /* Внутренний отступ */
     /*border: 2px solid var(--color-content-label-rgb); /* Граница */
     font-size: 1.1rem; /* Размер шрифта */
 }
@@ -1073,7 +1073,7 @@ a.informers-grid-item-button-failed:focus {
     color: var(--color-content-label-rgb); /* Цвет текста */
     background-color: var(--color-content-label-light-rgb); /* Цвет фона */
     border-radius: 10px; /* Радиус углов рамки */
-    padding: 5px 10px; /* Внутренний отступ */
+    padding: 2.5px 5px; /* Внутренний отступ */
     /* border: 2px solid var(--color-content-label-rgb); /* Граница */
 }
 
