@@ -20,7 +20,7 @@
                 {{ form.username }}
             </div>
 
-            <!-- Поле для пароля с глазиком рядом -->
+            <!-- Поле для пароля с глазиком внутри -->
             <div class="form-field">
                 {{ form.password.label_tag }}
                 <div class="password-container">
@@ -59,16 +59,18 @@
 <style>
     /* Стили для контейнера пароля */
     .password-container {
-        display: flex; /* Используем flexbox для выравнивания элементов */
-        align-items: center; /* Выравниваем по центру по вертикали */
+        position: relative; /* Устанавливаем относительное позиционирование для контейнера */
     }
 
     .password-container input {
-        flex: 1; /* Поле ввода занимает оставшееся пространство */
-        margin-right: 10px; /* Отступ между полем и иконкой */
+        padding-right: 40px !important; /* Добавляем отступ справа для иконки */
     }
 
     .password-toggle {
+        position: absolute; /* Устанавливаем абсолютное позиционирование для иконки */
+        right: 10px; /* Позиционируем иконку на 10px от правого края */
+        top: 50%; /* Выравниваем по вертикали */
+        transform: translateY(-50%); /* Центрируем по вертикали */
         cursor: pointer; /* Указываем, что иконка кликабельна */
         pointer-events: auto; /* Разрешаем события на иконке */
     }
