@@ -613,7 +613,6 @@ a.informers-grid-item-button {
     font-weight: 400; /* Обычный (нормальный) шрифт */
     font-size: 1.25rem; /* Размер шрифта */
     color: var(--color-in-progress-rgb); /* Цвет текста */
-    background-color: var(--color-in-progress-light-rgb); /* Цвет фона */
     border-radius: 15px; /* Радиус углов рамки */
     padding: 15px 25px; /* Вертикальный и горизонтальный отступы кнопки */
     border: 3px solid var(--color-in-progress-rgb); /* Граница */
@@ -627,14 +626,12 @@ a.informers-grid-item-button {
 a.informers-grid-item-button-completed {
     color: var(--color-completed-rgb); /* Цвет текста */
     border: 3px solid var(--color-completed-rgb); /* Граница */
-    background-color: var(--color-completed-light-rgb); /* Цвет фона */
 }
 
 /* Информеры */
 a.informers-grid-item-button-failed {
     color: var(--color-attention-rgb); /* Цвет текста */
     border: 3px solid var(--color-attention-rgb); /* Граница */
-    background-color: var(--color-attention-light-rgb); /* Цвет фона */
 }
 
 /* Информеры */
@@ -1171,7 +1168,6 @@ a.informers-grid-item-button-failed:focus {
 a.status-button {
     font-weight: normal; /* Обычный (нормальный) шрифт */
     color: var(--color-in-progress-rgb); /* Цвет текста */
-    background-color: var(--color-in-progress-light-rgb); /* Цвет фона */
     border-radius: 10px; /* Радиус углов рамки */
     padding: 5px 10px; /* Внутренний отступ */
     border: 3px solid var(--color-in-progress-rgb); /* Граница */
@@ -1186,7 +1182,6 @@ a.status-button {
 a.status-button-big {
     font-weight: normal; /* Обычный (нормальный) шрифт */
     color: var(--color-in-progress-rgb); /* Цвет текста */
-    background-color: var(--color-in-progress-light-rgb); /* Цвет фона */
     border-radius: 15px; /* Радиус углов рамки */
     padding: 10px 15px; /* Вертикальный и горизонтальный отступы кнопки */
     border: 3px solid var(--color-in-progress-rgb); /* Граница */
@@ -1202,14 +1197,12 @@ a.status-button-big {
 a.status-button-completed {
     color: var(--color-completed-rgb); /* Цвет текста */
     border: 3px solid var(--color-completed-rgb); /* Граница */
-    background-color: var(--color-completed-light-rgb); /* Цвет фона */
 }
 
 /* Статус */
 a.status-button-failed {
     color: var(--color-attention-rgb); /* Цвет текста */
     border: 3px solid var(--color-attention-rgb); /* Граница */
-    background-color: var(--color-attention-light-rgb); /* Цвет фона */
 }
 
 /* Статус */
