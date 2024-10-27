@@ -29,8 +29,10 @@
                 </div>
                 <div class="auth-text">
                     <div>
-                        <p>Вы авторизованы, можете открыть <a href="javascript:void(0);" onclick="document.querySelector('.hamburger-menu').click();">меню</a> для начала обучения!</p>
-                        <p>Или перейдите в <a href="{% url 'core:personal_area' %}">личный кабинет</a> для просмотра результатов.</p>
+                        <p>
+                            Вы авторизованы, можете открыть <a href="javascript:void(0);" onclick="document.querySelector('.hamburger-menu').click();">меню</a> для начала обучения!
+                            Или перейдите в <a href="{% url 'core:personal_area' %}">личный кабинет</a> для просмотра результатов.
+                        </p>
                     </div>
                     <div class="informers-grid">
                         {% if appointed_paths_count != 0 %}

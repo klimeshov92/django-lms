@@ -668,7 +668,7 @@ a.informers-grid-item-button-failed:focus {
 
 /* Авторизация */
 .auth {
-    max-width: 300px; /* Установка максимальной ширины */
+    max-width: 400px; /* Установка максимальной ширины */
     width: 100%; /* Обеспечиваем, что контейнер займет всю ширину */
     padding: 25px; /* Отступы внутри контейнера */
     box-sizing: border-box; /* Учитываем отступы и границы внутри размеров элемента */
@@ -682,7 +682,7 @@ a.informers-grid-item-button-failed:focus {
 
 /* Авторизация */
 .auth form p {
-    text-align: center;
+    text-align: left;
     word-wrap: break-word; /* Перенос слов */
 }
 
@@ -1182,6 +1182,7 @@ a.status-button {
 a.status-button-big {
     font-weight: normal; /* Обычный (нормальный) шрифт */
     color: var(--color-in-progress-rgb); /* Цвет текста */
+    background-color: var(--color-in-progress-light-rgb); /* Цвет фона */
     border-radius: 15px; /* Радиус углов рамки */
     padding: 10px 15px; /* Вертикальный и горизонтальный отступы кнопки */
     border: 3px solid var(--color-in-progress-rgb); /* Граница */
@@ -1197,12 +1198,14 @@ a.status-button-big {
 a.status-button-completed {
     color: var(--color-completed-rgb); /* Цвет текста */
     border: 3px solid var(--color-completed-rgb); /* Граница */
+    background-color: var(--color-completed-light-rgb); /* Цвет фона */
 }
 
 /* Статус */
 a.status-button-failed {
     color: var(--color-attention-rgb); /* Цвет текста */
     border: 3px solid var(--color-attention-rgb); /* Граница */
+    background-color: var(--color-attention-light-rgb); /* Цвет фона */
 }
 
 /* Статус */
@@ -1451,7 +1454,7 @@ display: block; /* Делаем блочный */
 
 /* Изменение формата лейблов для переноса строки */
 label {
-    display: block;
+    /*display: block;*/
 }
 
 /* Звездочка обязательного поля */
@@ -1475,6 +1478,11 @@ label[for$="clear_id"] {
     font-family: 'Roboto', sans-serif; /* Шрифт Roboto, без засечек */
     font-weight: 400; /* Толщина шрифта */
     word-wrap: break-word; /* Перенос */
+}
+
+/* Стили для полей формы в виде дивов */
+.form-field {
+    margin: 15px 0; /* Отступ между полями формы */
 }
 
 /* Стили для формы */
