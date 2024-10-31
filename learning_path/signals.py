@@ -18,7 +18,7 @@ import logging
 # Создаем логгер с именем 'project'.
 logger = logging.getLogger('project')
 
-
+# Результаты обучения
 @transaction.atomic
 @receiver(post_save, sender=Assignment)
 def create_learning_results(sender, instance, created, **kwargs):
