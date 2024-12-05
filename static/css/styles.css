@@ -1082,8 +1082,8 @@ a.informers-grid-item-button-failed:focus {
     display: inline-block;  /* Рамка будет занимать только столько места, сколько нужно */
     color: var(--color-in-progress-rgb); /* Цвет текста */
     border-radius: 15px; /* Радиус углов рамки */
-    padding: 10px 15px; /* Внутренний отступ */
-    border: 2px solid var(--color-in-progress-rgb); /* Граница */
+    padding: 5px 10px; /* Внутренний отступ */
+    background-color: var(--color-in-progress-light-rgb); /* Граница */
     font-size: 1.1rem; /* Размер шрифта */
 }
 
