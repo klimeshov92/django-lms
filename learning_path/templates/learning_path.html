@@ -81,7 +81,7 @@
                                 <a href="{% url 'learning_path:self_appointment' pk=object.id type='learning_path' %}">Самоназначение</a>
                         {% endif %}
                     {% endif %}
-                    {% if object.result %}
+                    {% if user|perms:"learning_path.view_learningpath" %}
                         <a href="{% url 'learning_path:learning_path_tasks' pk=object.id%}">Просмотреть</a>
                     {% endif %}
                     {% if user|perms:"learning_path.change_learningpath" %}
