@@ -631,6 +631,7 @@ class LearningPathDeleteView(LoginRequiredMixin, PermissionRequiredMixin, Delete
 class LearningPathTasksView(LoginRequiredMixin, PreviousPageSetMixinL1, PermissionRequiredMixin, ListView):
     # Права доступа
     permission_required = 'learning_path.view_learningpath'
+    accept_global_perms = True
     # Модель.
     model = LearningTask
     # Поле сортировки.
