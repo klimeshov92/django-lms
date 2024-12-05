@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 
 # Импорт моделей.
-from .models import Employee, EmployeesGroup, GroupsGenerator, EmployeesGroupObjectPermission,\
+from .models import Employee, EmployeesGroup, GroupsGenerator, EmployeesGroupObjectPermission, EmployeesObjectPermission, \
     Organization, Subdivision, Position, Placement, \
     EmployeeExcelImport, Category, PrivacyPolicy, DataProcessing, Home
 from django.contrib.auth.models import Group
@@ -22,6 +22,7 @@ admin.site.unregister(Group)
 admin.site.register(EmployeesGroup)
 admin.site.register(GroupsGenerator)
 admin.site.register(EmployeesGroupObjectPermission)
+admin.site.register(EmployeesObjectPermission)
 admin.site.register(PrivacyPolicy)
 admin.site.register(DataProcessing)
 admin.site.register(Home)
