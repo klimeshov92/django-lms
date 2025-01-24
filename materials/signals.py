@@ -27,10 +27,10 @@ def add_nodownload_to_all_videos(sender, instance, **kwargs):
             soup = BeautifulSoup(instance.content, 'html.parser')
             # Поиск всех элементов 'video'.
             videos = soup.find_all('video')
-            for video in videos:
+            # for video in videos:
                 # Добавление 'nodownload' к 'controlsList', если его нет.
-                if 'controlsList' not in video.attrs or 'nodownload' not in video.attrs['controlsList']:
-                    video['controlsList'] = 'nodownload'
+                # if 'controlsList' not in video.attrs or 'nodownload' not in video.attrs['controlsList']:
+                    # video['controlsList'] = 'nodownload'
             # Обновление содержимого экземпляра.
             instance.content = str(soup)
     except Exception as e:
