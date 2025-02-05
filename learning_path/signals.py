@@ -971,7 +971,7 @@ def create_learning_results(sender, instance, created, **kwargs):
                         course=course,
                         assignment=assignment,
                         planned_end_date=planned_end_date,
-                        type='material'
+                        type='course'
                     )
                     logger.info(f"Создан {course_result}")
 
