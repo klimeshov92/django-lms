@@ -22,18 +22,20 @@ logger = logging.getLogger('project')
 @receiver(pre_save, sender=Result)
 def wrap_tables_result(sender, instance, **kwargs):
     try:
-        # Парсинг содержимого экземпляра.
-        soup = BeautifulSoup(instance.executor_report, "html.parser")
-        # Поиск всех таблиц.
-        tables = soup.find_all('table')
-        if tables:
-            for table in tables:
-                # Оборачивание таблицы в див, если она не обёрнута.
-                if 'material-content-table-responsive' not in table.parent.get('class', []):
-                    new_div = soup.new_tag("div", **{'class': 'material-content-table-responsive'})
-                    table.wrap(new_div)
-            # Обновление содержимого экземпляра.
-            instance.executor_report = str(soup)
+        # Проверяем, что содержимое не пустое.
+        if instance.executor_report:
+            # Парсинг содержимого экземпляра.
+            soup = BeautifulSoup(instance.executor_report, "html.parser")
+            # Поиск всех таблиц.
+            tables = soup.find_all('table')
+            if tables:
+                for table in tables:
+                    # Оборачивание таблицы в див, если она не обёрнута.
+                    if 'material-content-table-responsive' not in table.parent.get('class', []):
+                        new_div = soup.new_tag("div", **{'class': 'material-content-table-responsive'})
+                        table.wrap(new_div)
+                # Обновление содержимого экземпляра.
+                instance.executor_report = str(soup)
     except Exception as e:
         # Логирование ошибки.
         logger.error(f"Ошибка при оборачивании таблиц: {e}", exc_info=True)
