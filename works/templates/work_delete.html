@@ -1,0 +1,33 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Удаление работы
+{% endblock %}
+
+{% block content %}
+
+<div class="detail-card-with-image-container">
+
+    <div class="content-type-div">
+        <span class="content-type-basic">Работа</span>
+    </div>
+
+    <form action="" method="post" enctype="multipart/form-data" class="form">
+        {# Стандартная защита формы #}
+        {% csrf_token %}
+        <p>Удаляем "{{ object.name }}"?</p>
+        <nav class="form-menu">
+            <button type="button" onclick="history.back();" class="button">Отмена</button>
+            <input type="submit" value="Удалить" class="button"/>
+        </nav>
+    </form>
+
+</div>
+
+{% endblock content %}

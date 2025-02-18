@@ -2,60 +2,41 @@ document.addEventListener('DOMContentLoaded', function() {
     // Находим все элементы, которые начинаются с класса 'type-select-'
     var typeFieldElements = document.querySelectorAll('[class^="type-select-"]');
 
-    // Создаем массив для хранения конфигурации каждого поля
-    var typeConfigs = [];
-
-    // Проходимся по каждому найденному элементу и создаем конфигурацию
-    typeFieldElements.forEach(function(element, index) {
-        var selectedTypeAtr = 'data-show-if-type-' + (index + 1);
-        typeConfigs.push({
-            element: element,
-            selectedTypeAtr: selectedTypeAtr
-        });
-    });
-
     // Функция для переключения полей в зависимости от значения "Тип".
     function toggleFields(typeFieldElement, selectedTypeAtr) {
-        var typeField = typeFieldElement;
-        var allToggleFields = document.querySelectorAll('.toggle-field');
+        var value = typeFieldElement.type === "checkbox" ? typeFieldElement.checked : typeFieldElement.value;
+        console.log("value", value);
 
-        allToggleFields.forEach(function(field) {
+        // Проходим по всем элементам с классом 'toggle-field'
+        document.querySelectorAll('.toggle-field').forEach(function(field) {
             var selectedTypeAttr = field.getAttribute(selectedTypeAtr);
-            if (!selectedTypeAttr) {
-                console.log("У поля нет атрибута", selectedTypeAtr + ":", field);
-                return;
-            }
-            var selectedType = JSON.parse(selectedTypeAttr);
+            if (!selectedTypeAttr) return;  // Если атрибут не найден, пропускаем
 
-            var selectedTypeParentElement = field.closest('p') || field.closest('.form-group');
-            if (!selectedTypeParentElement) {
-                console.log("Не удалось найти родительский элемент для поля:", field);
-                return;
-            }
+            console.log("selectedTypeAttr", selectedTypeAttr);
 
-            if (selectedType.includes(typeField.value)) {
-                selectedTypeParentElement.style.display = 'block';
-                console.log("Родительский элемент показан для поля:", field);
-            } else {
-                selectedTypeParentElement.style.display = 'none';
-                console.log("Родительский элемент скрыт для поля:", field);
+            // Преобразуем атрибут в массив, если это необходимо
+            var selectedType = [];
+            try {
+                selectedType = JSON.parse(selectedTypeAttr);
+            } catch (e) {
+                selectedType = [selectedTypeAttr];  // Если не удалось, обрабатываем как строку
+            }
+            console.log("selectedType", selectedType);
+
+            var parentElement = field.closest('p') || field.closest('.form-group');
+            if (parentElement) {
+                parentElement.style.display = selectedType.includes(value) ? 'block' : 'none';
+                console.log(selectedType.includes(value) ? "Показан" : "Скрыт", "для поля:", field);
             }
         });
     }
 
-    // Для каждой конфигурации вызываем функцию toggleFields при загрузке страницы и при изменении значения
-    typeConfigs.forEach(function(config) {
-        var typeFieldElement = config.element;
-        var selectedTypeAtr = config.selectedTypeAtr;
-
-        if (typeFieldElement) {
-            typeFieldElement.addEventListener('change', function() {
-                toggleFields(typeFieldElement, selectedTypeAtr);
-            });
-
-            toggleFields(typeFieldElement, selectedTypeAtr);
-        } else {
-            console.log("Элемент не найден на странице.");
-        }
+    // Настроим обработку изменений
+    typeFieldElements.forEach(function(element, index) {
+        var selectedTypeAtr = 'data-show-if-type-' + (index + 1);
+        element.addEventListener('change', function() {
+            toggleFields(element, selectedTypeAtr);
+        });
+        toggleFields(element, selectedTypeAtr);  // При загрузке страницы тоже вызываем
     });
 });

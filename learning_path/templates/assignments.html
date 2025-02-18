@@ -73,6 +73,14 @@
 
                                 </div>
                             {% endif %}
+                        {% elif obj.type == 'work' %}
+                            {% if obj.work.avatar %}
+                               <img src="{{obj.work.avatar.url}}">
+                            {% else %}
+                                <div class="list-grid-item-image-container-blank">
+
+                                </div>
+                            {% endif %}
                         {% elif obj.type == 'course' %}
                             {% if obj.course.avatar %}
                                <img src="{{obj.course.avatar.url}}">
@@ -92,6 +100,8 @@
                             <h3>{{obj.material.name}}</h3>
                         {% elif obj.type == 'test' %}
                             <h3>{{obj.test.name}}</h3>
+                        {% elif obj.type == 'work' %}
+                            <h3>{{obj.work.name}}</h3>
                         {% elif obj.type == 'course' %}
                             <h3>{{obj.course.name}}</h3>
                         {% endif %}
@@ -114,6 +124,10 @@
                             <p><span class="description-item">Сотрудник:</span> {{obj.employee}}</p>
                         {% endif %}
                         <p><span class="description-item">Дата начала:</span> {{obj.planned_start_date}}</p>
+                        <p><span class="description-item">Контроль менеджеров:</span> {{obj.manager_supervising|yesno}}</p>
+                        {% if obj.supervisors_group  %}
+                            <p><span class="description-item">Группа контролеров:</span> {{obj.supervisors_group.name}}</p>
+                        {% endif %}
                     </div>
                     <div class="list-grid-item-footer">
                         <div class="submenu-mini">

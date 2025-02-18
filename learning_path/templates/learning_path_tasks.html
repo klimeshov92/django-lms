@@ -51,6 +51,14 @@
 
                                         </div>
                                     {% endif %}
+                                {% elif obj.type == 'work' %}
+                                    {% if obj.work.avatar %}
+                                       <img src="{{obj.work.avatar.url}}">
+                                    {% else %}
+                                        <div class="content-grid-item-list-grid-item-image-container-blank">
+
+                                        </div>
+                                    {% endif %}
                                 {% elif obj.type == 'course' %}
                                     {% if obj.course.avatar %}
                                        <img src="{{obj.course.avatar.url}}">
@@ -66,6 +74,8 @@
                                     <h3>{{obj.material.name}} </h3>
                                 {% elif obj.type == 'test' %}
                                     <h3>{{obj.test.name}} </h3>
+                                {% elif obj.type == 'work' %}
+                                    <h3>{{obj.work.name}} </h3>
                                 {% elif obj.type == 'course' %}
                                     <h3>{{obj.course.name}} </h3>
                                 {% endif %}
@@ -101,6 +111,8 @@
                                                 <a href="{% url 'courses:course' pk=blocking_task.course.id %}" class="status-button status-button-failed">{{blocking_task}}</a>
                                             {% elif blocking_task.type == 'test' %}
                                                 <a href="{% url 'testing:test' pk=blocking_task.test.id %}" class="status-button status-button-failed">{{blocking_task}}</a>
+                                            {% elif blocking_task.type == 'work' %}
+                                                <a href="{% url 'works:work' pk=blocking_task.work.id %}" class="status-button status-button-failed">{{blocking_task}}</a>
                                             {% endif %}
                                         </p>
                                     {% endfor %}
@@ -125,6 +137,16 @@
                                             {% endfor %}
                                         </p>
                                     {% endif %}
+                                {% elif obj.type == 'work' %}
+                                    {% if obj.work.categories.exists  %}
+                                        <p><span class="description-item">Категории:</span>
+                                            {% for category in obj.work.categories.all %}
+                                                <span>
+                                                    <a href="{% url 'works:works' %}?сategory={{category.id}}" target="_blank">{{category}}</a>{% if not forloop.last %}, {% endif %}
+                                                </span>
+                                            {% endfor %}
+                                        </p>
+                                    {% endif %}
                                 {% elif obj.type == 'course' %}
                                     {% if obj.course.categories.exists  %}
                                         <p><span class="description-item">Категории:</span>
@@ -143,6 +165,10 @@
                                 {% elif obj.type == 'test' %}
                                     {% if obj.test.desc %}
                                         <p>{{obj.test.desc}}</p>
+                                    {% endif %}
+                                {% elif obj.type == 'work' %}
+                                    {% if obj.work.desc %}
+                                        <p>{{obj.work.desc}}</p>
                                     {% endif %}
                                 {% elif obj.type == 'course' %}
                                     {% if obj.course.desc %}
@@ -171,6 +197,18 @@
                                             {% endif %}
                                         {% endif %}
                                         <a href="{% url 'testing:test' pk=obj.test.id %}">Подробнее</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if obj.type == 'work' %}
+                                <div class="content-grid-item-list-grid-item-footer">
+                                    <div class="submenu-mini">
+                                        {% if obj.tasks_latest_result_status == 'appointed' or obj.tasks_latest_result_status == 'in_progress' %}
+                                            {% if not obj.now_blocking_tasks %}
+                                                <a href="{% url 'works:work_read' pk=obj.work.id %}">Просмотреть</a>
+                                            {% endif %}
+                                        {% endif %}
+                                        <a href="{% url 'works:work' pk=obj.work.id %}">Подробнее</a>
                                     </div>
                                 </div>
                             {% endif %}

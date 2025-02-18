@@ -10,8 +10,10 @@ from materials.models import Material
 from testing.models import Test, Question, Answer, RelevantPoint
 from courses.models import Course
 from events.models import Event
+from works.models import Work
 from asgiref.sync import sync_to_async
 from django.core.validators import MinValueValidator
+from ckeditor.fields import RichTextField
 
 # Класс комплекса.
 class LearningComplex(models.Model):
@@ -196,6 +198,7 @@ class LearningTask(models.Model):
         ('material', 'Материал'),
         ('test', 'Тест'),
         ('course', 'Курс'),
+        ('work', 'Работа'),
     ]
     type = models.CharField(max_length=255, choices=TYPES, default='', verbose_name='Тип')
     # Позиция.
@@ -222,6 +225,17 @@ class LearningTask(models.Model):
     course = models.ForeignKey(
         Course,
         verbose_name='Курс',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name='learning_tasks',
+        related_query_name='learning_tasks',
+        db_index=True
+    )
+    # Работы.
+    work = models.ForeignKey(
+        Work,
+        verbose_name='Работа',
         null=True,
         blank=True,
         on_delete=models.PROTECT,
@@ -257,6 +271,8 @@ class LearningTask(models.Model):
             object = self.test
         if self.type == 'course':
             object = self.course
+        if self.type == 'work':
+            object = self.work
         if object:
             return f'{self.get_type_display()} - {object.name} | {self.learning_path}'
 
@@ -271,6 +287,7 @@ class Assignment(models.Model):
         ('material', 'Материал'),
         ('course', 'Курс'),
         ('test', 'Тест'),
+        ('work', 'Работа'),
     ]
     type = models.CharField(max_length=255, choices=TYPES, default='', verbose_name='Тип')
     PARTICIPANTS = [
@@ -339,6 +356,16 @@ class Assignment(models.Model):
         related_query_name='assignments',
         db_index=True
     )
+    work = models.ForeignKey(
+        Work,
+        verbose_name='Работа',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='assignments',
+        related_query_name='assignments',
+        db_index=True
+    )
     # Дата и время создания и изменения.
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания', db_index=True)
     changed = models.DateTimeField(auto_now=True, verbose_name='Дата и время изменения', db_index=True)
@@ -379,6 +406,26 @@ class Assignment(models.Model):
     deadlines = models.BooleanField(verbose_name='Соблюдение сроков обязательно', default=False)
     # Описание.
     desc = models.TextField(verbose_name='Описание', null=True, blank=True)
+    # Переназначение.
+    REASSIGNMENT = [
+        ('', 'Выберите тип переназначения'),
+        ('anyway', 'В любом случае'),
+        ('not_completed', 'Если не прошел'),
+        ('not_appoint', 'Если не проходил'),
+    ]
+    reassignment = models.CharField(max_length=255, choices=REASSIGNMENT, default='', verbose_name='Переназначение')
+    # Добавить менеджера в проверяющие
+    manager_supervising = models.BooleanField('Контроль менеджеров', default=True)
+    # Группа прав супервизоров
+    supervisors_group = models.ForeignKey(
+        EmployeesGroup,
+        related_name='assignment_supervisors',
+        related_query_name='assignment_supervisors',
+        verbose_name='Группа контролеров',
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True
+    )
     # Группа прав участников.
     participants_group = models.OneToOneField(
         EmployeesGroup,
@@ -389,14 +436,6 @@ class Assignment(models.Model):
         related_name='assignment_participants',
         related_query_name='assignment_participants'
     )
-    # Переназначение.
-    REASSIGNMENT = [
-        ('', 'Выберите тип переназначения'),
-        ('anyway', 'В любом случае'),
-        ('not_completed', 'Если не прошел'),
-        ('not_appoint', 'Если не проходил'),
-    ]
-    reassignment = models.CharField(max_length=255, choices=REASSIGNMENT, default='', verbose_name='Переназначение')
     # Это повтор.
     is_repeat = models.BooleanField(verbose_name='Это повтор', default=False)
     class Meta:
@@ -416,6 +455,8 @@ class Assignment(models.Model):
                 object = self.test
             if self.type == 'course':
                 object = self.course
+            if self.type == 'work':
+                object = self.work
             if self.participants == 'group':
                 participants = self.group
             if self.participants == 'employee':
@@ -506,6 +547,7 @@ class Result(models.Model):
         ('learning_path', 'Траектория обучения'),
         ('material', 'Материал'),
         ('test', 'Тест'),
+        ('work', 'Работа'),
         ('course', 'Курс'),
         ('event', 'Мероприятие'),
     ]
@@ -539,7 +581,8 @@ class Result(models.Model):
     # Статус.
     STATUSES = [
         ('appointed', 'Назначено'),
-        ('in_progress', 'В процессe'),
+        ('in_progress', 'В процессе'),
+        ('on_review', 'На проверке'),
         ('completed', 'Пройдено'),
         ('failed', 'Провалено'),
         ('registered', 'Зарегистрирован'),
@@ -667,9 +710,21 @@ class Result(models.Model):
     # Прогресс.
     progress = models.TextField(verbose_name='Прогресс', default="{}")
     '''
-    Для тестов и курсов.
+    Для работ.
     '''
-    score_scaled = models.IntegerField(verbose_name='Полученный бал в %', default=0)
+    # Результат работы.
+    work = models.ForeignKey(
+        Work,
+        verbose_name='Работа',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='results',
+        related_query_name='results',
+        db_index=True
+    )
+    executor_report = RichTextField(verbose_name='Отчет исполнителя', null=True, blank=True)
+    executor_report_date = models.DateTimeField(auto_now=False, verbose_name='Дата и время ответа', null=True, blank=True, db_index=True)
     '''
     Для мероприятий.
     '''
@@ -682,6 +737,11 @@ class Result(models.Model):
         related_name='results',
         related_query_name='results'
     )
+    '''
+    Для тестов, курсов и работ.
+    '''
+    # %.
+    score_scaled = models.IntegerField(verbose_name='Полученный бал в %', default=0)
 
     class Meta:
         # Изменение имени модели.
@@ -704,10 +764,89 @@ class Result(models.Model):
             object = self.test
         if self.type == 'course':
             object = self.course
+        if self.type == 'work':
+            object = self.work
         if self.type == 'event':
             object = self.event
         if object:
             return f'{self.get_type_display()}: {object.name} | {self.employee} | {self.get_status_display()}'
+
+class ResultSupervising(models.Model):
+    # Создатель.
+    creator = models.ForeignKey(
+        Employee,
+        verbose_name='Создатель',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='result_supervising_creators',
+        related_query_name='result_supervising_creators'
+    )
+    # Группа прав супервизоров
+    supervisor = models.ForeignKey(
+        Employee,
+        related_name='supervisors',
+        related_query_name='supervisor',
+        verbose_name='Контролеры',
+        on_delete=models.CASCADE
+    )
+    # Связанный результат
+    result = models.ForeignKey(
+        Result,
+        related_name='supervising',
+        related_query_name='supervising',
+        verbose_name='Результат',
+        on_delete=models.CASCADE
+    )
+    # Дата и время создания и изменения.
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания', db_index=True)
+
+    class Meta:
+        verbose_name = 'Контроль результата'
+        verbose_name_plural = 'Контроль результата'
+
+    def __str__(self):
+        return f'{self.result} - {self.supervisor}'
+
+class WorkReview(models.Model):
+    # Связанный результат
+    result = models.ForeignKey(
+        Result,
+        related_name='reviews',
+        related_query_name='reviews',
+        verbose_name='Результат',
+        on_delete=models.CASCADE
+    )
+    # Проверяющий и его отчет.
+    reviewer_report = RichTextField(verbose_name='Отчет проверяющего', blank=True, null=True)
+    reviewer = models.ForeignKey(
+        Employee,
+        verbose_name='Проверяющий',
+        blank=True,
+        related_name='work_result_reviewers',
+        related_query_name='work_result_reviewers',
+        on_delete = models.CASCADE
+    )
+    # %.
+    score_scaled = models.IntegerField(verbose_name='Полученный бал в %', default=0)
+    # Статус.
+    STATUSES = [
+        ('in_progress', 'В процессе'),
+        ('on_review', 'На проверке'),
+        ('completed', 'Пройдено'),
+        ('failed', 'Провалено'),
+    ]
+    status = models.CharField(max_length=255, choices=STATUSES, default='appointed', verbose_name='Статус')
+    # Дата и время создания и изменения.
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания', db_index=True)
+    changed = models.DateTimeField(auto_now=True, verbose_name='Дата и время изменения', db_index=True)
+
+    class Meta:
+        verbose_name = 'Проверка работы'
+        verbose_name_plural = 'Проверка работы'
+
+    def __str__(self):
+        return f'{self.result.work.name} - {self.result.employee} - {self.reviewer}'
 
 # Результат вопроса.
 class QuestionsResult(models.Model):

@@ -12,6 +12,7 @@ from materials.models import Material
 from testing.models import Test
 from courses.models import Course
 from events.models import Event
+from works.models import Work
 
 # Класс материала.
 class Transaction(models.Model):
@@ -21,6 +22,7 @@ class Transaction(models.Model):
         ('material', 'Материал'),
         ('course', 'Курс'),
         ('test', 'Тест'),
+        ('work', 'Работа'),
         ('event', 'Мероприятие'),
     ]
     type = models.CharField(max_length=255, choices=TYPES, default='', verbose_name='Тип')
@@ -71,6 +73,15 @@ class Transaction(models.Model):
     test = models.ForeignKey(
         Test,
         verbose_name='Тест',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='transactions',
+        related_query_name='transactions',
+    )
+    work = models.ForeignKey(
+        Work,
+        verbose_name='Работа',
         null=True,
         blank=True,
         on_delete=models.CASCADE,

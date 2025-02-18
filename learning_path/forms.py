@@ -2,12 +2,15 @@
 from django import forms
 from guardian.forms import GroupObjectPermissionsForm
 # Импорт моделей.
-from .models import LearningPath, LearningTask, Assignment, Result, LearningComplex, LearningComplexPath, AnswersResult, AssignmentRepeat
+from .models import LearningPath, LearningTask, Assignment, Result, \
+    LearningComplex, LearningComplexPath, AnswersResult, AssignmentRepeat, WorkReview
 # Импорт select2.
 from django_select2.forms import Select2Widget, Select2MultipleWidget
 # Импорт групп и прав
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
+# CKEditor.
+from ckeditor.widgets import CKEditorWidget
 
 # Форма создания комплексной программы.
 class LearningComplexForm(forms.ModelForm):
@@ -79,6 +82,7 @@ class LearningTaskForm(forms.ModelForm):
                   'material',
                   'test',
                   'course',
+                  'work',
                   'control_task',
                   'blocking_tasks'
         ]
@@ -90,6 +94,7 @@ class LearningTaskForm(forms.ModelForm):
             'material': Select2Widget(attrs={'class': 'material-select toggle-field', 'data-show-if-type-1': '["material"]'}),
             'test': Select2Widget(attrs={'class': 'test-select toggle-field', 'data-show-if-type-1': '["test"]'}),
             'course': Select2Widget(attrs={'class': 'course-select toggle-field', 'data-show-if-type-1': '["course"]'}),
+            'work': Select2Widget(attrs={'class': 'work-select toggle-field', 'data-show-if-type-1': '["work"]'}),
             'blocking_tasks': Select2MultipleWidget(),
         }
 
@@ -106,6 +111,7 @@ class AssignmentForm(forms.ModelForm):
                   'material',
                   'course',
                   'test',
+                  'work',
                   'categories',
                   'participants',
                   'employee',
@@ -114,6 +120,8 @@ class AssignmentForm(forms.ModelForm):
                   'duration',
                   'reassignment',
                   'deadlines',
+                  'manager_supervising',
+                  'supervisors_group',
                   'desc',
         ]
         # Классы виджетов.
@@ -135,6 +143,9 @@ class AssignmentForm(forms.ModelForm):
             'test': Select2Widget(
                 attrs={'class': 'test-select toggle-field', 'data-show-if-type-1': '["test"]'}
             ),
+            'work': Select2Widget(
+                attrs={'class': 'work-select toggle-field', 'data-show-if-type-1': '["work"]'}
+            ),
             'categories': Select2MultipleWidget(),
             'participants': forms.Select(attrs={'class': 'type-select-2'}),
             'employee': Select2Widget(
@@ -149,6 +160,7 @@ class AssignmentForm(forms.ModelForm):
             'duration': forms.NumberInput(
               attrs={'class': 'duration-select toggle-field', 'data-show-if-type-1': '["material", "course", "test"]'}
             ),
+            'supervisors_group': Select2Widget(),
         }
 
     # Проверки.
@@ -219,5 +231,4 @@ class AssignmentRepeatForm(forms.ModelForm):
             #self.fields['group'].widget = forms.HiddenInput()
             #self.fields['planned_start_date'].widget = forms.HiddenInput()
             #self.fields['reassignment'].widget = forms.HiddenInput()
-
 

@@ -77,4 +77,5 @@ urlpatterns = [
    path('<str:type>/<int:pk>/self_appointment/', self_appointment, name='self_appointment'),
    # Маршрут вывода списка.
    path('results/', ResultsView.as_view(), name='results'),
+
 ]

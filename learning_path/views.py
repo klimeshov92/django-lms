@@ -8,9 +8,10 @@ from django.shortcuts import render
 
 from django.conf import settings
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import LearningPath, LearningTask, Assignment, Result, LearningComplex, LearningComplexPath, AssignmentRepeat
+from .models import LearningPath, LearningTask, Assignment, Result, LearningComplex, LearningComplexPath, AssignmentRepeat, WorkReview
 from .filters import LearningPathFilter, AssignmentFilter, ResultFilter, LearningComplexFilter
-from .forms import LearningPathForm, LearningTaskForm, AssignmentForm, LearningComplexForm, LearningComplexPathForm, AssignmentRepeatForm
+from .forms import LearningPathForm, LearningTaskForm, AssignmentForm, LearningComplexForm, LearningComplexPathForm, \
+    AssignmentRepeatForm
 import pandas as pd
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.http import HttpResponse, JsonResponse
@@ -20,6 +21,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin as GPermissionReq
 from materials.models import Material
 from courses.models import Course
 from testing.models import Test
+from works.models import Work
 from events.models import Event
 from core.models import Subdivision, Employee, Placement
 from django.db.models import OuterRef, Subquery, BooleanField, Count, IntegerField
@@ -56,6 +58,7 @@ from datetime import date
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 # Импортируем логи
 import logging
@@ -668,6 +671,10 @@ class LearningPathTasksView(LoginRequiredMixin, PreviousPageSetMixinL1, Permissi
                 test=OuterRef('test'),
                 employee=self.request.user
             ).order_by('-id').values('status', 'learning_path_result__planned_end_date', 'end_date')[:1]
+        work_latest_result = Result.objects.filter(
+                work=OuterRef('work'),
+                employee=self.request.user
+            ).order_by('-id').values('status', 'learning_path_result__planned_end_date', 'end_date')[:1]
 
         # Аннотируем queryset
         queryset = queryset.annotate(
@@ -679,12 +686,14 @@ class LearningPathTasksView(LoginRequiredMixin, PreviousPageSetMixinL1, Permissi
                 When(material__isnull=False, then=Subquery(material_latest_result.values('status'))),
                 When(course__isnull=False, then=Subquery(course_latest_result.values('status'))),
                 When(test__isnull=False, then=Subquery(test_latest_result.values('status'))),
+                When(work__isnull=False, then=Subquery(work_latest_result.values('status'))),
                 default=Value(None)
             ),
             latest_result_planned_end_date=Case(
                 When(material__isnull=False, then=Subquery(material_latest_result.values('learning_path_result__planned_end_date'))),
                 When(course__isnull=False, then=Subquery(course_latest_result.values('learning_path_result__planned_end_date'))),
                 When(test__isnull=False, then=Subquery(test_latest_result.values('learning_path_result__planned_end_date'))),
+                When(work__isnull=False, then=Subquery(work_latest_result.values('learning_path_result__planned_end_date'))),
                 default=Value(None),
             ),
             latest_result_end_date = Case(
@@ -694,6 +703,8 @@ class LearningPathTasksView(LoginRequiredMixin, PreviousPageSetMixinL1, Permissi
                      then=Subquery(course_latest_result.values('end_date'))),
                 When(test__isnull=False,
                      then=Subquery(test_latest_result.values('end_date'))),
+                When(work__isnull=False,
+                     then=Subquery(work_latest_result.values('end_date'))),
                 default=Value(None),
             )
         )
@@ -1167,6 +1178,23 @@ def self_appointment(request, pk, type):
                     )
                     logger.info(f"Создан {learning_task_result}")
 
+                if learning_task.type == 'work':
+
+                    # Забираем тест.
+                    work = learning_task.work
+
+                    # Создание объекта результата для задачи.
+                    learning_task_result = Result.objects.create(
+                        learning_path=learning_path,
+                        learning_path_result=learning_path_result,
+                        employee=request.user,
+                        work=work,
+                        learning_task=learning_task,
+                        type='work',
+                        self_appointment=True
+                    )
+                    logger.info(f"Создан {learning_task_result}")
+
                 if learning_task.type == 'course':
 
                     # Забираем курс.
@@ -1294,6 +1322,42 @@ def self_appointment(request, pk, type):
 
             # Уходим.
             return redirect('testing:test', pk=pk)
+
+    # Если работа.
+    if type == 'work':
+
+        # Забираем.
+        work = Work.objects.get(pk=pk)
+
+        # Если нельзя назначить.
+        if not work.self_appointment:
+            return HttpResponseForbidden('Эту работу нельзя назначить самому!')
+
+        # Если уже идет.
+        if Result.objects.filter(employee=request.user, work=work).exists():
+            last_result = Result.objects.filter(employee=request.user, work=work).latest('id')
+
+            # Если уже пройден не переназначаем.
+            if last_result.status == 'appointed' or last_result.status == 'in_progress':
+                appoint = False
+                if settings.DEBUG:
+                    logger.info(f"Существующий последний результат: {last_result}")
+                return HttpResponseForbidden('Вы уже обучаетесь! Перейдите в меню.')
+
+        # Если результата нет.
+        if appoint == True:
+
+            # Создаем.
+            result = Result.objects.create(
+                employee=request.user,
+                type='work',
+                work=work,
+                self_appointment=True
+            )
+            logger.info(f"Создан результат: {result}")
+
+            # Уходим.
+            return redirect('works:work', pk=pk)
 
     # Если эвент.
     if type == 'event':
@@ -1439,7 +1503,8 @@ class ResultsView(LoginRequiredMixin, PreviousPageSetMixinL1, ListView):
                     (str(result.material) if result.material else
                      (str(result.course) if result.course else
                       (str(result.test) if result.test else
-                       str(result.event) if result.event else ''))),
+                       (str(result.event) if result.event else
+                        (str(result.work) if result.work else ''))))),
                     result.planned_end_date.strftime('%d.%m.%Y') if result.planned_end_date else None,
                     result.end_date.strftime('%d.%m.%Y %H:%M') if result.end_date else None,
                     result.get_status_display() if not result.event else result.get_status_display(),
@@ -1507,3 +1572,4 @@ class ResultsView(LoginRequiredMixin, PreviousPageSetMixinL1, ListView):
         context['filterset'] = self.filterset
         # Возвращаем новый набор переменных.
         return context
+

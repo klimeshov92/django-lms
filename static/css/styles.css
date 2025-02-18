@@ -1259,6 +1259,30 @@ a.status-button-failed:hover {
     box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
 }
 
+/* Работа */
+.work-container-header {
+    padding: 0px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
+}
+
+/* Работа */
+.work-container {
+    padding: 0px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
+}
+
+/* Работа */
+.work-container-footer {
+    padding: 0px 25px 25px 25px; /* Отступы внутри */
+    margin: 0 auto; /* Отступы внешние */
+    max-width: 800px; /* Установка максимальной ширины */
+    box-sizing: border-box; /* Учитываем внутренние отступы и границы при расчете ширины */
+}
+
 /* Материал */
 .material {
     display: flex; /* Устанавливаем Flexbox */
@@ -1269,7 +1293,7 @@ a.status-button-failed:hover {
 
 /* Материал */
 .material-content {
-    padding: 25px; /* Отступы внутри */
+    padding: 10px 25px; /* Отступы внутри */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -2px 4px rgba(0, 0, 0, 0.1); /* Добавляет тень для эффекта глубины */
     border-radius: 25px; /* Радиус скругления границ элементов формы */
     word-wrap: break-word; /* Перенос слов */

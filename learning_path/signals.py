@@ -6,8 +6,8 @@ from guardian.shortcuts import assign_perm, remove_perm
 from django.db import transaction
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Assignment, Result, LearningTask, LearningPath
-from core.models import Employee, EmployeesGroup, EmployeesGroupObjectPermission
+from .models import Assignment, Result, LearningTask, LearningPath, ResultSupervising
+from core.models import Employee, EmployeesGroup, EmployeesGroupObjectPermission, Placement
 from leaders.models import Transaction
 from django.conf import settings
 from django.utils import timezone
@@ -23,9 +23,40 @@ logger = logging.getLogger('project')
 @receiver(post_save, sender=Assignment)
 def create_learning_results(sender, instance, created, **kwargs):
 
+    # Функция для получения супервизоров
+    def get_supervisors(assignment, employee):
+        # Проверка на наличие группы супервизоров.
+        if assignment.supervisors_group:
+            supervisors_group_users = assignment.supervisors_group.user_set.all()
+        else:
+            supervisors_group_users = Employee.objects.none()
+        logger.info(f"Сотрудники контролирующей группы: {supervisors_group_users}")
+
+        # Если менеджеры являются наблюдателями, добавляем их к супервизорам.
+        if assignment.manager_supervising:
+            # Находим все подразделения сотрудника.
+            employee_placements = employee.placements.all()
+
+            # Ищем менеджеров в этих подразделениях.
+            managers = Placement.objects.filter(
+                position__subdivision__in=employee_placements.values_list('position__subdivision__id', flat=True),
+                manager=True
+            ).values_list('employee', flat=True)
+
+            # Добавляем найденных менеджеров к супервизорам.
+            supervisors = supervisors_group_users.union(Employee.objects.filter(id__in=managers))
+        else:
+            supervisors = supervisors_group_users
+
+        logger.info(f"Итоговый список супервизоров: {supervisors}")
+        return supervisors
+
     # Создание результатов комплексной программы.
     def create_learning_complex_results(assignment, employee, learning_complex, learning_paths, planned_start_date, reassignment):
         logger.info(f"Назначение комплексной программы {learning_complex} для {employee}.")
+
+        # Забираем супервизоров
+        supervisors = get_supervisors(assignment, employee)
 
         # Проверка на переназначение.
         if reassignment == 'not_completed' and Result.objects.filter(
@@ -52,6 +83,11 @@ def create_learning_results(sender, instance, created, **kwargs):
             type='learning_complex',
         )
         logger.info(f"Создан {learning_complex_result}")
+
+        # Добавление контролеров
+        for supervisor in supervisors:
+            result_supervising, _ = ResultSupervising.objects.get_or_create(supervisor=supervisor, result=learning_complex_result)
+            logger.info(f"Создан контроль результата {result_supervising}")
 
         # Переменная для определения даты конца.
         _planned_start_date = planned_start_date
@@ -95,6 +131,11 @@ def create_learning_results(sender, instance, created, **kwargs):
             )
             logger.info(f"Создан: {learning_path_result}")
 
+            # Добавление контролеров
+            for supervisor in supervisors:
+                result_supervising, _ = ResultSupervising.objects.get_or_create(supervisor=supervisor, result=learning_path_result)
+                logger.info(f"Создан контроль результата {result_supervising}")
+
             # Перебор задач учебного пути.
             for learning_task in learning_path.learning_tasks.all():
                 logger.info(f"Назначение учебной задачи {learning_task} для {employee}.")
@@ -131,7 +172,8 @@ def create_learning_results(sender, instance, created, **kwargs):
                         material=material,
                         learning_task=learning_task,
                         assignment=assignment,
-                        type='material'
+                        type='material',
+                        planned_end_date=planned_end_date,
                     )
                     logger.info(f"Создан {learning_task_result}")
 
@@ -167,7 +209,45 @@ def create_learning_results(sender, instance, created, **kwargs):
                         test=test,
                         learning_task=learning_task,
                         assignment=assignment,
-                        type='test'
+                        type='test',
+                        planned_end_date=planned_end_date,
+                    )
+                    logger.info(f"Создан {learning_task_result}")
+
+                if learning_task.type == 'work':
+
+                    # Забираем тест.
+                    work = learning_task.work
+
+                    # Проверка на переназначение.
+                    if reassignment == 'not_completed' and Result.objects.filter(
+                            employee=employee,
+                            work=work,
+                            status='completed'
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже сдан.")
+                        if learning_task.control_task == True:
+                            learning_path_result.completed_control_tasks +=1
+                            learning_path_result.save()
+                            logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
+                        continue
+                    if reassignment == 'not_appoint' and Result.objects.filter(
+                            employee=employee,
+                            work=work
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже назначен.")
+                        continue
+
+                    # Создание объекта результата для задачи.
+                    learning_task_result = Result.objects.create(
+                        learning_path=learning_path,
+                        learning_path_result=learning_path_result,
+                        employee=employee,
+                        work=work,
+                        learning_task=learning_task,
+                        assignment=assignment,
+                        type='work',
+                        planned_end_date=planned_end_date,
                     )
                     logger.info(f"Создан {learning_task_result}")
 
@@ -203,12 +283,25 @@ def create_learning_results(sender, instance, created, **kwargs):
                         course=course,
                         learning_task=learning_task,
                         assignment=assignment,
-                        type='course'
+                        type='course',
+                        planned_end_date=planned_end_date,
                     )
                     logger.info(f"Создан {learning_task_result}")
 
+                # Добавление контролеров
+                for supervisor in supervisors:
+                    result_supervising, _ = ResultSupervising.objects.get_or_create(
+                        supervisor=supervisor,
+                        result=learning_task_result
+                    )
+                    logger.info(f"Создан контроль результата {result_supervising}")
+
     # Создание результатов учебной траектории.
     def create_learning_path_results(assignment, employee, learning_path, planned_start_date, reassignment):
+
+        logger.info(f"!!!Дата начала назначения траектории: {planned_start_date}")
+        # Забираем супервизоров
+        supervisors = get_supervisors(assignment, employee)
 
         # Переменные.
         duration = learning_path.duration
@@ -241,6 +334,14 @@ def create_learning_results(sender, instance, created, **kwargs):
             planned_end_date=planned_end_date,
         )
         logger.info(f"Создан {learning_path_result}")
+
+        # Добавление контролеров
+        for supervisor in supervisors:
+            result_supervising, _ = ResultSupervising.objects.get_or_create(
+                supervisor=supervisor,
+                result=learning_path_result
+            )
+            logger.info(f"Создан контроль результата {result_supervising}")
 
         # Перебор задач учебного пути.
         for learning_task in learning_path.learning_tasks.all():
@@ -278,7 +379,8 @@ def create_learning_results(sender, instance, created, **kwargs):
                     material=material,
                     learning_task=learning_task,
                     assignment=assignment,
-                    type='material'
+                    type='material',
+                    planned_end_date=planned_end_date,
                 )
                 logger.info(f"Создан {learning_task_result}")
 
@@ -314,7 +416,45 @@ def create_learning_results(sender, instance, created, **kwargs):
                     test=test,
                     learning_task=learning_task,
                     assignment=assignment,
-                    type='test'
+                    type='test',
+                    planned_end_date=planned_end_date,
+                )
+                logger.info(f"Создан {learning_task_result}")
+
+            if learning_task.type == 'work':
+
+                # Забираем тест.
+                work = learning_task.work
+
+                # Проверка на переназначение.
+                if reassignment == 'not_completed' and Result.objects.filter(
+                        employee=employee,
+                        work=work,
+                        status='completed'
+                ).exists():
+                    logger.info(f"Пропускаем для {employee}: уже сдан.")
+                    if learning_task.control_task == True:
+                        learning_path_result.completed_control_tasks += 1
+                        learning_path_result.save()
+                        logger.info(f"Перезачтено задач: {learning_path_result.completed_control_tasks}")
+                    continue
+                if reassignment == 'not_appoint' and Result.objects.filter(
+                        employee=employee,
+                        work=work
+                ).exists():
+                    logger.info(f"Пропускаем для {employee}: уже назначен.")
+                    continue
+
+                # Создание объекта результата для задачи.
+                learning_task_result = Result.objects.create(
+                    learning_path=learning_path,
+                    learning_path_result=learning_path_result,
+                    employee=employee,
+                    work=work,
+                    learning_task=learning_task,
+                    assignment=assignment,
+                    type='work',
+                    planned_end_date=planned_end_date,
                 )
                 logger.info(f"Создан {learning_task_result}")
 
@@ -350,9 +490,18 @@ def create_learning_results(sender, instance, created, **kwargs):
                     course=course,
                     learning_task=learning_task,
                     assignment=assignment,
-                    type='course'
+                    type='course',
+                    planned_end_date=planned_end_date,
                 )
                 logger.info(f"Создан {learning_task_result}")
+
+            # Добавление контролеров
+            for supervisor in supervisors:
+                result_supervising, _ = ResultSupervising.objects.get_or_create(
+                    supervisor=supervisor,
+                    result=learning_task_result
+                )
+                logger.info(f"Создан контроль результата {result_supervising}")
 
     # Создание прав доступа.
     def create_groups_perms(type, object, participants_group):
@@ -394,6 +543,15 @@ def create_learning_results(sender, instance, created, **kwargs):
                         # Присвоение прав доступа.
                         assign_perm('view_test', participants_group, test)
                         logger.info(f"Право на просмотр теста {test} назначено группе {participants_group}.")
+
+                    if learning_task.type == 'work':
+
+                        # Забираем тест.
+                        work = learning_task.work
+
+                        # Присвоение прав доступа.
+                        assign_perm('view_work', participants_group, work)
+                        logger.info(f"Право на просмотр теста {work} назначено группе {participants_group}.")
 
                     if learning_task.type == 'course':
 
@@ -441,6 +599,14 @@ def create_learning_results(sender, instance, created, **kwargs):
                     assign_perm('view_test', participants_group, test)
                     logger.info(f"Право на просмотр теста {test} назначено группе {participants_group}.")
 
+                if learning_task.type == 'work':
+                    # Забираем тест.
+                    work = learning_task.work
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_work', participants_group, work)
+                    logger.info(f"Право на просмотр теста {work} назначено группе {participants_group}.")
+
                 if learning_task.type == 'course':
                     # Забираем курс.
                     course = learning_task.course
@@ -467,6 +633,15 @@ def create_learning_results(sender, instance, created, **kwargs):
             # Присвоение прав доступа для группы.
             assign_perm('view_test', participants_group, test)
             logger.info(f"Право на просмотр теста {test} назначено группе {participants_group}.")
+
+        # Создание прав.
+        if type == 'work':
+            # Переменная.
+            work = object
+
+            # Присвоение прав доступа для группы.
+            assign_perm('view_work', participants_group, work)
+            logger.info(f"Право на просмотр теста {work} назначено группе {participants_group}.")
 
         # Создание прав.
         if type == 'course':
@@ -518,6 +693,15 @@ def create_learning_results(sender, instance, created, **kwargs):
                         assign_perm('view_test', employee, test)
                         logger.info(f"Право на просмотр теста {test} назначено {employee}.")
 
+                    if learning_task.type == 'work':
+
+                        # Забираем тест.
+                        work = learning_task.work
+
+                        # Присвоение прав доступа.
+                        assign_perm('view_work', employee, work)
+                        logger.info(f"Право на просмотр теста {work} назначено {employee}.")
+
                     if learning_task.type == 'course':
 
                         # Забираем курс.
@@ -562,6 +746,15 @@ def create_learning_results(sender, instance, created, **kwargs):
                     assign_perm('view_test', employee, test)
                     logger.info(f"Право на просмотр теста {test} назначено {employee}.")
 
+                if learning_task.type == 'work':
+
+                    # Забираем тест.
+                    work = learning_task.work
+
+                    # Присвоение прав доступа к Material для группы.
+                    assign_perm('view_work', employee, work)
+                    logger.info(f"Право на просмотр теста {work} назначено {employee}.")
+
                 if learning_task.type == 'course':
 
                     # Забираем курс.
@@ -592,6 +785,16 @@ def create_learning_results(sender, instance, created, **kwargs):
             logger.info(f"Право на просмотр теста {test} назначено {employee}.")
 
         # Создание прав.
+        if type == 'work':
+
+            # Переменная.
+            work = object
+
+            # Присвоение прав доступа для группы.
+            assign_perm('view_work', employee, work)
+            logger.info(f"Право на просмотр теста {work} назначено {employee}.")
+
+        # Создание прав.
         if type == 'course':
 
             # Переменная.
@@ -606,7 +809,7 @@ def create_learning_results(sender, instance, created, **kwargs):
 
         # Если объект создается.
         if created:
-            logger.info(f"Обработка создания Assignment: {instance}")
+            logger.info(f"Обработка создания назначения: {instance}")
 
             # Получение переменных.
             assignment = instance
@@ -619,7 +822,8 @@ def create_learning_results(sender, instance, created, **kwargs):
                     'results',
                 )
             planned_start_date = instance.planned_start_date
-            if instance.type == 'material' or instance.type == 'test' or instance.type == 'course':
+            logger.info(f"!!!Дата начала назначения: {instance}")
+            if instance.type == 'material' or instance.type == 'test' or instance.type == 'work' or instance.type == 'course':
                 duration = instance.duration
                 planned_end_date = planned_start_date + timedelta(days=duration)
 
@@ -644,12 +848,16 @@ def create_learning_results(sender, instance, created, **kwargs):
                 test = instance.test
                 if instance.participants == 'group':
                     participants_group_name = f"Назначение теста [{instance.pk}]: {instance.test.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
+            if instance.type == 'work':
+                work = instance.work
+                if instance.participants == 'group':
+                    participants_group_name = f"Назначение теста [{instance.pk}]: {instance.work.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
             if instance.type == 'course':
                 course = instance.course
                 if instance.participants == 'group':
                     participants_group_name = f"Назначение курса [{instance.pk}]: {instance.course.name} для {group} с {planned_start_date.strftime('%d.%m.%Y')}"
 
-            # Забираем группу для отвественных и участников мероприятия.
+            # Забираем группу для участников.
             if instance.participants == 'group':
                 participants_group, _ = EmployeesGroup.objects.get_or_create(name=participants_group_name, type='assignment')
                 instance.participants_group = participants_group
@@ -785,9 +993,19 @@ def create_learning_results(sender, instance, created, **kwargs):
                                 material=material,
                                 assignment=assignment,
                                 planned_end_date=planned_end_date,
-                                type='material'
+                                type='material',
                             )
                             logger.info(f"Создан {material_result}")
+
+                            # Забираем супервизоров
+                            supervisors = get_supervisors(assignment, employee)
+                            # Добавление контролеров
+                            for supervisor in supervisors:
+                                result_supervising, _ = ResultSupervising.objects.get_or_create(
+                                    supervisor=supervisor,
+                                    result=material_result
+                                )
+                                logger.info(f"Создан контроль результата {result_supervising}")
 
                             participants_group.user_set.add(employee)
                             logger.info(f"Сотрудник {employee} добавлен в группу участников назначения")
@@ -821,6 +1039,16 @@ def create_learning_results(sender, instance, created, **kwargs):
                         type='material'
                     )
                     logger.info(f"Создан {material_result}")
+
+                    # Забираем супервизоров
+                    supervisors = get_supervisors(assignment, employee)
+                    # Добавление контролеров
+                    for supervisor in supervisors:
+                        result_supervising, _ = ResultSupervising.objects.get_or_create(
+                            supervisor=supervisor,
+                            result=material_result
+                        )
+                        logger.info(f"Создан контроль результата {result_supervising}")
 
                     # Присвоение прав доступа.
                     assign_perm('view_material', employee, material)
@@ -865,6 +1093,16 @@ def create_learning_results(sender, instance, created, **kwargs):
                             )
                             logger.info(f"Создан {test_result}")
 
+                            # Забираем супервизоров
+                            supervisors = get_supervisors(assignment, employee)
+                            # Добавление контролеров
+                            for supervisor in supervisors:
+                                result_supervising, _ = ResultSupervising.objects.get_or_create(
+                                    supervisor=supervisor,
+                                    result=test_result
+                                )
+                                logger.info(f"Создан контроль результата {result_supervising}")
+
                             participants_group.user_set.add(employee)
                             logger.info(f"Сотрудник {employee} добавлен в группу участников назначения")
 
@@ -899,9 +1137,117 @@ def create_learning_results(sender, instance, created, **kwargs):
                     )
                     logger.info(f"Создан {test_result}")
 
+                    # Забираем супервизоров
+                    supervisors = get_supervisors(assignment, employee)
+                    # Добавление контролеров
+                    for supervisor in supervisors:
+                        result_supervising, _ = ResultSupervising.objects.get_or_create(
+                            supervisor=supervisor,
+                            result=test_result
+                        )
+                        logger.info(f"Создан контроль результата {result_supervising}")
+
                     # Присвоение прав доступа.
                     assign_perm('view_test', employee, test)
                     logger.info(f"Право на просмотр теста {test} назначено {employee}.")
+
+            # Создание результатов.
+            if instance.type == 'work':
+
+                # Создание результатов группы.
+                if instance.participants == 'group':
+
+                    # Нарезка.
+                    chunk_size = 50
+                    employees_chunks = [employees[i:i + chunk_size] for i in range(0, len(employees), chunk_size)]
+
+                    # Перебор сотрудников и создание результатов.
+                    for employees_chunk in employees_chunks:
+                        for employee in employees_chunk:
+
+                            # Проверка на переназначение.
+                            if reassignment == 'not_completed' and Result.objects.filter(
+                                    employee=employee,
+                                    work=work,
+                                    status='completed'
+                            ).exists():
+                                logger.info(f"Пропускаем для {employee}: уже сдан")
+                                continue
+                            if reassignment == 'not_appoint' and Result.objects.filter(
+                                    employee=employee,
+                                    work=work
+                            ).exists():
+                                logger.info(f"Пропускаем для {employee}: уже назначен")
+                                continue
+
+                            # Создание объекта результата для задачи.
+                            work_result = Result.objects.create(
+                                employee=employee,
+                                work=work,
+                                assignment=assignment,
+                                planned_end_date=planned_end_date,
+                                type='work'
+                            )
+                            logger.info(f"Создан {work_result}")
+
+                            # Забираем супервизоров
+                            supervisors = get_supervisors(assignment, employee)
+                            # Добавление контролеров
+                            for supervisor in supervisors:
+                                result_supervising, _ = ResultSupervising.objects.get_or_create(
+                                    supervisor=supervisor,
+                                    result=work_result
+                                )
+                                logger.info(f"Создан контроль результата {result_supervising}")
+
+                            participants_group.user_set.add(employee)
+                            logger.info(f"Сотрудник {employee} добавлен в группу участников назначения")
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_work', participants_group, work)
+                    logger.info(f"Право на просмотр теста {work} назначено группе {participants_group}.")
+
+
+                # Создание результатов сотрудника.
+                if instance.participants == 'employee':
+
+                    # Проверка на переназначение.
+                    if reassignment == 'not_completed' and Result.objects.filter(
+                            employee=employee,
+                            work=work,
+                            status='completed'
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже сдан")
+                    if reassignment == 'not_appoint' and Result.objects.filter(
+                            employee=employee,
+                            work=work
+                    ).exists():
+                        logger.info(f"Пропускаем для {employee}: уже назначен")
+
+                    # Создание объекта результата для задачи.
+                    work_result = Result.objects.create(
+                        employee=employee,
+                        work=work,
+                        assignment=assignment,
+                        planned_end_date=planned_end_date,
+                        type='work'
+                    )
+                    logger.info(f"Создан {work_result}")
+
+                    # Забираем супервизоров
+                    supervisors = get_supervisors(assignment, employee)
+                    # Добавление контролеров
+                    for supervisor in supervisors:
+                        result_supervising, _ = ResultSupervising.objects.get_or_create(
+                            supervisor=supervisor,
+                            result=work_result
+                        )
+                        logger.info(f"Создан контроль результата {result_supervising}")
+
+                    # Присвоение прав доступа.
+                    assign_perm('view_work', employee, work)
+                    logger.info(f"Право на просмотр теста {work} назначено {employee}.")
+
 
             # Создание результатов.
             if instance.type == 'course':
@@ -942,6 +1288,16 @@ def create_learning_results(sender, instance, created, **kwargs):
                             )
                             logger.info(f"Создан {course_result}")
 
+                            # Забираем супервизоров
+                            supervisors = get_supervisors(assignment, employee)
+                            # Добавление контролеров
+                            for supervisor in supervisors:
+                                result_supervising, _ = ResultSupervising.objects.get_or_create(
+                                    supervisor=supervisor,
+                                    result=course_result
+                                )
+                                logger.info(f"Создан контроль результата {result_supervising}")
+
                             participants_group.user_set.add(employee)
                             logger.info(f"Сотрудник {employee} добавлен в группу участников назначения")
 
@@ -974,6 +1330,16 @@ def create_learning_results(sender, instance, created, **kwargs):
                         type='course'
                     )
                     logger.info(f"Создан {course_result}")
+
+                    # Забираем супервизоров
+                    supervisors = get_supervisors(assignment, employee)
+                    # Добавление контролеров
+                    for supervisor in supervisors:
+                        result_supervising, _ = ResultSupervising.objects.get_or_create(
+                            supervisor=supervisor,
+                            result=course_result
+                        )
+                        logger.info(f"Создан контроль результата {result_supervising}")
 
                     # Присвоение прав доступа.
                     assign_perm('view_course', employee, course)
@@ -1075,6 +1441,16 @@ def delete_assignment(sender, instance, **kwargs):
                             logger.info(f"Право на просмотр тест {test} удалено {employee}.")
 
                         # Создание результатов.
+                        if learning_task.type == 'work':
+
+                            # Забираем материал.
+                            work = learning_task.work
+
+                            # Исключение прав.
+                            remove_perm('view_work', employee, work)
+                            logger.info(f"Право на просмотр тест {work} удалено {employee}.")
+
+                        # Создание результатов.
                         if learning_task.type == 'course':
 
                             # Забираем материал.
@@ -1146,6 +1522,15 @@ def delete_assignment(sender, instance, **kwargs):
                         logger.info(f"Право на просмотр тест {test} удалено {employee}.")
 
                     # Создание результатов.
+                    if learning_task.type == 'work':
+                        # Забираем материал.
+                        work = learning_task.work
+
+                        # Исключение прав.
+                        remove_perm('view_work', employee, work)
+                        logger.info(f"Право на просмотр тест {work} удалено {employee}.")
+
+                    # Создание результатов.
                     if learning_task.type == 'course':
                         # Забираем материал.
                         course = learning_task.course
@@ -1177,6 +1562,30 @@ def delete_assignment(sender, instance, **kwargs):
                 # Исключение прав.
                 remove_perm('view_material', employee, material)
                 logger.info(f"Право на просмотр материала {material} удалено {employee}.")
+
+            if instance.type == 'work':
+
+                # Забираем объект.
+                work = instance.work
+
+                result = Result.objects.get(
+                    employee=employee,
+                    assignment=assignment,
+                    work=work,
+                    type='work'
+                )
+
+                if Result.objects.filter(
+                        employee=employee,
+                        work=work,
+                        type='work'
+                ).exclude(id=result.id).exists():
+                    logger.info(f"Пропускаем для {work}: есть другое назначение")
+                    return
+
+                # Исключение прав.
+                remove_perm('view_work', employee, work)
+                logger.info(f"Право на просмотр материала {work} удалено {employee}.")
 
             if instance.type == 'test':
 
@@ -1434,6 +1843,30 @@ def create_results_transaction(sender, instance, created, **kwargs):
                     else:
                         logger.info(f"Обновлена транзакция {transaction}")
 
+                # Если это тест.
+                if instance.type == 'work':
+
+                    # Вычисляем бонус.
+                    works_bonus = instance.work.bonus
+                    score_scaled = instance.score_scaled
+                    bonus = (works_bonus * score_scaled) / 100
+
+                    # Создаем транзакцию.
+                    transaction, created = Transaction.objects.get_or_create(
+                        type='work',
+                        employee=instance.employee,
+                        work=instance.work,
+                        bonus=bonus,
+                    )
+                    transaction.result=instance
+                    transaction.save()
+
+                    # Логи.
+                    if created:
+                        logger.info(f"Создана транзакция {transaction}")
+                    else:
+                        logger.info(f"Обновлена транзакция {transaction}")
+
             # Если мероприятие пройдено.
             if instance.status == 'present':
 
@@ -1456,6 +1889,53 @@ def create_results_transaction(sender, instance, created, **kwargs):
     # Логирование исключений, если они возникнут.
     except Exception as e:
         logger.error(f"Ошибка при обработке сигнала create_results_transaction для Result: {e}", exc_info=True)
+        # Повторный вызов исключения в режиме отладки.
+        if settings.DEBUG:
+            raise
+        else:
+            return HttpResponseServerError("Ошибка сервера, обратитесь к администратору")
+
+# Создание контроля результутов.
+@receiver(post_save, sender=ResultSupervising)
+def create_result_supervising(sender, instance, created, **kwargs):
+
+    # Проверка ошибок.
+    try:
+
+        if created:
+            # Извлекаем связанные объекты.
+            result = instance.result
+            supervisor = instance.supervisor
+
+            # Присвоение прав доступа.
+            assign_perm('view_result', supervisor, result)
+            logger.info(f"Право на просмотр резульата {result} назначено {supervisor}.")
+
+    # Логирование исключений, если они возникнут.
+    except Exception as e:
+        logger.error(f"Ошибка при обработке сигнала create_result_supervising для ResultSupervising: {e}", exc_info=True)
+        # Повторный вызов исключения в режиме отладки.
+        if settings.DEBUG:
+            raise
+        else:
+            return HttpResponseServerError("Ошибка сервера, обратитесь к администратору")
+
+# Удаление контроля результутов.
+@receiver(post_delete, sender=ResultSupervising)
+def delete_result_supervising(sender, instance, **kwargs):
+    # Проверка ошибок.
+    try:
+        # Извлекаем связанные объекты.
+        result = instance.result
+        supervisor = instance.supervisor
+
+        # Удаление прав доступа.
+        remove_perm('view_result', supervisor, result)
+        logger.info(f"Право на просмотр результата {result} удалено у {supervisor}.")
+
+    # Логирование исключений, если они возникнут.
+    except Exception as e:
+        logger.error(f"Ошибка при обработке сигнала delete_result_supervising для ResultSupervising: {e}", exc_info=True)
         # Повторный вызов исключения в режиме отладки.
         if settings.DEBUG:
             raise

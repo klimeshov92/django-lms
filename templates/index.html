@@ -78,6 +78,14 @@
             <a href="{% url 'testing:tests' %}">Тесты ({{active_tests_count}})</a>
         {% endif %}
 
+        {% if user|perms:"works.view_work" %}
+            <a href="{% url 'works:works' %}">Работы ({{active_works_count}})</a>
+        {% endif %}
+
+        {% if user|perms:"learning_path.view_result" %}
+            <a href="{% url 'works:results_supervising' %}">Работы на проверке ({{active_supervising_results_count}})</a>
+        {% endif %}
+
         {% if user|perms:"testing.view_question" %}
             <a href="{% url 'testing:questions' %}">Вопросы</a>
         {% endif %}

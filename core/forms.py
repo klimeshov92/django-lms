@@ -11,6 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from materials.models import Material, File
 from courses.models import Course
 from testing.models import Test
+from works.models import Work
 from events.models import Event
 from learning_path.models import LearningPath
 from django.contrib.auth.forms import UserCreationForm
@@ -333,6 +334,9 @@ class EmployeesGroupObjectPermissionForm(forms.ModelForm):
         if type == 'course':
             content_type = ContentType.objects.get_for_model(Course)
             self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
+        if type == 'work':
+            content_type = ContentType.objects.get_for_model(Work)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'test':
             content_type = ContentType.objects.get_for_model(Test)
             self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
@@ -387,6 +391,9 @@ class EmployeesObjectPermissionForm(forms.ModelForm):
             self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'test':
             content_type = ContentType.objects.get_for_model(Test)
+            self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
+        if type == 'work':
+            content_type = ContentType.objects.get_for_model(Work)
             self.fields['permission'].queryset = Permission.objects.filter(content_type_id=content_type.id).exclude(codename__startswith='add_')
         if type == 'event':
             content_type = ContentType.objects.get_for_model(Event)

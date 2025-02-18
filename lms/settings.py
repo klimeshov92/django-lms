@@ -103,6 +103,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_api_key',
     # Подключаем курсы.
+    'works.apps.WorksConfig',
+    # Подключаем работы.
     'courses.apps.CoursesConfig',
     # Подключаем мероприятия.
     'events.apps.EventsConfig',

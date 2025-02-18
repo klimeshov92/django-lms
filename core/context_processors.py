@@ -29,6 +29,12 @@ def context_processor(request):
         employee=request.user
     ).order_by('-id').values('id')[:1]
 
+    latest_works_results = request.user.results.filter(
+        work=OuterRef('work'),
+        type='work',
+        employee=request.user
+    ).order_by('-id').values('id')[:1]
+
     latest_courses_results = request.user.results.filter(
         course=OuterRef('course'),
         type='course',
@@ -54,6 +60,10 @@ def context_processor(request):
     employees_tests_results = request.user.results.filter(
         id__in=Subquery(latest_tests_results)
     ).prefetch_related('test')
+
+    employees_works_results = request.user.results.filter(
+        id__in=Subquery(latest_works_results)
+    ).prefetch_related('works')
 
     employees_courses_results = request.user.results.filter(
         id__in=Subquery(latest_courses_results)
@@ -89,6 +99,26 @@ def context_processor(request):
     ).count()
     active_tests_count = appointed_tests_count + tests_in_progress_count
 
+    appointed_works_count = employees_works_results.filter(
+        status='appointed',
+    ).count()
+    works_in_progress_count = employees_works_results.filter(
+        status='in_progress',
+    ).count()
+    active_works_count = appointed_works_count + works_in_progress_count
+
+    works_supervising = request.user.supervisors.all()
+    # Получаем все записи ResultSupervising, где текущий пользователь является супервизором
+    works_supervising = request.user.supervisors.all()
+
+    # Извлекаем результаты с условием
+    supervising_results = [
+        supervising.result for supervising in works_supervising
+        if supervising.result.status == 'on_review'
+    ]
+    active_supervising_results_count = len(supervising_results)
+
+
     appointed_courses_count = employees_courses_results.filter(
         status='appointed',
     ).count()
@@ -110,6 +140,8 @@ def context_processor(request):
         'active_paths_count': active_paths_count,
         'active_materials_count': active_materials_count,
         'active_tests_count': active_tests_count,
+        'active_works_count': active_works_count,
+        'active_supervising_results_count': active_supervising_results_count,
         'active_courses_count': active_courses_count,
         'active_events_count': active_events_count,
         # Другие переменные.

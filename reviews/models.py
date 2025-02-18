@@ -7,6 +7,7 @@ from core.models import Employee
 from learning_path.models import LearningPath
 from materials.models import Material
 from testing.models import Test
+from works.models import Work
 from courses.models import Course
 from events.models import Event
 
@@ -90,6 +91,15 @@ class Review(models.Model):
         related_name='reviews',
         related_query_name='reviews',
     )
+    work = models.ForeignKey(
+        Work,
+        verbose_name='Работа',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        related_query_name='reviews',
+    )
     event = models.ForeignKey(
         Event,
         verbose_name='Мероприятие',
@@ -117,6 +127,7 @@ class Review(models.Model):
             ('material', 'Материал'),
             ('course', 'Курс'),
             ('test', 'Тест'),
+            ('work', 'Работа'),
             ('event', 'Мероприятие'),
         ]
         if self.type == 'learning_path':
@@ -131,6 +142,9 @@ class Review(models.Model):
         elif self.type == 'test':
             object = self.test
             str = 'Тест'
+        elif self.type == 'work':
+            object = self.work
+            str = 'Работа'
         elif self.type == 'event':
             object = self.event
             str = 'Мероприятие'

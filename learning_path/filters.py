@@ -200,6 +200,7 @@ class ResultFilter(FilterSet):
         choices=[
             ('appointed', 'Назначено'),
             ('in_progress', 'В процессе'),
+            ('on_review', 'На проверке'),
             ('completed', 'Пройдено'),
             ('failed', 'Провалено'),
             ('registered', 'Зарегистрирован'),

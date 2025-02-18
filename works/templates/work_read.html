@@ -1,0 +1,162 @@
+{# Подключение index #}
+{% extends 'index.html' %}
+
+{# Подключение кастомных тегов #}
+{% load custom_tags %}
+{% load guardian_tags %}
+
+{# Подключение заголовка #}
+{% block title %}
+Просмотр работы
+{% endblock title %}
+
+{# Подключение контента #}
+{% block content %}
+
+{# Вывод элемента #}
+<div class="work-container-header">
+
+    <div class="content-type-div">
+        <span class="content-type-basic">Просмотр работы</span>
+    </div>
+
+    {% if object %}
+
+        <div class="h1-center">
+            <h1>{{object.name}}</h1>
+        </div>
+
+</div>
+
+<div class="work-container">
+
+        <div class="material">
+            <div class="material-content">
+                <p>{{object.manual|safe}}</p>
+            </div>
+        </div>
+
+    {% else %}
+
+        {# Вывод сообщения, если элемента нет #}
+        <div class="not-found">
+            <p>Инструкция не найдена!</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+<div class="work-container-header">
+
+    {% if result.executor_report|striptags|slice:":1" %}
+
+        <div class="h1-center">
+            <h2>Отчет | {{result.executor_report_date}}</h2>
+        </div>
+
+</div>
+
+<div class="work-container">
+
+        <div class="material">
+            <div class="material-content">
+                <p><span class="description-item">Выполнил:</span> {{result.employee}}</p>
+                <p><span class="description-item">Текущий статус:</span> {{result.get_status_display}}</p>
+                <p><span class="description-item">Текущая оценка (%):</span> {{result.score_scaled}}</p>
+                <p>{{result.executor_report|safe}}</p>
+            </div>
+        </div>
+
+    {% else %}
+
+        {# Вывод сообщения, если элемента нет #}
+        <div class="not-found">
+            <p>Ответ не найден!</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{# Вывод элементов #}
+{% if result.reviews %}
+    {# Перебор элементов #}
+        {% for review in result.reviews.all %}
+            <div class="work-container-header">
+
+                {% if result.executor_report|striptags|slice:":1" %}
+
+                    <div class="h1-center">
+                        <h2>Проверка | {{review.changed}} </h2>
+                    </div>
+
+            </div>
+
+            <div class="work-container">
+
+                    <div class="material">
+                        <div class="material-content">
+                            <p><span class="description-item">Проверил:</span> {{review.reviewer}}</p>
+                            <p><span class="description-item">Статус:</span> {{review.get_status_display}}</p>
+                            <p><span class="description-item">Оценка (%):</span> {{review.score_scaled}}</p>
+                            <p>{{review.reviewer_report|safe}}</p>
+                            <div class="submenu-mini submenu-mini-end">
+                            {% if user_is_supervisor %}
+                                <a href="{% url 'works:work_review_update' pk=review.id %}">Изменить оценку</a>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                {% else %}
+
+                    {# Вывод сообщения, если элемента нет #}
+                    <div class="not-found">
+                        <p>Ответ не найден!</p>
+                    </div>
+
+                {% endif %}
+
+            </div>
+        {% endfor %}
+{% else %}
+    {# Вывод сообщения, если элементов нет #}
+        <div class="not-found">
+            <p>Проверки не найдены!</p>
+        </div>
+{% endif %}
+
+<div class="work-container-footer">
+
+    {% if result %}
+
+        <div class="submenu-container">
+            <nav class="submenu">
+                {% if user_is_executor and result.status == 'in_progress' or not result.work.require_review %}
+                    <a href="{% url 'works:executor_report_update' pk=result.id %}">Написать ответ</a>
+                {% endif %}
+                {% if user_is_supervisor %}
+                    <a href="{% url 'works:work_review_create' pk=result.id %}">Оценить ответ</a>
+                {% endif %}
+                <a href="{{ previous_page_l0 }}">Назад</a>
+            </nav>
+        </div>
+
+    {% else %}
+
+        <div class="submenu-container">
+            <nav class="submenu">
+                <a href="{{ previous_page_l0 }}">Назад</a>
+            </nav>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{# Увеличение изображений #}
+{% load static %}
+<script src="{% static 'js/show_img.js' %}"></script>
+
+{% endblock content %}

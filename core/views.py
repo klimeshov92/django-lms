@@ -36,6 +36,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from materials.models import Material, File
 from courses.models import Course
 from testing.models import Test
+from works.models import Work
 from events.models import Event
 from learning_path.models import Result
 from django.contrib.contenttypes.models import ContentType
@@ -2008,6 +2009,8 @@ class EmployeesGroupObjectPermissionCreateView(LoginRequiredMixin, GPermissionRe
             content_type = ContentType.objects.get_for_model(Course)
         elif self.kwargs.get('type') == 'test':
             content_type = ContentType.objects.get_for_model(Test)
+        elif self.kwargs.get('type') == 'work':
+            content_type = ContentType.objects.get_for_model(Work)
         elif self.kwargs.get('type') == 'event':
             content_type = ContentType.objects.get_for_model(Event)
         initial["content_type"] = content_type
@@ -2026,6 +2029,8 @@ class EmployeesGroupObjectPermissionCreateView(LoginRequiredMixin, GPermissionRe
             return reverse('courses:course', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'test':
             return reverse('testing:test', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'work':
+            return reverse('works:work', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'event':
             return reverse('events:event', kwargs={'pk': self.kwargs.get('pk')})
 
@@ -2053,6 +2058,8 @@ class EmployeesGroupObjectPermissionDeleteView(LoginRequiredMixin, PermissionReq
             return reverse('courses:course', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'test':
             return reverse('testing:test', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'work':
+            return reverse('works:work', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'event':
             return reverse('events:event', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'group':
@@ -2090,6 +2097,8 @@ class EmployeesObjectPermissionCreateView(LoginRequiredMixin, GPermissionRequire
             content_type = ContentType.objects.get_for_model(Course)
         elif self.kwargs.get('type') == 'test':
             content_type = ContentType.objects.get_for_model(Test)
+        elif self.kwargs.get('type') == 'work':
+            content_type = ContentType.objects.get_for_model(Work)
         elif self.kwargs.get('type') == 'event':
             content_type = ContentType.objects.get_for_model(Event)
         initial["content_type"] = content_type
@@ -2108,6 +2117,8 @@ class EmployeesObjectPermissionCreateView(LoginRequiredMixin, GPermissionRequire
             return reverse('courses:course', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'test':
             return reverse('testing:test', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'work':
+            return reverse('works:work', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'event':
             return reverse('events:event', kwargs={'pk': self.kwargs.get('pk')})
 
@@ -2135,6 +2146,8 @@ class EmployeesObjectPermissionDeleteView(LoginRequiredMixin, PermissionRequired
             return reverse('courses:course', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'test':
             return reverse('testing:test', kwargs={'pk': self.kwargs.get('pk')})
+        elif self.kwargs.get('type') == 'work':
+            return reverse('works:work', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'event':
             return reverse('events:event', kwargs={'pk': self.kwargs.get('pk')})
         elif self.kwargs.get('type') == 'employee':

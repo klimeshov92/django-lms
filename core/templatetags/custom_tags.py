@@ -41,6 +41,7 @@ def status_display(value):
     status_dict = {
         'appointed': 'Назначено',
         'in_progress': 'В процессe',
+        'on_review': 'На проверке',
         'completed': 'Пройдено',
         'failed': 'Провалено',
         'registered': 'Зарегистрирован',

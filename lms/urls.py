@@ -58,6 +58,8 @@ urlpatterns = [
     path('tests/', include('testing.urls')),
     # Для курсов.
     path('courses/', include('courses.urls')),
+    # Для работ.
+    path('works/', include('works.urls')),
     # Для мероприятий.
     path('events/', include('events.urls')),
     # Для рассылок.
