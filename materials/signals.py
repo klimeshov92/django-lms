@@ -46,18 +46,19 @@ def add_nodownload_to_all_videos(sender, instance, **kwargs):
 @receiver(pre_save, sender=Material)
 def wrap_tables(sender, instance, **kwargs):
     try:
-        # Парсинг содержимого экземпляра.
-        soup = BeautifulSoup(instance.content, "html.parser")
-        # Поиск всех таблиц.
-        tables = soup.find_all('table')
-        if tables:
-            for table in tables:
-                # Оборачивание таблицы в див, если она не обёрнута.
-                if 'material-content-table-responsive' not in table.parent.get('class', []):
-                    new_div = soup.new_tag("div", **{'class': 'material-content-table-responsive'})
-                    table.wrap(new_div)
-            # Обновление содержимого экземпляра.
-            instance.content = str(soup)
+        if instance.content:
+            # Парсинг содержимого экземпляра.
+            soup = BeautifulSoup(instance.content, "html.parser")
+            # Поиск всех таблиц.
+            tables = soup.find_all('table')
+            if tables:
+                for table in tables:
+                    # Оборачивание таблицы в див, если она не обёрнута.
+                    if 'material-content-table-responsive' not in table.parent.get('class', []):
+                        new_div = soup.new_tag("div", **{'class': 'material-content-table-responsive'})
+                        table.wrap(new_div)
+                # Обновление содержимого экземпляра.
+                instance.content = str(soup)
     except Exception as e:
         # Логирование ошибки.
         logger.error(f"Ошибка при оборачивании таблиц: {e}", exc_info=True)

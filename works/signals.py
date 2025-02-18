@@ -49,18 +49,19 @@ def wrap_tables_result(sender, instance, **kwargs):
 @receiver(pre_save, sender=WorkReview)
 def wrap_tables_work_review(sender, instance, **kwargs):
     try:
-        # Парсинг содержимого экземпляра.
-        soup = BeautifulSoup(instance.reviewer_report, "html.parser")
-        # Поиск всех таблиц.
-        tables = soup.find_all('table')
-        if tables:
-            for table in tables:
-                # Оборачивание таблицы в див, если она не обёрнута.
-                if 'material-content-table-responsive' not in table.parent.get('class', []):
-                    new_div = soup.new_tag("div", **{'class': 'material-content-table-responsive'})
-                    table.wrap(new_div)
-            # Обновление содержимого экземпляра.
-            instance.reviewer_report = str(soup)
+        if instance.reviewer_report:
+            # Парсинг содержимого экземпляра.
+            soup = BeautifulSoup(instance.reviewer_report, "html.parser")
+            # Поиск всех таблиц.
+            tables = soup.find_all('table')
+            if tables:
+                for table in tables:
+                    # Оборачивание таблицы в див, если она не обёрнута.
+                    if 'material-content-table-responsive' not in table.parent.get('class', []):
+                        new_div = soup.new_tag("div", **{'class': 'material-content-table-responsive'})
+                        table.wrap(new_div)
+                # Обновление содержимого экземпляра.
+                instance.reviewer_report = str(soup)
     except Exception as e:
         # Логирование ошибки.
         logger.error(f"Ошибка при оборачивании таблиц: {e}", exc_info=True)
