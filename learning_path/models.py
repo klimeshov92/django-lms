@@ -828,7 +828,7 @@ class WorkReview(models.Model):
         on_delete = models.CASCADE
     )
     # %.
-    score_scaled = models.IntegerField(verbose_name='Полученный бал в %', default=0)
+    score_scaled = models.IntegerField(verbose_name='Полученный балл в %', default=0)
     # Статус.
     STATUSES = [
         ('in_progress', 'В процессе'),

@@ -8,6 +8,8 @@ from django_select2.forms import Select2MultipleWidget, Select2Widget
 from .models import EmployeeExcelImport, Category, EmployeesGroup, Employee, Organization, Subdivision, Position
 from django.db.models import Count
 from django.contrib.contenttypes.models import ContentType
+from django_filters import CharFilter
+from django.forms import TextInput
 
 # Фильтрация импортов.
 class EmployeeExcelImportFilter(FilterSet):
@@ -81,11 +83,10 @@ class EmployeeFilter(FilterSet):
         widget=Select2MultipleWidget()
     )
     # Фильтрация по фамилии.
-    last_name = ModelMultipleChoiceFilter(
-        queryset=Employee.objects.all(),
-        to_field_name='last_name',
+    last_name = CharFilter(
+        field_name='last_name',
         lookup_expr='icontains',
-        widget=Select2MultipleWidget()
+        widget=TextInput()
     )
 
 # Фильтрация сотрудников.

@@ -2359,8 +2359,32 @@ def activate(request, uidb64, token):
         if not next_url or not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
             next_url = 'home'
         return redirect(next_url)
+
+    # Или заново отправляем письмо с кодом и говорим об этом.
     else:
-        # рендерим страницу, уведомляющую о недействительной ссылке активации
+
+        # Получаем текущий сайт (домен).
+        current_site = get_current_site(request)
+        # Тема письма.
+        mail_subject = 'Активируйте ваш аккаунт.'
+
+        # Генерируем текст письма на основе шаблона.
+        message = render_to_string('registration/account_activation_email.html', {
+            'user': user,
+            'domain': current_site.domain,
+            'protocol': 'https' if request.is_secure() else 'http',  # Определяем протокол.
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),  # Кодируем UID пользователя.
+            'token': default_token_generator.make_token(user),  # Создаем токен для активации.
+        })
+        # Получаем email пользователя из формы.
+        to_email = user.email
+        # Создаем объект email-сообщения.
+        email = EmailMessage(mail_subject, message, to=[to_email])
+        try:
+            email.send()
+            logger.debug(f"Email sent to {to_email}")
+        except Exception as e:
+            logger.error(f"Error sending email: {e}")
         return render(request, 'registration/activation_invalid.html')
 
 # Объект контактов.
