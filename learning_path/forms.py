@@ -196,6 +196,8 @@ class AssignmentForm(forms.ModelForm):
             self.fields['employee'].widget = forms.HiddenInput()
             self.fields['planned_start_date'].widget = forms.HiddenInput()
             self.fields['reassignment'].widget = forms.HiddenInput()
+            self.fields['manager_supervising'].widget = forms.HiddenInput()
+            self.fields['supervisors_group'].widget = forms.HiddenInput()
 
 # Форма создания назначения.
 class AssignmentRepeatForm(forms.ModelForm):

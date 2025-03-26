@@ -1364,101 +1364,103 @@ def delete_assignment(sender, instance, **kwargs):
         if instance.participants == 'group':
 
             # Удаляем связанные группы.
-            instance.participants_group.delete()
-            logger.info(f"Удаляется связанная с обучением {instance} группа {instance.participants_group}.")
+            if instance.participants_group:
+                instance.participants_group.delete()
+                logger.info(f"Удаляется связанная с обучением {instance} группа {instance.participants_group}.")
 
         if instance.participants == 'employee':
 
             # Получение переменных.
-            assignment = instance
-            employee = instance.employee
+            if instance.employee:
+                assignment = instance
+                employee = instance.employee
 
-            # Если это комплексная программа.
-            if instance.type == 'learning_complex':
+                # Если это комплексная программа.
+                if instance.type == 'learning_complex':
 
-                # Забираем объект.
-                learning_complex=instance.learning_complex
+                    # Забираем объект.
+                    learning_complex=instance.learning_complex
 
-                # Убираем рпава доступа.
-                for learning_path in learning_complex.learning_complex_paths.all():
-
-                    result = Result.objects.get(
-                        employee=employee,
-                        assignment=assignment,
-                        learning_path=learning_path,
-                        type='learning_path'
-                    )
-
-                    if Result.objects.filter(
-                            employee=employee,
-                            learning_path=learning_path,
-                            type='learning_path'
-                    ).exclude(id=result.id).exists():
-                        logger.info(f"Пропускаем для {learning_path}: есть другое назначение")
-                        continue
-
-                    # Исключение прав.
-                    remove_perm('view_learningpath', employee, learning_path)
-                    logger.info(f"Право на просмотр траектории обучения {learning_path} удалено {employee}.")
-
-                    for learning_task in learning_path.learning_tasks.all():
+                    # Убираем рпава доступа.
+                    for learning_path in learning_complex.learning_complex_paths.all():
 
                         result = Result.objects.get(
                             employee=employee,
                             assignment=assignment,
-                            learning_task=learning_task,
+                            learning_path=learning_path,
+                            type='learning_path'
                         )
 
                         if Result.objects.filter(
                                 employee=employee,
-                                learning_task=learning_task,
+                                learning_path=learning_path,
+                                type='learning_path'
                         ).exclude(id=result.id).exists():
-                            logger.info(f"Пропускаем для {learning_task}: есть другое назначение")
+                            logger.info(f"Пропускаем для {learning_path}: есть другое назначение")
                             continue
 
                         # Исключение прав.
-                        remove_perm('view_learningtask', employee, learning_task)
-                        logger.info(f"Право на просмотр материал {learning_task} удалено {employee}.")
+                        remove_perm('view_learningpath', employee, learning_path)
+                        logger.info(f"Право на просмотр траектории обучения {learning_path} удалено {employee}.")
 
-                        # Создание результатов.
-                        if learning_task.type == 'material':
+                        for learning_task in learning_path.learning_tasks.all():
 
-                            # Забираем материал.
-                            material = learning_task.material
+                            result = Result.objects.get(
+                                employee=employee,
+                                assignment=assignment,
+                                learning_task=learning_task,
+                            )
 
-                            # Исключение прав.
-                            remove_perm('view_material', employee, material)
-                            logger.info(f"Право на просмотр материал {material} удалено {employee}.")
-
-                        # Создание результатов.
-                        if learning_task.type == 'test':
-
-                            # Забираем материал.
-                            test = learning_task.test
-
-                            # Исключение прав.
-                            remove_perm('view_test', employee, test)
-                            logger.info(f"Право на просмотр тест {test} удалено {employee}.")
-
-                        # Создание результатов.
-                        if learning_task.type == 'work':
-
-                            # Забираем материал.
-                            work = learning_task.work
+                            if Result.objects.filter(
+                                    employee=employee,
+                                    learning_task=learning_task,
+                            ).exclude(id=result.id).exists():
+                                logger.info(f"Пропускаем для {learning_task}: есть другое назначение")
+                                continue
 
                             # Исключение прав.
-                            remove_perm('view_work', employee, work)
-                            logger.info(f"Право на просмотр тест {work} удалено {employee}.")
+                            remove_perm('view_learningtask', employee, learning_task)
+                            logger.info(f"Право на просмотр материал {learning_task} удалено {employee}.")
 
-                        # Создание результатов.
-                        if learning_task.type == 'course':
+                            # Создание результатов.
+                            if learning_task.type == 'material':
 
-                            # Забираем материал.
-                            course = learning_task.course
+                                # Забираем материал.
+                                material = learning_task.material
 
-                            # Исключение прав.
-                            remove_perm('view_course', employee, course)
-                            logger.info(f"Право на просмотр курс {course} удалено {employee}.")
+                                # Исключение прав.
+                                remove_perm('view_material', employee, material)
+                                logger.info(f"Право на просмотр материал {material} удалено {employee}.")
+
+                            # Создание результатов.
+                            if learning_task.type == 'test':
+
+                                # Забираем материал.
+                                test = learning_task.test
+
+                                # Исключение прав.
+                                remove_perm('view_test', employee, test)
+                                logger.info(f"Право на просмотр тест {test} удалено {employee}.")
+
+                            # Создание результатов.
+                            if learning_task.type == 'work':
+
+                                # Забираем материал.
+                                work = learning_task.work
+
+                                # Исключение прав.
+                                remove_perm('view_work', employee, work)
+                                logger.info(f"Право на просмотр тест {work} удалено {employee}.")
+
+                            # Создание результатов.
+                            if learning_task.type == 'course':
+
+                                # Забираем материал.
+                                course = learning_task.course
+
+                                # Исключение прав.
+                                remove_perm('view_course', employee, course)
+                                logger.info(f"Право на просмотр курс {course} удалено {employee}.")
 
             if instance.type == 'learning_path':
 
@@ -1895,7 +1897,7 @@ def create_results_transaction(sender, instance, created, **kwargs):
         else:
             return HttpResponseServerError("Ошибка сервера, обратитесь к администратору")
 
-# Создание контроля результутов.
+# Создание контроля результатов.
 @receiver(post_save, sender=ResultSupervising)
 def create_result_supervising(sender, instance, created, **kwargs):
 
