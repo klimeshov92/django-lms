@@ -248,14 +248,14 @@ class GroupsGenerator(models.Model):
         verbose_name='Отработано от (дней)',
         null=True,
         blank=True,
-        default=0,
+        default=None,
         validators=[MinValueValidator(0)]
     )
     days_worked_lte = models.IntegerField(
         verbose_name='Отработано до (дней)',
         null=True,
         blank=True,
-        default=90,
+        default=None,
         validators=[MinValueValidator(0)]
     )
     # Обновлять автоматически.
