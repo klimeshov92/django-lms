@@ -16,6 +16,8 @@ from events.models import Event
 from learning_path.models import LearningPath
 from django.contrib.auth.forms import UserCreationForm
 from ckeditor.widgets import CKEditorWidget
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
 
 # Форма сотрудника.
@@ -402,6 +404,7 @@ class EmployeesObjectPermissionForm(forms.ModelForm):
 
 # Регистрация.
 class SignUpForm(UserCreationForm):
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
     agree_to_privacy_policy = forms.BooleanField(
         required=True,
         label=mark_safe('Я согласен с <a href="/core/privacy_policy/" target="_blank">политикой конфиденциальности</a>')
@@ -425,7 +428,8 @@ class SignUpForm(UserCreationForm):
             'password2',
             'agree_to_privacy_policy',
             'agree_to_data_processing',
-            'self_registration'
+            'self_registration',
+            'captcha'
         )
         # Классы виджетов.
         widgets = {

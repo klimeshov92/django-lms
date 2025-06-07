@@ -14,9 +14,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 BASE_URL = 'http://127.0.0.1:8000'
 
 from pathlib import Path
-# импорт ОС для указания различных путей и dotenv .
 import os
-# dotenv
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -62,7 +60,12 @@ CSP_FRAME_ANCESTORS = ("*",)
 # Разрешаем загружать фреймы с любых источников.
 CSP_FRAME_SRC = ("*",)
 # Разрешаем загружать скрипты только из основных источников.
-CSP_SCRIPT_SRC = ("'self'", "cdnjs.cloudflare.com")
+CSP_SCRIPT_SRC = (
+    "'self'",
+    "cdnjs.cloudflare.com",
+    "www.google.com",
+    "www.gstatic.com"
+)
 # Разрешаем загружать стили из любых источников.
 CSP_STYLE_SRC = ("*",)
 # Разрешаем загружать изображения из любых источников.
@@ -120,6 +123,8 @@ INSTALLED_APPS = [
     'debug_toolbar',
     # Защита контента.
     'csp',
+    # Капча.
+    'django_recaptcha',
 ]
 
 MIDDLEWARE = [
@@ -269,6 +274,10 @@ GUARDIAN_GROUP_OBJ_PERMS_MODEL = 'core.EmployeesGroupObjectPermission'
 GUARDIAN_USER_OBJ_PERMS_MODEL = 'core.EmployeesObjectPermission'
 ANONYMOUS_USER_ID = -1
 
+# Капча.
+RECAPTCHA_PUBLIC_KEY = '6LfCu1grAAAAAOloYPsza8SoWKDWi9fnFUozXGmV'
+RECAPTCHA_PRIVATE_KEY = '6LfCu1grAAAAAK0agpbreGj7kgZPG33yMOQt7nSq'
+#RECAPTCHA_TESTING = True
 
 LOGGING = {
     # Версия конфигурации логирования. 1 — это единственное допустимое значение.
@@ -290,20 +299,28 @@ LOGGING = {
 
     # Определение обработчиков сообщений лога
     'handlers': {
-        # Определение обработчика с именем 'file'
+        # Определение обработчика с именем 'file'.
         'file': {
-            # Минимальный уровень логирования
+            # Минимальный уровень логирования.
             'level': 'DEBUG',
-            # Класс обработчика, записывающего сообщения в файл
-            'class': 'logging.handlers.RotatingFileHandler',
-            # Путь к файлу логов
+            # Класс обработчика, записывающего сообщения в файл.
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            # Путь к файлу логов.
             'filename': 'debug.log',
-            # Размер файла в байтах, после которого будет происходить ротация
-            'maxBytes': 50 * 1024 * 1024,
-            # Количество файлов бэкапа логов
-            'backupCount': 5,
-            # Используемый форматтер
+            # Ротация раз в сутки.
+            'when': 'midnight',
+            # Интервал ротации (1 день).
+            'interval': 1,
+            # Хранить логи за последнюю неделю.
+            'backupCount': 7,
+            # Используемый форматер.
             'formatter': 'verbose',
+            # Используемая кодировка.
+            'encoding': 'utf-8',
+            # Гарантируем, что ротация идёт по UTC-времени.
+            'utc': True,
+            # Откладывает открытие файла до первой записи
+            'delay': True,
         },
         # Определение обработчика с именем 'console'
         'console': {
